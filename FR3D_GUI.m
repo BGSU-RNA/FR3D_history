@@ -1,5 +1,7 @@
 % FR3D_GUI is the graphical user interface to FR3D, Find RNA 3D
 
+% 33(9),36(9),37:39(9),43:47(9)
+
 %<div class="moz-text-flowed" style="font-family: -moz-fixed">
 function varargout = FR3D_GUI(varargin)   %By Ali Mokdad - March 2006
 
@@ -140,43 +142,66 @@ function QueryNTs_Callback(hObject, eventdata, handles)
 % ------------------------------- Executes on button press in ReadQuery
 
 function ReadQuery_Callback(hObject, eventdata, handles)
-%%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
+
+  %%%Read Query PDB File or just use the one in memory if it is present and same as the new Query PDB
+  x=get(handles.QueryPDB,'Value');
+  s=get(handles.QueryPDB,'String');
+  Query.Filename = s{x};
+  set(handles.Status,'String','Reading query PDB, please wait ...');
+  drawnow
+  %%handles.File.Filename 
+
+  if isfield(handles,'File')
+    File = handles.File;
+    [File,QIndex]=zAddNTData(Query.Filename,2,File);
+  else
+    [File,QIndex]=zAddNTData(Query.Filename,2);
+  end
+
+  %%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
+
+  Indices = zIndexLookup(File(QIndex),get(handles.QueryNTs,'String'));
+
+  for i=1:length(Indices),
+    Query.NTList{i} = File(QIndex).NT(Indices(i)).Number;
+  end
+
+% This is in the middle of being altered, and needs to be finished!
 
 NTs = [',' get(handles.QueryNTs,'String') ',']; % pad with commas; useful below
-NTs = regexprep(NTs,'A|C|G|U','');      % strip out base letters if present
-NTs = regexprep(NTs,';| ',',');
-while strfind(NTs,',,'),
-  NTs = regexprep(NTs,',,',',');
-end
-ind=findstr(',',NTs);
+ind=findstr(',',NTs);                   % locations of commas, for parsing
 for i=1:length(ind)-1
-    NT{i}=NTs(ind(i)+1:ind(i+1)-1);        % read nucleotide numbers
+  NT{i}=NTs(ind(i)+1:ind(i+1)-1);       % extract nucleotide numbers
 end
-Query.NTList=NT;
+
+
+Query.NTList=NT;                        % cell array of nucleotide numbers
+
+
 %%%End DetermineQuery.NTList
 
 if length(NT)<=12 %this is a limitation by the size of the GUI
-    %%%Read Query PDB File or just use the one in memory if it is present and same as the new Query PDB
-    x=get(handles.QueryPDB,'Value');
-    s=get(handles.QueryPDB,'String');
-    Query.Filename = s{x};
-    set(handles.Status,'String','Reading query PDB, please wait ...');
-    drawnow
-    %%handles.File.Filename 
-
-    if isfield(handles,'File')
-        File = handles.File;
-        [File,QIndex]=zAddNTData(Query.Filename,2,File);
-    else
-        [File,QIndex]=zAddNTData(Query.Filename,2);
-    end
     %%%
 
     %     mCreateDynamicGUI 
     % Creates all dynamic popum menus and edit boxes and hides extra ones 
     % from previous searches
 
-    mCreateChains                        % find chains for these nucleotides
+    % Create popupmenus (and delete extra ones) for determining Query.ChainPopup
+
+    for i=1:12
+      h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+      delete(h);
+    end
+
+
+
+    for i=1:length(NT)
+      [a,b,Ch] = zIndexLookup(File(QIndex),NT(i));
+      handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.795) .054 .04],'String',Ch,'Background',[1 1 1]);
+    end
+    set(handles.QueryChains,'Visible','on')
+                             % this is the text just to the left of the popups
 
     %Pass some variables created here to be used by other functions
     handles.NT=NT;

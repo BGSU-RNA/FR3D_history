@@ -2,11 +2,10 @@
 
 % defaults:
 % Query.Geometric = 1 if Query.Filename and Query.NTList are defined
-% Query.Geometric = 0 if not; in that case, Query.Mask, Query.ReqInter, or
+% Query.Geometric = 0 if not; in that case, Query.Mask, Query.Edges, or
 %      Query.MaxDiff need to be defined, or there is no focus for the search
 % Query.ExcludeOverlap = 1 if there are 7 or more nucleotides
 % Query.Mask is "NNNNN..."
-% Query.ReqInter is empty
 % Query.Sequential is 1 if Query.MaxDiff is non-empty
 % Query.MaxDiff is [Inf Inf ...] by default
 % Query.LocWeight is [1 1 1 1...]
@@ -38,10 +37,6 @@ end
 
 if Query.Geometric == 0,
   m = 0;
-  if isfield(Query,'ReqInter'),
-    [s,t] = size(Query.ReqInter);
-    m = max([m s t]);               % number of nucleotides
-  end
   if isfield(Query,'Edges'),
     [s,t] = size(Query.Edges);
     m = max([m s t]);               % number of nucleotides
@@ -147,7 +142,6 @@ if Query.Geometric == 1,                    % model comes from a file
     Query.NT(i) = File.NT(Query.Indices(i));
   end
 
-  Query.Inter = File.Inter(Query.Indices,Query.Indices);
   Query.Edge  = File.Edge(Query.Indices,Query.Indices);
 end
 
@@ -198,28 +192,6 @@ end
 if ~isfield(Query,'OKCodes'),
   for i=1:Query.NumNT,
     Query.OKCodes{i} = [1 1 1 1];
-  end
-end
-
-% --------- Make interaction matrix symmetric
-
-if isfield(Query,'ReqInter'),
-  Query.ReqInter{Query.NumNT,Query.NumNT} = 0;
-  for i=1:Query.NumNT,
-    for j=(i+1):Query.NumNT,
-      if ~isempty(Query.ReqInter{j,i}),
-        Query.ReqInter{i,j} = Query.ReqInter{j,i};
-      elseif ~isempty(Query.ReqInter{i,j}),
-        Query.ReqInter{j,i} = Query.ReqInter{i,j};
-      else
-        Query.ReqInter{i,j} = [];
-        Query.ReqInter{j,i} = [];
-      end
-      if length(Query.ReqInter{i,j}) > 0,
-        Query.ReqInter{i,j} = Query.ReqInter{i,j}(find(Query.ReqInter{i,j}));
-        Query.ReqInter{j,i} = Query.ReqInter{i,j};
-      end
-    end
   end
 end
 

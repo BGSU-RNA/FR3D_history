@@ -23,20 +23,81 @@ if strcmp(class(Chain),'char'),
   Chain = {Chain};
 end
 
+% split multiple specifications into separate cells
+
+t = 1;
+for k = 1:length(Num),
+  N = regexprep(Num{k},';| ',',');    % replace other delimeters with commas
+  while strfind(N,',,'),              % replace double commas with single
+    N = regexprep(N,',,',',');
+  end
+  a = [1 1+strfind(N,',')];               % locations of commas
+  for i = 1:(length(a)-1),
+    Numb{t} = N(a(i):(a(i+1)-2));
+    Chai{t} = Chain{k};
+    t = t + 1;
+  end
+  Numb{t} = N(a(end):end);
+  Chai{t} = Chain{k};
+  t = t + 1;
+end
+
 % check for chain indicated in parentheses
 
-for k = 1:length(Num),
-  if ~isempty(strfind(Num{k},'(')),
-    a = strfind(Num{k},'(');
-    b = strfind(Num{k},')');
-    Chain{k} = Num{k}(a(1)+1:b(1)-1);
-    if length(a) == 1,                    % one chain specified
-      Num{k} = [Num{k}(1:a(1)-1) Num{k}(b(1)+1:end)];
+for k = 1:length(Numb),
+  if ~isempty(strfind(Numb{k},'(')),
+    a = strfind(Numb{k},'(');
+    b = strfind(Numb{k},')');
+    Chai{k} = Numb{k}(a(1)+1:b(1)-1);     % extract chain
+    if length(a) == 1,                    % one chain specified      
+      Numb{k} = [Numb{k}(1:a(1)-1) Numb{k}(b(1)+1:end)];
     elseif length(a) == 2,                % range with two chains specified
-      Num{k} = [Num{k}(1:a(1)-1) Num{k}(b(1)+1:a(2)-1)];
+      Numb{k} = [Numb{k}(1:a(1)-1) Numb{k}(b(1)+1:a(2)-1)];
     end
   end
 end
+
+% check for chain indicated by underscore
+
+for k = 1:length(Numb),
+  if ~isempty(strfind(Numb{k},'_')),
+    a = strfind(Numb{k},'_');
+    Chai{k} = Numb{k}(a(end)+1:end);        % extract chain
+    Numb{k} = Numb{k}(1:a(end)-1);          % remove chain reference
+  end
+end
+
+% check for indicated base - what if this happens like A65:G67?
+
+for k = 1:length(Numb),
+  Numb{k} = upper(Numb{k});
+  aa = strfind(Numb{k},'A');
+  ac = strfind(Numb{k},'C');
+  ag = strfind(Numb{k},'G');
+  au = strfind(Numb{k},'U');
+  Base{k} = '';
+  if ~isempty(aa),
+    Numb{k} = strrep(Numb{k},'A','');
+    Base{k} = 'A';
+  end
+  if ~isempty(ac),
+    Numb{k} = strrep(Numb{k},'C','');
+    Base{k} = 'C';
+  end
+  if ~isempty(ag),
+    Numb{k} = strrep(Numb{k},'G','');
+    Base{k} = 'G';
+  end
+  if ~isempty(au),
+    Numb{k} = strrep(Numb{k},'U','');
+    Base{k} = 'U';
+  end
+end
+
+Numb
+Chai
+Base
+
 
 ind = [];
   

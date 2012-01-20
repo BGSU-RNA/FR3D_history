@@ -127,7 +127,9 @@ if fix(abs(CLE(row))) == 13,
   
   end
 
-  save('PairExemplars','Exemplar');
+%  save('PairExemplars','Exemplar'); % Matlab version 7 only
+
+  save PairExemplars.mat Exemplar -V6 % for compatibility with older versions
 
 end
 

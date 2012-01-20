@@ -3,7 +3,11 @@
 
 function [File] = zGetPDBInfo(File)
 
-[n,t,r] = xlsread('PDB_File_Headers.xls');
+%[n,t,r] = xlsread('PDB_File_Headers.xls');
+%save('PDBInfo.mat','n','t','r'); % Matlab version 7
+%save PDBInfo.mat n t -V6      % for compatibility with earlier versions
+
+load('PDBInfo.mat','n','t','-mat');
 
 PDBNames = lower(t(:,2));              % convert PDB filenames to lowercase
 

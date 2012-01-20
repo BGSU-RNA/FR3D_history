@@ -1,8 +1,30 @@
 
 function [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P,OCC,TEMP] = zReadPDBTextRead(Filename)
 
-[A, B, C, E, F, G, X, Y, Z, OCC, TEMP] ...
- = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %1s%5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+Readable = 1;
+
+try
+
+  [A, B, C, E, F, G, X, Y, Z, OCC, TEMP] ...
+   = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %1s%5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+
+catch
+
+  try
+    [A, B, C, E, G, X, Y, Z, OCC, TEMP] ...
+     = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+    for i=1:length(A),
+      F{i} = '1';                % invent a chain number
+    end
+  catch
+
+    fprintf('Unable to read the PDB file %s\n',Filename);
+    Readable = 0;
+
+  end
+end
+
+if Readable > 0,
 
 [s,t] = size(C);
 
@@ -42,3 +64,16 @@ end
 
 %fprintf('Read  %s\n', [Filename '_Atoms.pdb']);
 
+else
+
+ATOM_TYPE = [];
+ATOMNUMBER = [];
+NTLETTER = [];
+NTNUMBER = [];
+P        = [];
+ATOMNAME = [];
+VERSION  = [];
+OCC      = [];
+TEMP     = [];
+
+end

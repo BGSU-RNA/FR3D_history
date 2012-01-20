@@ -89,7 +89,7 @@ for k=1:length(SP)
                  end
         case 19, fprintf('%6.1f',p.StackingOverlap);
         case 21, fprintf('%7.2f',SP(k).PairDisc);
-        case 22, if isfield(File(f),'Info'),
+        case 22, if ~isempty(File(f).Info.Resolution),
                    fprintf('%6.2f',File(f).Info.Resolution);
                  else
                    fprintf('      ');

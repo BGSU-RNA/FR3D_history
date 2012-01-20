@@ -105,6 +105,7 @@ for f=1:length(Filenames),
     if (ReadCode == 2) | (ReadCode == 3) | (ReadCode == 4),
       File = zReadHandFile(File);
     end
+    File = zGetPDBInfo(File);          % get resolution and other info
   else
     File.SizeCode = 2;
   end
@@ -156,8 +157,6 @@ for f=1:length(Filenames),
     File.Header.Resolution = '';
     ClassifyCode = 1;
   end
-
-  File = zGetPDBInfo(File);          % get resolution and other info
 
   File = orderfields(File);
 

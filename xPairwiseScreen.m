@@ -10,17 +10,6 @@ else
   D = File.Distance;
 end
 
-if isfield(Model,'ReqInter'),                 % if screening by interaction
-  if length(Model.ReqInter{p,q}) > 0 & all(Model.ReqInter{p,q} ~= 0),
-                                           % 0 means no screening for p,q
-    E = sparse(zeros(size(D)));
-    for i=1:length(Model.ReqInter{p,q}),
-      E = E + (fix(File.Inter) == Model.ReqInter{p,q}(i));
-    end
-    D = D .* (E > 0);
-  end
-end
-
 if isfield(Model,'EdgeNums'),                 % if screening by edges
   if length(Model.EdgeNums{p,q} > 0),
     E = sparse(zeros(size(D)));

@@ -255,8 +255,7 @@ for n=1:NumNT,                                   % analyze all nucleotides
   e  = sqrt(sum(sum((Y - F(1:L,:)).^2)))/L;      % error measure;
                                                  % should be between 0 and 10
   if (e > 0.1),
-    fprintf('Nucleotide %5s has average fitting error %6.4f Angstroms\n', NT(n).Number, e);
-    fprintf('Code is %2d \n',NT(n).Code);
+    fprintf('Nucleotide %c%s has average fitting error %6.4f Angstroms\n', NT(n).Base, NT(n).Number, e);
   end
 
   NT(n).Rot         = r;                         % save the rotation matrix
@@ -296,7 +295,7 @@ else
   NumNT = 0;
   File.Filename = Filename;
   File.NT        = [];
-  File.NumNT     = 0;
+  File.NumNT     = -1;
   File.Distance  = [];
   File.HandClass = [];
   File.Comment   = [];
