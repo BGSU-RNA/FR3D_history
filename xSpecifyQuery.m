@@ -35,10 +35,11 @@ function [Query] = xSpecifyQuery(QName);
 if nargin > 0,
   Query.Name = QName;
 else                        % change the following line to change the query!
-  Query.Name = 'StackedPair'; 
   Query.Name = 'BasepairGeometric2';
-  Query.Name = 'Sarcin5Geo';
   Query.Name = 'Sarcin9Mixed';
+  Query.Name = 'Sarcin5Geo';
+  Query.Name = 'StackedPair'; 
+  Query.Name = 'Stack';
 end
 
 Query.SearchFiles = '1s72';        % default is to search 1s72
@@ -53,8 +54,8 @@ case 'Sarcin5Geo'
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.5;
-  Query.SearchFiles    = {'1s72' 'HighResolution_list'};
   Query.SearchFiles    = {'1s72' 'Nonredundant_list'};
+  Query.SearchFiles    = {'1s72' 'HighResolution_list'};
 
 case 'Sarcin5Symb'
   Query.Description    = 'Sarcin five nucleotide symbolic';
@@ -173,6 +174,11 @@ case 'StackedPair'
   Query.Diff{4,3}      = '< <5';
   Query.Edges{1,4}     = 'cWW';
   Query.Edges{2,3}     = 'tSH';
+  Query.Edges{1,2}     = 'stack';
+
+case 'Stack'
+  Query.Description    = 'Two stacked bases';
+  Query.Mask           = 'AA';
   Query.Edges{1,2}     = 'stack';
 
 case 'StackedOncWW'

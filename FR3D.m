@@ -137,7 +137,7 @@ if ~isempty(Candidates),                         % some candidate(s) found
  fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
 
  if (~exist('GUIactive')) && (~isempty(Candidates)),
-   xListCandidates(File(SIndex),Search,Inf);
+   xListCandidates(Search,Inf,1);
    Search = xDisplayCandidates(File(SIndex),Search);
    save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
  end

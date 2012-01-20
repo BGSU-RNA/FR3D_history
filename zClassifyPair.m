@@ -2,7 +2,11 @@
 % between bases in File that are close enough to possibly be interacting, then
 % classifies the interaction
 
-function [Pair,s] = zClassifyPair(N1,N2,CL,Exemplar)
+function [Pair,s] = zClassifyPair(N1,N2,CL,Exemplar,Force)
+
+if nargin < 5,
+  Force = 0;
+end
 
 if nargin < 3,
   CL = zClassLimits;                              % read ClassLimits matrix
@@ -36,7 +40,7 @@ end
                                              % between glycosidic atoms,
                                              % relative to the plane of base 1
 
-  if (abs(sh(3)) < 5)                        % if small vertical shift
+  if (abs(sh(3)) < 5) || (Force > 0)           % if small vertical shift
     Pair = zAnalyzePair(M1,M2,CL,Exemplar,sh); % analyze and classify pair
 
     if (abs(Pair.Class) >= 30) & (M1.Code == M2.Code),  % re-analyze AA CC ...
