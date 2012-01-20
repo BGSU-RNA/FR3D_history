@@ -111,9 +111,6 @@ for n=1:length(Node),
       Indices = [Node(n).LeftIndex(Node(n).Left) ...
                  Node(n).RightIndex(Node(n).Right)];
 
-n
-Node(n)
-
       for i = 1:length(Node(n).IBases(:,1)),
         Text = [Text sprintf('Interaction  | Interacting Bases ')];
         Text = [Text sprintf('[%d,%d] ', ...
