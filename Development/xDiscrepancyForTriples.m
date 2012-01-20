@@ -3,10 +3,9 @@
 
 % Model and Cand are two lists of indices or nucleotide numbers
 
-function [Disc,R,MM,CM,A] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
+function [Disc,R,MM,CM,A] = xDiscrepancyForTriples(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 
 UseAsCenter = 2;
-
 OrientationCriterion = 2;
 
 %figure(1)

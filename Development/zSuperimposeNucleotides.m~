@@ -109,11 +109,6 @@ if isfield(ViewParam,'Write'),
   VP.Write = ViewParam.Write;
 end
 
-if isfield(ViewParam,'SuperR'),
-  VP.SuperR = ViewParam.SuperR;
-end
-
-
 % --------------------------------------- File1 ----------------------------
 % if File is a text string (filename), load the file and display
 
@@ -235,15 +230,7 @@ end
 
 % ---------------- Calculate the discrepancy between the two structures --
 
-if isfield(ViewParam,'SuperR'),
-disp('Using user-defined superposition matrix');
-  disc = NaN;
-  SuperR = ViewParam.SuperR;
-  CC1 = ViewParam.CC1;
-  CC2 = ViewParam.CC2;
-else
-  [disc,SuperR,CC1,CC2] = xDiscrepancy(File1,Indices1(1:L),File2,Indices2(1:L),LW);
-end
+[disc,SuperR,CC1,CC2] = xDiscrepancy(File1,Indices1(1:L),File2,Indices2(1:L),LW);
 
 Shift = CC2-CC1;
 
@@ -256,8 +243,6 @@ end
 % ---------------- Write PDB file for first set of nucleotides
 
 if VP.Write > 0,
-
-class(NTList1)
 
   L1 = strrep(NTList1{1},':','-');
   L2 = strrep(NTList2{1},':','-');

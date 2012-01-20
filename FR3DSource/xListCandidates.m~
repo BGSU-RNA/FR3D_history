@@ -264,7 +264,7 @@ if s > NumToOutput,
 end
 
 if (N == 2) && (WheretoOutput < 4),
-  figure(12)
+  figure
   clf
   hist(CP,30)
   title('Histogram of C1''-C1'' distance for these pairs');

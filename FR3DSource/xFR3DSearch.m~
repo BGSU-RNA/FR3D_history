@@ -109,22 +109,21 @@ starttime = cputime;
 
 Candidates = xFindCandidates(File(SIndex),Query,Verbose);  % screen for candidates
 
-if 1 > 2,
-  L = length(Candidates(:,1));
-  C = sortrows(Candidates, [1 2 3]);
-  D = full(File.Distance);
-  a = [];
-  b = [];
-  c = [];
-  for i = 1:L,
-    fprintf('%s %s %s %8.4f %8.4f %8.4f\n', File.NT(C(i,1)).Number, File.NT(C(i,2)).Number, File.NT(C(i,3)).Number, D(C(i,1),C(i,2)), D(C(i,1),C(i,3)), D(C(i,2),C(i,3)));
-    a(i) = D(C(i,1),C(i,2));
-    b(i) = D(C(i,1),C(i,3));
-    c(i) = D(C(i,2),C(i,3));
-  end
-
-  [min(a) max(a) min(b) max(b) min(c) max(c)]
+L = length(Candidates(:,1));
+C = sortrows(Candidates, [1 2 3]);
+D = full(File.Distance);
+a = [];
+b = [];
+c = [];
+for i = 1:L,
+  fprintf('%s %s %s %8.4f %8.4f %8.4f\n', File.NT(C(i,1)).Number, File.NT(C(i,2)).Number, File.NT(C(i,3)).Number, D(C(i,1),C(i,2)), D(C(i,1),C(i,3)), D(C(i,2),C(i,3)));
+  a(i) = D(C(i,1),C(i,2));
+  b(i) = D(C(i,1),C(i,3));
+  c(i) = D(C(i,2),C(i,3));
 end
+
+[min(a) max(a) min(b) max(b) min(c) max(c)]
+
 
 
 if ~isempty(Candidates),                         % some candidate(s) found
