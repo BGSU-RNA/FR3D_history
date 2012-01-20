@@ -1,21 +1,43 @@
 
 % download new .pdb and .pdb1 files - manually at this time
 
+Verbose = 1;
+
 % download a new report, save it as PDB_File_Information current-date.xls
 % and modify the following line:
 
-Verbose = 1;
-
-Date = '2009-07-24';
+Date = '2010-02-12';
 
 PDBInfoName = ['PDB_File_Information ' Date '.xls'];
+
+% Columns should correspond to this list:
+% A	Structure ID
+% B	Descriptor
+% C	Experimental Technique
+% D	Release Date
+% E	Authors
+% F	Keywords
+% G	Resolution (Å)
+% H	Source
+
+% We should add an additional column for NDB ID
 
 % -------------------------------- Create PDBInfo.mat
 
 [n,t,r] = xlsread(PDBInfoName);  % read Excel report on PDB files
+
 t = t(2:end,:);                  % remove the header row
 t{1,9} = '';                     % make space to save base sequence
 n(1,3) = 0;                      % make space to save number of nucleotides
+
+for i = 1:length(t(:,7)),
+  a = str2num(t{i,7});
+  if isempty(a),
+    n(i,1) = NaN;
+  else
+    n(i,1) = a;
+  end
+end
 
 % save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 
@@ -82,6 +104,7 @@ save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 coun = 0;
 
 for i = 1:length(t(:,1)),
+%for i = 319:length(t(:,1)),
   File = zAddNTData(t{i,1},0,[],1);          % load file
   if ~isempty(File.NT),                      % if it has nucleotides,
     n(i,2) = length(File.NT);                % store the number of NT

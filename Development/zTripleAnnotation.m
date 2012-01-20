@@ -1,11 +1,9 @@
 
-if 0 > 1,
-%load 2009-07-09_16_37_30-Base_triples.mat
-load 2009-07-09_17_08_51-Base_triples.mat
-
-File = zAddNTData(Search.Filenames);
-
-xAnnotate
+if 10 > 1,
+  %load 2009-07-09_16_37_30-Base_triples.mat
+  load 2009-07-09_17_08_51-Base_triples.mat
+  File = zAddNTData(Search.Filenames);
+  xAnnotate
 end
 
 [L,N] = size(Search.Candidates);
@@ -67,9 +65,9 @@ T{1,7} = 'Num 3';
 T{1,8} = 'Pair 1-2';
 T{1,9} = 'Pair 2-3';
 T{1,10} = 'Pair 1-3';
-T{1,11} = 'Range 1-2';
-T{1,12} = 'Range 2-3';
-T{1,13} = 'Range 1-3';
+T{1,11} = 'Crossing 1-2';
+T{1,12} = 'Crossing 2-3';
+T{1,13} = 'Crossing 1-3';
 T{1,14} = 'SecStruct 1';
 T{1,15} = 'SecStruct 2';
 T{1,16} = 'SecStruct 3';

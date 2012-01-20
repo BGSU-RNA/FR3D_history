@@ -74,13 +74,17 @@ end
   if ~isempty(r1) && ~isempty(r3),            % row a has an alignment btw 1,3
     i = zIndexLookup(File1,r1,Chain1);
     k = zIndexLookup(File2,r3,Chain2);
-    indices = [indices; [i k]];
+    if ~isempty(i) && ~isempty(k),
+      indices = [indices; [i k]];
+    end
   end
 
   if ~isempty(r2) && ~isempty(r4),            % row a has an alignment btw 2,4
     j = zIndexLookup(File1,r2,Chain1);
     m = zIndexLookup(File2,r4,Chain2);
-    indices = [indices; [j m]];               % append these matches
+    if ~isempty(j) && ~isempty(m),
+      indices = [indices; [j m]];               % append these matches
+    end
   end
 end
 

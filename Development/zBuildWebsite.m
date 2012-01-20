@@ -20,7 +20,7 @@ Names = t(:,1);                        % names of files from PDB/NDB
 
 WTW = WhatToWrite;
 
-for f = 1:length(Names),  
+for f = 903:length(Names),  
   t = cputime;
 
   if exist(['Web/AnalyzedStructures/' Names{f}]) == 7,
@@ -30,6 +30,12 @@ for f = 1:length(Names),
   end
 
   if New > 0 || WTW(5) == 0,
+
+    if New == 1,
+      ND = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep File.Filename];
+      mkdir(ND);
+    end
+
     File = zAddNTData(Names{f},0,[],2);              % load RNA data
 
     t(end+1) = cputime;

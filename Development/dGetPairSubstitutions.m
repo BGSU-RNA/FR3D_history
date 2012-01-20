@@ -6,21 +6,23 @@ f = 1;
 %File = zAddNTData('Nonredundant_2009-05-14_list');
 %File = zAddNTData({'2avy','2aw4'});
 
-Filename = '2avy';
+Filename = '2aw4';
 
 [File,f] = zAddNTData(Filename,0,File,Verbose);   % load PDB data
 
 [i,j] = find((File(f).Edge > 20) .* (File(f).Edge < 24));
 
-length(i)
+%clear SubsData
+%clear SubsMatrices
+%clear Counts
 
-clear SubsData
-clear SubsMatrices
-clear Counts
+SubsMatrices{max(i),max(j)} = [];
 
 for k = 1:length(i),
 
-  fprintf('Finding stacks similar to %s%s-%s%s %s\n',  File(f).NT(i(k)).Base, File(f).NT(i(k)).Number, File(f).NT(j(k)).Base,  File(f).NT(j(k)).Number, zEdgeText(File(f).Edge(i(k),j(k))));
+  if isempty(SubsMatrices{i(k),j(k)}),
+
+  fprintf('#%d Finding stacks similar to %s%s-%s%s %s\n', k, File(f).NT(i(k)).Base, File(f).NT(i(k)).Number, File(f).NT(j(k)).Base,  File(f).NT(j(k)).Number, zEdgeText(File(f).Edge(i(k),j(k))));
 
    clf
    VP.Sugar = 1;
@@ -64,7 +66,7 @@ for k = 1:length(i),
 %  SubsData{j(k),i(k)} = D(:,[2 1 3]);
 
    if mod(k,500) == 0,
-     save SubsMatrices2AVY SubsMatrices
+     save SubsMatrices2AW4 SubsMatrices
    end
 
 if 0 > 1,
@@ -77,5 +79,6 @@ if 0 > 1,
    pause
 end
 
+  end
 end
 

@@ -47,6 +47,18 @@ end
 
 fid = fopen(PDBFilename,'r');
 
+if fid < 0,
+  NewPDBFilename = strrep(PDBFilename,'.pdb','.ent');
+  NewPDBFilename = ['pdb' NewPDBFilename];
+
+  fid = fopen(NewPDBFilename,'r');
+
+  if fid > 0,
+    PDBFilename = NewPDBFilename;
+  end
+end
+
+
 if (fid > 0) && (Stop == 0),
 
 fclose(fid);

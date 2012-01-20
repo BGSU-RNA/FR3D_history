@@ -38,6 +38,7 @@ if exist('chiropraxis.jar') == 2 ...       % if chiropraxis is here
   if fid > 0
 
   clear T
+  T = [];
   L = 1;
   c = 1;
 
@@ -71,6 +72,8 @@ if exist('chiropraxis.jar') == 2 ...       % if chiropraxis is here
   Numbers = cat(1,{File.NT(:).Number});
 
   c = 0;                                      % current index in the file
+
+  
 
   for t = 1:length(T),
   a = T{t};

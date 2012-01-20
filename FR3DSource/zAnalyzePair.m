@@ -52,24 +52,17 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
 
   % ------------------------ check for coplanarity
 
-  Pair.Coplanar = 0;                      % default value, not coplanar
-
-  % Criteria for possibly being coplanar:
-  %   Pair.Gap must be < 2 Angstroms
-  %   Pair.MinDist must be < 4.5 Angstroms
-  %   Angle between center-center vector and each normal must be > 60 degrees
-  %   Angle between normal vectors must be < 45 degrees
-
-
-  if (abs(Pair.Gap) < 1.556) && (Pair.MinDist < 2.45),
+  Pair.Coplanar = 0;                      % default value
+  if (abs(Pair.Gap) < 2) && (Pair.MinDist < 5),
     v  = N1.Center - N2.Center;           % vector from center to center
     v  = v / norm(v);                     % normalize
 
     dot1 = abs(v * N1.Rot(:,3));          % to calculate angle: v and normal
     dot2 = abs(v * N2.Rot(:,3));
-    dot3 = abs(N1.Rot(:,3)' * N2.Rot(:,3));
 
-    if (dot1 < 0.345) && (dot2 < 0.345) && (dot3 > 0.761),
+    yy = 0.5;
+
+    if (dot1 < yy) && (dot2 < yy),         % angle > acos(yy) = 60 degrees
 
       d = zDistance(N1.Fit(1:Lim(2,N1.Code),:), N2.Center); 
                                            % distances to base 2 center
@@ -77,19 +70,9 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
       m = m(1);                            % in case of a tie, use the first
       Gap2 = N2.Rot(:,3)'*(N1.Fit(m,:)-N2.Center)';% height above plane of 1
 
-      if abs(Gap2) < 1.556,
-        Pair.Coplanar = min(1+[(abs(Pair.Gap)- 0.5066)*(-0.9527) (abs(Gap2)- 0.5066)*(-0.9527) (dot1- 0.1347)*(-4.7505) (dot2- 0.1347)*(-4.7505) (dot3- 0.9357)*( 5.7279) (Pair.MinDist- 1.9455)*(-1.9804)]);
+      if abs(Gap2) < 2,
+        Pair.Coplanar = min([(2-abs(Pair.Gap))/2 (2-abs(Gap2))/2 (yy-dot1)/yy (yy-dot2)/yy min(1,5-Pair.MinDist)]);
 
-if 10 < 1,
-
-  Pair.Coplanar
-  clf
-  F.NT(1) = N1;
-  F.NT(2) = N2;
-  F.Filename = '--';
-  zDisplayNT(F);
-  pause
-end
       end
     end
   end
@@ -262,9 +245,7 @@ end
 
   % reverse classification for GC and CG pairs, but why, exactly????
 
-  
-
-  if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (mod(abs(Pair.Class),100) < 14),
+  if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (abs(Pair.Class) < 14),
     Pair.Edge = -Pair.Class;
   else
     Pair.Edge = Pair.Class;

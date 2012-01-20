@@ -25,7 +25,7 @@ NTLimit = 7300;                   % above this limit, do not align sequences
 MaxRes  = 4;                      % maximum resolution value to use
 SL = 3000;                        % upper limit on # bases to align
 
-Criterion = 15;                   
+Criterion = 5;                   
                                   % 1-earliest release date 
                                   % 2-resolution 
                                   % 3-number of nucleotides
@@ -102,7 +102,7 @@ fprintf('Geometric discrepancy cutoff will be %7.2f.\n', maxd);
 % ---------------------------------------------- Growth of whole database
 
 for i = 1:F,
-  d = datenum(t{i,4}, 'mm/dd/yyyy');
+  d = datenum(t{i,4}, 'yyyy-mm-dd');
   Timeline = [Timeline; [d 1 n(i,2) n(i,3)]];  % accumulate data
 end
 
