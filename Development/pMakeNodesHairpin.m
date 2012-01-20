@@ -1,44 +1,94 @@
-% Add a hairpin
+% Add a hairpin node
 
-        n = n + 1;
-        Node(n).type = 'Hairpin';
-        Node(n).MiddleIndex = [a:B];
-        Node(n).LeftIndex   = a;                 % added 12/7/08.  OK?
-        Node(n).RightIndex  = B;                 % added 12/7/08.  OK?
-        Node(n).LeftLetter        = cat(2,File.NT(a:B).Base);
-        Node(n).RightLetter       = '';
-        if a > B,
-          Node(n).MiddleIndex = [a];
-        end
-        Node(n).P       = ones(17,1);
-        Node(n).PIns    = 1;
-        Node(n).subtype = 'XXXX';                  % revise this later!
+n = n + 1;
+Node(n).type = 'Hairpin';
 
-        LI = a;                      % use the first
-        RI = B;                      % use the last
+if TertiaryFreeNode == 0 || Extension < 2,  % this stem has long-range inter
+                                            % or we are using regular hairpins
+  Node(n).MiddleIndex = [a:B];
+  Node(n).LeftIndex   = a;                 % 
+  Node(n).RightIndex  = B;                 % 
+  Node(n).LeftLetter  = cat(2,File.NT(a:B).Base);
+  Node(n).RightLetter = '';
+  if a > B,
+    Node(n).MiddleIndex = [a];
+  end
+  Node(n).P           = ones(17,1);
+  Node(n).PIns        = 1;
+  Node(n).subtype     = 'XXXX';                  % revise this later!
 
-        Node(n).Comment = [ ' // Hairpin node ' File.NT(LI).Base File.NT(LI).Number ':' File.NT(RI).Base File.NT(RI).Number];
+% if we were adding interactions in hairpins automatically, ...
+% Node(n).InteractionComment{i} = 
 
-        % if we were adding interactions in hairpins automatically, ...
-        % Node(n).InteractionComment{i} = 
+% if we were adding insertions in hairpins automatically, ...
+% Node(n).InsertionComment{i} = 
 
-        % if we were adding insertions in hairpins automatically, ...
-        % Node(n).InsertionComment{i} = 
+  Node(n).Comment = [ ' // Hairpin node ' File.NT(a).Base File.NT(a).Number ':' File.NT(B).Base File.NT(B).Number];
 
-        if Verbose > 0,
-          fprintf('%3d Hairpin   %s:%s %s\n', n, File.NT(a).Number, File.NT(B).Number, cat(2,File.NT(a:B).Base));
-        end
-        EndLoop = 1;
+  if Verbose > 0,
+    fprintf('%3d Hairpin   %s:%s %s\n', n, File.NT(a).Number, File.NT(B).Number, cat(2,File.NT(a:B).Base));
+  end
 
-LR = File.Edge .* (File.Crossing > 2);
-[i,j,e] = find(LR(a:B,:));
-i = i + a - 1;
-[yy,ii] = sort(abs(e));
-i = i(ii);
-j = j(ii);
-e = e(ii);
+else                                        % no long-range interactions
+                                            % and we are modeling radically
+ 
+  m = floor((a+B)/2);                       % middle base of hairpin
+  Node(n).MiddleIndex = (m-1):(m+1);        % three fixed bases
+  Node(n).LeftIndex   = a;                  % 
+  Node(n).RightIndex  = B;                  % 
+  Node(n).LeftLetter  = cat(2,File.NT(a:B).Base);
+  Node(n).RightLetter = '';
+  if a > B,
+    Node(n).MiddleIndex = [a];
+  end
+  Node(n).P           = ones(17,1);
+  Node(n).PIns        = 1;
+  Node(n).subtype     = 'Vague';                  % revise this later!
+
+  % --------------------------------------- % interaction between 1 and 3
+  
+  Node(n).IBases      = [1 3];              % fixed bases 1 and 3 interact
+
+  Node(n).InteractionComment{1} = [' // Hairpin on extensible stem ' File.NT(a).Number ' - ' File.NT(B).Number ' ' cat(2,File.NT(a:B).Base)];
+
+  P = [1 1 1 10; 1 1 10 1; 8 10 1 1; 10 4 8 1];   % typical closing pairs
+
+  Node(n).SubsProb(:,:,1) = P / sum(sum(P));      % normalize subs probs
+
+  if any(nonzeros(fix(File.Edge(a:B,a:B))) == -6) ...  % tSW, as in UNCG
+     || any(nonzeros(fix(File.Edge(a:B,a:B))) == 10), ... %tSH as in GNRA
+     Node(1).Edge(a:B,a:B) = File.Edge(a:B,a:B);       % as if we got this one
+  end
+
+  Node(n).Insertion(1).Position = 2;
+  Node(n).Insertion(1).LengthDist = [0.4 0.4 0.15 0.05];
+  Node(n).Insertion(1).LetterDist = [1 1 1 1]/4;
+  Node(n).InsertionComment{1} = ' // Insertion in vague hairpin';
+
+  Node(n).Comment = [ ' // Hairpin node on extensible stem ' File.NT(a).Base File.NT(a).Number ':' File.NT(B).Base File.NT(B).Number];
+
+  if Verbose > 0,
+    fprintf('%3d Hairpin   %s:%s %s  Extensible stem\n', n, File.NT(a).Number, File.NT(B).Number, cat(2,File.NT(a:B).Base));
+  end
+
+end
+
+
+
+EndLoop = 1;
+
+
+% ----------------------------------------- Look for long-range interactions
 
 if Verbose > 1,
+  LR = File.Edge .* (File.Crossing > 2);
+  [i,j,e] = find(LR(a:B,:));
+  i = i + a - 1;
+  [yy,ii] = sort(abs(e));
+  i = i(ii);
+  j = j(ii);
+  e = e(ii);
+
   if length(i) > 0,
     fprintf('Hairpin has these long-range interactions: ===================\n');
     for z = 1:length(i),

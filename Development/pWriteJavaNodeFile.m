@@ -1,9 +1,7 @@
-% pWriteJavaNodeFile(File,Node) writes Java code describing each node
+% pWriteJavaNodeFile(File,Node) writes Java code describing each JAR3D node
 
 % NumChar tells it how large to make letter and pair distributions, what to
 % add for * hairpins, for example
-
-% pWriteNodesForJava(File,Node,4,'Ecoli_16S_with_motifs.txt')
 
 function [void] = pWriteJavaNodeFile(File,Node,NumChar,Filename)
 
@@ -26,8 +24,6 @@ fprintf(fid,'%s\n',Text);
 
 for n=1:length(Node),
   Text = '';
-
-% Node(n)
 
   switch Node(n).type
     case 'Initial' % -----------------------------------------------------

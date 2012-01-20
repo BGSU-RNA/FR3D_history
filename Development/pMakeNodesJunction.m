@@ -130,7 +130,7 @@ end
           end
           nn = length(Node) + 1;
           Node(jn).nextnode(ln) =  length(Node)+1;
-          Node = pMakeNodes(File,Verbose,junc(ln,1),junc(ln,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(ln,1),junc(ln,2),Truncate,Interact,Node,n);
           Node(nn).id         = ['J' num2str(id)];
           n = length(Node);
          end
@@ -147,7 +147,7 @@ end
 
           nn = length(Node) + 1;
           Node(jn).nextnode(1) = length(Node) + 1;
-          Node = pMakeNodes(File,Verbose,junc(1,1),junc(NN,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(1,1),junc(NN,2),Truncate,Interact,Node,n);
           Node(nn).id         = ['J' num2str(id)];
           n = length(Node);
 
@@ -158,7 +158,7 @@ end
 
           nn = length(Node) + 1;
           Node(jn).nextnode(2) = length(Node) + 1;
-          Node = pMakeNodes(File,Verbose,junc(NN+1,1),junc(NL,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(NN+1,1),junc(NL,2),Truncate,Interact,Node,n);
           Node(nn).id         = ['J' num2str(id)];
 
         end
@@ -241,10 +241,10 @@ end
         u = uuu;
 
         Node(n).nextnode(1) =  n+1;          % index of next node in tree
-        Node = pMakeNodes(File,Verbose,r,s,Truncate,Interact,Node,n);
+        Node = pMakeNodes(File,Param,r,s,Truncate,Interact,Node,n);
 
         Node(n).nextnode(2)  = length(Node)+1;
-        Node = pMakeNodes(File,Verbose,t,u,Truncate,Interact,Node,length(Node));
+        Node = pMakeNodes(File,Param,t,u,Truncate,Interact,Node,length(Node));
       end                                  % junction cluster
 
       Node(n).P    = [0.05*ones(17,1) 0.95*ones(17,1)];

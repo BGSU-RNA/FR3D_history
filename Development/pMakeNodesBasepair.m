@@ -33,19 +33,14 @@ if Verbose > 0,
   fprintf('%3d Basepair  %4s %4s %s%s %s\n',n, File.NT(a).Number, File.NT(B).Number,File.NT(a).Base,File.NT(B).Base,zEdgeText(File.Edge(a,B)));
 end
 
-Q = pAdjustSubsProb(File,a,B,P,method);
-Node(n).SubsProb = Q;
+% ----------------------------------------- Adjust subs probs for LR, BPh inter
+
+if AdjustSubsForLR == 1 && (TertiaryFreeNode == 0 || Extension < 2),
+  Node(n).SubsProb = pAdjustSubsProb(File,a,B,P,method);
+else
+  Node(n).SubsProb = P;
+end
 
 a = a + 1;                                % current base on the left
 B = B - 1;                                % current base on the right
-
-if sum(sum(J(a:B,[1:(a-5) (B+5):length(File.NT)]))) == 0,
-                                  % no tertiary interaction outside this stem
-  if TertiaryFreeNode == 0,              % only mark the first one
-    TertiaryFreeNode = n;                
-    if Verbose > 0,
-      fprintf('Starting with node %3d, this stem is free of tertiary interactions\n',n);
-    end
-  end
-end
 

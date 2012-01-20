@@ -1,6 +1,6 @@
 % pMakeNodes(File,NTNumber,LastNTNumber,Truncate,Interact,Node,n) makes a secondary structure node model based on the Edge interaction matrix in File, starting at NTNumber and ending at LastNTNumber.  It assigns various nodes consistent with this secondary structure.  Truncate indicates where to put * hairpins.  Interact, Node, and n are optional parameters specified when pMakeNodes is called by itself.
 
-function [Node] = pMakeNodes(File,Verbose,NTNumber,LastNTNumber,Truncate,Interact,Node,n)
+function [Node] = pMakeNodes(File,Param,NTNumber,LastNTNumber,Truncate,Interact,Node,n)
 
 if nargin < 2,
   Verbose = 1;
@@ -12,10 +12,25 @@ end
 
 load PairExemplars
 
-method = 4;                       % method for assigning pair subst probs
+method          = 4;             % method for assigning pair subst probs
+Extension       = 1;             % whether to extend stems with no LR inter
+AdjustSubsForLR = 1;             % adjust basepair subs probs for LR inter
+cdepth          = 10;            % how far to look ahead for a cluster
+jcdepth         = 4;             % how far to look for a junction cluster
 
-cdepth  = 10;                      % how far to look ahead for a cluster
-jcdepth = 4;                      % how far to look for a junction cluster
+if length(Param) > 3,
+  AdjustSubsForLR = Param(4);
+end
+
+if length(Param) > 2,
+  Extension = Param(3);
+end
+
+if length(Param) > 1,
+  method  = Param(2);
+end
+
+Verbose = Param(1);
 
 if nargin < 5,
   Truncate = [];
@@ -58,11 +73,18 @@ end
 
 % ------------------------------------------ prepare to identify motifs
 
-HasMotif = zeros(1,length(File.NT));
+HasMotif     = zeros(1,length(File.NT));
+HasGUPacking = zeros(1,length(File.NT));   % highly-conserved motif
+
 if isfield(File,'Nucl'),
   for i = 1:length(File.NT),
     if ~isempty(File.Nucl(i).Motif),
       HasMotif(i) = 1;
+      for m = 1:length(File.Nucl(i).Motif),
+        if ~isempty(strfind(File.Nucl(i).Motif(m).Name,'GU_packing')),
+          HasGUPacking(i) = 1;
+        end
+      end
     end
   end
 end
@@ -74,7 +96,6 @@ E = abs(fix(File.Edge));                   % don't distinguish subcategories
 G = E .* (E < 13) .* (E ~= 0);             % consider basepairing only
                                            % don't consider bifurcated now
 H = (G ~= 0) .* max(File.Crossing == 0, abs(G) == 1) ;
-
                                            % 1 for nested pairs, 0 otherwise
 
 J = abs(G .* (File.Crossing >  0));        % long-range basepairs only
@@ -83,7 +104,11 @@ DelProb = 0.01;                            % nominal deletion probability
                                            % for basepairs
 TertiaryFreeNode = 0;                      % first node in this stem making
                                            % no tertiary intearctions beyond it
-                                           
+
+if ~isfield(File,'BasePhosphate'),
+  File.BasePhosphate = sparse(zeros(N,N));
+end
+
 if nargin < 4,
   LastNTNumber = N;
 elseif strcmp(class(LastNTNumber),'cell'),
@@ -97,7 +122,6 @@ end
 if nargin < 6,
  for a = 1:N,                              % loop through nucleotides
   k = find(G(a,:));                        % find indices of interacting bases
-%  k = find(H(a,:));                        % find indices of interacting bases
   [y,L] = sort(E(a,k));                    % sort by edge interaction category
   Interact{a}.Categ = abs(File.Edge(a,k(L)));   % store categories
   Interact{a}.Index = k(L);                % store indices of interacting bases
@@ -158,7 +182,7 @@ while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
         fprintf('Found nested interactions between %s and %s and between %s and %s\n', File.NT(r).Number, File.NT(s).Number, File.NT(t).Number, File.NT(u).Number);
       end
 
-      pMakeNodesJunction                   % identify make models for junctions
+      pMakeNodesJunction                   % make models for junctions
       return                               % nothing left to do!
 
     else                                   % not a junction
@@ -173,7 +197,6 @@ while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
       if HasMotif(a),   % ---------------------- Insert motif model when needed
  
         pMakeNodesMotif
-        pMakeNodesProbeForInsertions          % add Initial node if needed
 
       elseif ((H(a,B) > 0) && sum(sum(G(a,[LS RS]))) == 0 ...
                            && sum(sum(G([LS RS],B))) == 0), 
@@ -191,6 +214,10 @@ while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
 
       end                                          % basepair or cluster
 
+      % ------------------- check for tertiary interactions in this stem
+
+      pMakeNodesCheckForExtensibility
+
       % ------------------- check for truncation and hairpin
 
       if (EndLoop == 0),
@@ -199,7 +226,7 @@ while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
           pMakeNodesTruncate
 
         elseif (a == B) || ((sum(sum(G(a:B,a:B))) == 0)), % time for a hairpin
-          if (TertiaryFreeNode > 0) && isempty(Truncate),
+          if (TertiaryFreeNode > 0) && isempty(Truncate) && Extension > 0,
                      % extensible region, not a truncated model
             pMakeNodesExtraBasepairs;       % add extra basepairs if extensible
           end
@@ -210,6 +237,8 @@ while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
           pMakeNodesProbeForInsertions       % add insertions if needed
 
         end                                  % hairpin or insertions
+      elseif TertiaryFreeNode > 0 && isempty(Truncate) && Extension > 0,
+        pMakeNodesExtraBasepairs;       % add extra basepairs if extensible
       end                                    % if EndLoop == 0
     end                                      % junction and junction cluster
 end                                       % while (EndLoop == 0) & (a <= N),

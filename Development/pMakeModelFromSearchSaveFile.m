@@ -6,7 +6,7 @@
 % load LIB00014_IL_tSH-tSH-tHS-tHS.mat
 % pMakeModelFromSearchSaveFile(Search,'IL',1);
 
-function [Node,Truncate] = pMakeModelFromSearchSaveFile(Search,Type,Verbose)
+function [Node,Truncate] = pMakeModelFromSearchSaveFile(Search,Verbose)
 
 if nargin < 3,
   Verbose = 0;
@@ -25,11 +25,16 @@ N = N - 1;                              % number of nucleotides
 
 f = Search.Candidates(:,N+1);           % file numbers of motifs
 
-File = Search.File(f(1));               % file of query motif
+% the following line assumes that the GU packing motif has the text
+% 'GU_packing' in its name and that the GU pair are nucleotides 1 and 2
+
+if ~isempty(strfind(Search.SaveName,'GU_packing')), % GU packing motif
+  N = 2;                                          % skip last nucleotide
+end
+
+File = Search.File(f(1));                      % file of query motif
 NTNumber = double(Search.Candidates(1,1));     % index of first NT
 LastNTNumber = double(Search.Candidates(1,N)); % index of last NT
-
-
 
 % ----------------------------------- Find locations of truncations
 
@@ -95,28 +100,10 @@ if Verbose > 0,
   full(F.Edge)                                  % consensus interactions
 end
 
-% File.Edge(i,i) = F.Edge;                  % substitute consensus
 F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
 F.Crossing = zeros(N,N);                    % small enough, pretend none
 
-%Node = pMakeNodes(File,NTNumber,LastNTNumber,Truncate);
 Node = pMakeNodes(F,Verbose,1,N,Truncate);          % make the SCFG/MRF model
-
-% ---------------------------- Shift indices down to 1
-
-% This should not be necessary since the model is based on F, not File
-
-if 0 > 1,
-  a = Node(1).LeftIndex;
-  b = Node(1).RightIndex-length(Node);
-
-  for n = 1:length(Node),
-%  Node(n).LeftIndex  = Node(n).LeftIndex - a + 1;
-%  Node(n).RightIndex = Node(n).RightIndex - b + 1;
-%  Node(n).RightIndex = max(Node(n).RightIndex,max(Node(n).LeftIndex)+1);
-%  Node(n).MiddleIndex = Node(n).MiddleIndex - a + 1;
-  end
-end
 
 % ---------------------------- Set parameters for the nodes from instances
 
@@ -131,11 +118,13 @@ for n = 1:length(Node),
     b = Node(n).RightIndex;                  % right NT of the query motif
     Score = pConsensusPairSubstitution(a,b,f,Search.File,F,Node(n).Delete,L,Search,Verbose);
 
-%fprintf('Original substitution probabilities\n');
-%Node(n).SubsProb
+    if Verbose > 0,
+      fprintf('Original substitution probabilities\n');
+      Node(n).SubsProb
 
-%fprintf('Consensus substitution probabilities\n');
-%Score
+      fprintf('Consensus substitution probabilities\n');
+      Score
+    end
 
     Node(n).SubsProb = Score;
 
@@ -145,7 +134,6 @@ for n = 1:length(Node),
     if n < length(Node),
       for c = 1:L,
         inscount(c) = Node(n+1).LeftIndex(1)-Node(n).LeftIndex(1)-1;
-        
       end
     end
 
@@ -170,6 +158,17 @@ for n = 1:length(Node),
     end
 
     Node(n).rightLengthDist = rld / sum(rld);    % normalize
+
+    % the following line assumes that the GU packing motif has the text
+    % 'GU_packing' in its name and that the GU pair are nucleotides 1 and 2
+
+    if ~isempty(strfind(Search.SaveName,'GU_packing')),  % GU packing motif
+      P = Node(n).SubsProb;
+      P(3,4) = 0;
+      P = 0.2 * P / sum(sum(P));
+      P(3,4) = 0.8;                             % 80% probability of being GU
+      Node(n).SubsProb = P;
+    end
 
   case 'Cluster'
     Indices = [Node(n).LeftIndex(Node(n).Left) ...

@@ -93,13 +93,20 @@ for ff = 1:length(File),
 
     [s,t] = size(Candidates);
 
+    % the following line assumes that the GU packing motif has the text
+    % 'GU_packing' in its name and that the GU pair are nucleotides 1 and 2
+
+    if ~isempty(strfind(Motif(m).name,'GU_packing')), % GU packing motif
+      t = 3;                                          % skip last nucleotide
+    end
+
     File(ff).Motifs(m).Name  = Motif(m).name;
     File(ff).Motifs(m).Count = s;
 
-    if s > 0,
+    if s > 0,                                    % at least one candidate
+      for c = 1:s,                               % go through candidates
 
-      for c = 1:s,
-       for n = 1:(t-1),
+       for n = 1:(t-1),                          % go through indices of cands
         clear Mot
         Mot.Name = strrep(MotifName,'.mat','');
         Mot.Index = m;

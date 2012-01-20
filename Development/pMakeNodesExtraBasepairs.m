@@ -1,20 +1,22 @@
 % pMakeNodesExtraBasepairs adds cWW basepairs with relatively high deletion probability, which is used in stems that make no tertiary interactions
 
-
 % the number of possible extra basepairs is hard to pinpoint!
 
-
-  nn = n;
-  while fix(abs(Node(n).Edge)) ~= 1,  % skip non-cWW pairs
+  nn = n;                               % store current node number
+  while fix(abs(Node(n).Edge)) ~= 1,    % work backward through non-cWW pairs
     n = n - 1;
   end
 
-  ClosingPairNode = Node((n+1):nn);   % store for later
-  fprintf('Found %d closing basepair\n', length(ClosingPairNode));
-  UP = 1 - DelProb;                % probability of being used
+  ClosingPairNode = Node((n+1):nn);     % store for later
+
+  if Verbose > 0,
+    fprintf('Found %d non-cWW closing basepair\n', length(ClosingPairNode));
+  end
+
+  UP = 1 - DelProb;                     % probability of being used
   for nn = TertiaryFreeNode:n,
-    UP = UP * 0.99;                 % reduce usage probability
-    Node(nn).Delete = 1 - UP;       % increasing deletion probs
+    UP = UP * 0.99;                     % reduce usage probability
+    Node(nn).Delete = 1 - UP;           % increasing deletion probs
   end
 
   s = 0.99;

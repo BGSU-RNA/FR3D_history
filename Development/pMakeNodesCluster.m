@@ -4,15 +4,12 @@
 % be left distinct.  Build from the left and from the right, and
 % when they overlap, coalesce them.
 
-
 % Problem:  When the cluster is merely a set of interactions on the left
 % strand or on the right strand, it still consumes one base on the other
 % strand, even though that might not make sense.
 
-
-
 if exist('zxsx')
-  disp('*****************************************************');
+  disp('Cluster *****************************************************');
 end
 
 %[a b B cdepth]
@@ -118,6 +115,7 @@ if n > 358000
   union(zt,yt)
   Node(n)
 end
+
 zsxs = union(zs,xs);
 if isempty(zsxs),                 % happens when no inter across
   zsxs = 1;
@@ -151,7 +149,7 @@ for aaa = 1:length(h),
   if Verbose > 0,
     fprintf('    %d insertions (%s) between %s%s and %s%s\n', ...
     d(h(aaa))-1, ...
-    cat(2,File.NT(AllIndices(h(aaa)):AllIndices(h(aaa)+d(h(aaa)))).Base), ...
+    cat(2,File.NT((AllIndices(h(aaa))+1):(AllIndices(h(aaa)+d(h(aaa)))-1)).Base), ...
                  File.NT(AllIndices(h(aaa))).Base, ...
                  File.NT(AllIndices(h(aaa))).Number, ...
                  File.NT(AllIndices(h(aaa)+d(h(aaa)))).Base, ...
@@ -160,14 +158,16 @@ for aaa = 1:length(h),
   cc = cc + 1;
 end
 
-% create a list of interacting bases
+% -------------------------------------- create a list of interacting bases
+
 % interactions between left and right
 K = 1;                                % counter
 [i,j] = find(Z);                      % interacting pairs
 for k = 1:length(i),                  % loop through them
     Node(n).IBases(K,:) = [leftnum(i(k)) rightnum(j(k))];
-    i1 = i(k) + a - 1;             % index of first base
-    i2 = j(k) + bb - 1;             % index of second
+    i1 = i(k) + a - 1;                % index of first base
+    i2 = j(k) + bb - 1;               % index of second
+    Node(n).InterIndices(K,:) = [i1 i2];
 
     Node(n).InteractionComment{K} = [ ' // Cluster Interaction ' File.NT(i1).Base File.NT(i1).Number ' - ' File.NT(i2).Base File.NT(i2).Number ' ' zEdgeText(File.Edge(i1,i2))];
 
@@ -189,6 +189,7 @@ for k = 1:length(i),                 % loop through them
     Node(n).IBases(K,:) = [leftnum(i(k)) leftnum(j(k))];
     i1 = i(k) + a - 1;             % index of first base
     i2 = j(k) + a - 1;             % index of second
+    Node(n).InterIndices(K,:) = [i1 i2];
 
     Node(n).InteractionComment{K} = [ ' // Cluster Interaction ' File.NT(i1).Base File.NT(i1).Number ' - ' File.NT(i2).Base File.NT(i2).Number ' ' zEdgeText(File.Edge(i1,i2))];
 
@@ -208,8 +209,9 @@ end
 [i,j] = find(Y);                      % interacting pairs
 for k = 1:length(i),                  % loop through them
     Node(n).IBases(K,:) = [rightnum(i(k)) rightnum(j(k))];
-    i1 = i(k) + bb - 1;             % index of first base
-    i2 = j(k) + bb - 1;             % index of second
+    i1 = i(k) + bb - 1;               % index of first base
+    i2 = j(k) + bb - 1;               % index of second
+    Node(n).InterIndices(K,:) = [i1 i2];
 
     Node(n).InteractionComment{K} = [ ' // Cluster Interaction ' File.NT(i1).Base File.NT(i1).Number ' - ' File.NT(i2).Base File.NT(i2).Number ' ' zEdgeText(File.Edge(i1,i2))];
 
@@ -223,6 +225,25 @@ for k = 1:length(i),                  % loop through them
     Node(1).Edge(i1,i2) = File.Edge(i1,i2);
     K  = K + 1;
 end
+
+% ----------------------------------------- Adjust subs probs for LR, BPh inter
+
+if AdjustSubsForLR == 1 && (TertiaryFreeNode == 0 || Extension < 2),
+  for K = 1:length(Node(n).IBases(:,1)),    % run through basepairs
+    i1 = Node(n).InterIndices(K,1);         % left base
+    i2 = Node(n).InterIndices(K,2);         % right base
+    P  = Node(n).SubsProb(:,:,K);           % current substitution probs
+    if Verbose > 1,
+      NT1 = File.NT(i1);
+      NT2 = File.NT(i2);
+      fprintf('    Possibly adjusting substitution probabilities for %4s %4s %s%s %s\n', NT1.Number, NT2.Number, NT1.Base, NT2.Base, zEdgeText(File.Edge(i1,i2)));
+    end
+    Node(n).SubsProb(:,:,K) = pAdjustSubsProb(File,i1,i2,P,method,AllIndices);
+  end
+end
+
+
+
 
 a = aa + 1;                           % current base on left
                                       % skip over rest of cluster

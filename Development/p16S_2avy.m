@@ -1,15 +1,21 @@
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
+AlignmentList = 6;
+
 if ~exist('File')
   File = zAddNTData({'2avy','1j5e'});
 end
 
 clc
 
-% remove a cWW-cWW triple
+JAR3D_path                                % tell where JAR3D class files are 
 
-File(1) = pModifyEdge(File(1),'454','478',0);
+% ----------------------------------------------- Fix up the file first
+
+File(1) = pModifyEdge(File(1),'454','478',0);      % remove a cWW-cWW triple
+File(1) = pModifyEdge(File(1),'113','353',-11);    % crystallographer fix
+File(1) = pModifyEdge(File(1),'415','428',8);      % crystallographer fix
 
 F = File(1);
 
@@ -26,8 +32,206 @@ F = pModifyEdge(F,'939','1375',0);
 
 F = pModifyEdge(F,'959','957',0);
 
-% remove a triple that is absent in 1j5e, just for comparison
+% ----------------------------------------------- JAR3D 1 alignment
+%       2002 IM and simple scoring, no extension of stems, no adjustment
+%       of basepairing probabilities due to LR interactions
 
+jj = 1;
+
+if any(jj == AlignmentList),
+  Node = pMakeNodes(F,[1 2 0 0]);           % use method 2 for basepairs
+
+Node1 = Node
+
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n',jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 2 alignment
+%       NIH BISTI Method 1 scoring, no extension of stems, no adjustment
+%       of basepairing probabilities due to LR interactions
+
+jj = 2;
+
+if any(jj == AlignmentList),
+  Node = pMakeNodes(F,[1 4 0 0]);                 % use method 4 for basepairs
+
+Node2 = Node
+
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 3 alignment
+%        NIH BISTI Method 1 scoring with extension of stems, but no adjustment
+%        of basepairing probabilities due to LR interactions
+
+jj = 3;
+
+if any(jj == AlignmentList),
+  Node = pMakeNodes(F,[1 4 1 0]);                 % use method 4 for basepairs
+
+Node3 = Node;
+
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 4 alignment
+%        NIH BISTI Method 1 scoring with extension of stems, and adjustment
+%        of basepairing probabilities due to LR interactions
+
+jj = 4;
+
+if any(jj == AlignmentList),
+  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 5 alignment
+%        NIH BISTI Method 1 scoring with extension of stems, and adjustment
+%        of basepairing probabilities due to LR interactions, and GU packing
+
+jj = 5;
+
+if any(jj == AlignmentList),
+  F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
+
+  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 6 alignment
+%        NIH BISTI Method 1 scoring with extension of stems, adjustment
+%        of basepairing probabilities due to LR interactions, GU packing,
+%        and nothing but cWW and vague hairpins in extensible stems
+
+jj = 6;
+
+if any(jj == AlignmentList),
+  F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
+
+  Node = pMakeNodes(F,[1 4 2 1]);                 % use method 4 for basepairs
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+% ----------------------------------------------- JAR3D 7 alignment
+%        NIH BISTI Method 1 scoring with extension of stems, adjustment
+%        of basepairing probabilities due to LR interactions, GU packing,
+%        and nothing but cWW and vague hairpins in extensible stems
+
+jj = 7;
+
+if any(jj == AlignmentList),
+  F = File(1);
+  % remove interactions which would necessitate a junction cluster
+
+  F = pModifyEdge(F,'959','984',0);
+  F = pModifyEdge(F,'959','1221',0);
+  F = pModifyEdge(F,'197','220',0);
+  F = pModifyEdge(F,'939','1375',0);
+
+  % remove an interaction on the left strand of a junction
+  % to restore this, allow for interactions within an initial node or
+  % allow a cluster to have zero length on one strand or another
+
+  F = pModifyEdge(F,'959','957',0);
+
+  F = xAnnotateWithKnownMotifs(File(1),1);
+  F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
+
+  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
+  pMakeNodesDiagnostics
+  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+  Alig = Alignment.getAlignment(A);
+
+  fprintf('JAR3D %d\n', jj);
+  for i = 0:4,
+    fprintf('%s\n', Alig.get(i));
+  end
+
+  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
+  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+end
+
+
+
+
+
+break
+
+% remove a triple that is absent in 1j5e, just for comparison
 % F = pModifyEdge(F,'69','100',0);
 
 F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
@@ -43,12 +247,10 @@ clf
 zCircularDiagram(FF,0.2,[1 1 1 1 0 0 1]);
 saveas(gcf,'2avy_circular_SCFG_basepairs.pdf','pdf');
 
-
-break
-
-
 fprintf('Running JAR3D\n');
 JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY.txt',2,0,18);
+
+break
 
 F = xAnnotateWithKnownMotifs(File(1),1);
 NodeM = pMakeNodes(F);
