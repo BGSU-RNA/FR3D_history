@@ -1,5 +1,5 @@
 
-File = zAddNTData('NonRedundant_list',0);      % reclassify
+File = zAddNTData('NonRedundant_list',1);      % reclassify
 zFindExemplars
 File = zUpdateDistanceToExemplars(File);
 
@@ -20,4 +20,20 @@ zExemplarTable([1:13],3.5)
 zExemplarTable([1 5],3.5)
 zExemplarTable(1:6,3.5)
 zExemplarTable(7:12,3.5)
+
+break
+
+
+for f = 1:length(File),
+  if isfield(File(f).Header,'Expdata'),
+    disp(File(f).Header.Expdata)
+  end
+end
+
+for f = 1:length(File),
+  if isfield(File(f).Header,'Resolution'),
+    disp(File(f).Header.Resolution)
+  end
+end
+
 

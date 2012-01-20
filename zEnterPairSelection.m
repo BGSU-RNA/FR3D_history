@@ -16,7 +16,7 @@ if isempty(P),
   P.Expert    = 0;
   P.Inbox     = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % almost everything
   P.Context   = 3;
-  P.PairFilename = 'rr0033_23S';
+  P.PairFilename = '1s72';
   P.PairNucleotide1 = '11';
   P.PairNucleotide2 = '12';
   P.PairDisc  = 5;

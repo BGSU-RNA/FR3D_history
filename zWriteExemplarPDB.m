@@ -11,7 +11,7 @@ if nargin < 1,
 
   % loop through pairs and classifications ----------------------
 
-  fid = fopen('PairExemplarPDB.pdb','w');       % open for writing
+  fid = fopen('Isostericity\PairExemplarPDB.pdb','w');       % open for writing
 
   a = 1;                                         % atom number
   c = 1;                                         % pair number
@@ -39,10 +39,10 @@ if nargin < 1,
 
 else
 
-  a = 1;                                         % atom number
-
   for pc = 1:length(Exemplar(1,:)),
     for row = 1:length(Exemplar(:,pc)),
+
+      a = 1;                                         % atom number
 
       E = Exemplar(row,pc);
   
@@ -57,7 +57,7 @@ else
           S = '';
         end
 
-        fid = fopen(['PairExemplar_' strrep(E.Pair.EdgeText,' ','') '_' E.NT1.Base E.NT2.Base '_' E.Filename '_' E.NT1.Number E.NT1.Chain '_' E.NT2.Number E.NT2.Chain S '.pdb'],'w');       % open for writing
+        fid = fopen(['Isostericity\PairExemplar_' strrep(E.Pair.EdgeText,' ','') '_' E.NT1.Base E.NT2.Base '_' E.Filename '_' E.NT1.Number E.NT1.Chain '_' E.NT2.Number E.NT2.Chain S '.pdb'],'w');       % open for writing
 
         a = zWriteNucleotidePDB(fid,E.NT1,a,0,R,sh);
         a = zWriteNucleotidePDB(fid,E.NT2,a,0,R,sh);

@@ -75,7 +75,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   % ---------- Eliminate out of plane interactions and bad hydrogen bonds
 
-  if abs(Pair.Gap) > 1.0,
+  if (abs(Pair.Gap) > 1.0) && (abs(a) < 20),     % bad basepairing?
     if length(Pair.Hydrogen) > 0,
       if (abs(a) < 11) || (abs(a) >= 13),        % avoid cSS, tSS cases
         if abs(Pair.Gap) > 2.0,

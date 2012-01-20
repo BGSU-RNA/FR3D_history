@@ -427,10 +427,10 @@ elseif (Class == -6) & (Paircode == 15),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(3,:);
 elseif (Class == 6) & (Paircode == 16),
-  X(1,:) = N1.Sugar(3,:);
-  Y(1,:) = N2.Fit(6,:);
-  X(2,:) = N1.Fit(3,:);
-  Y(2,:) = N2.Fit(11,:);
+  X(1,:) = N1.Fit(6,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(11,:);
+  Y(2,:) = N2.Fit(3,:);
 elseif (Class == 7) & (Paircode == 9),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(6,:);
