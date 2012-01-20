@@ -26,6 +26,9 @@ fprintf(fid,'%s\n',Text);
 
 for n=1:length(Node),
   Text = '';
+
+% Node(n)
+
   switch Node(n).type
     case 'Initial' % -----------------------------------------------------
 

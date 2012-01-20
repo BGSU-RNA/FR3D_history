@@ -6,7 +6,7 @@
 
 Verbose = 1;
 
-Date = '2009-03-31';
+Date = '2009-07-24';
 
 PDBInfoName = ['PDB_File_Information ' Date '.xls'];
 
@@ -91,7 +91,7 @@ for i = 1:length(t(:,1)),
 
     [F,LC] = zMarkRedundantChains(File,Verbose);  % find redundant chains
 
-    j = find(cat(2,File.NT.Chain) == LC);    % indices of longest chain
+    j = find(cat(2,File.NT.Chain) == LC{1});    % indices of longest chain
     t{i,11} = cat(2,File.NT(j).Base);        % bases in largest chain
 
     if Verbose > 0,

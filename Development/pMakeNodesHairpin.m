@@ -26,7 +26,7 @@
         % Node(n).InsertionComment{i} = 
 
         if Verbose > 0,
-          fprintf('%3d Hairpin  %s:%s\n', n, File.NT(a).Number, File.NT(B).Number);
+          fprintf('%3d Hairpin   %s:%s %s\n', n, File.NT(a).Number, File.NT(B).Number, cat(2,File.NT(a:B).Base));
         end
         EndLoop = 1;
 
@@ -38,20 +38,25 @@ i = i(ii);
 j = j(ii);
 e = e(ii);
 
-if length(i) > 0,
-  fprintf('Hairpin has these long-range interactions: ===================\n');
-  for z = 1:length(i),
-    NT1 = File.NT(i(z));
-    NT2 = File.NT(j(z));
-    fprintf('Pair %s %s%5s_%s - %s%5s_%s %s\n', File.Filename, NT1.Base,NT1.Number,NT1.Chain,NT2.Base,NT2.Number,NT2.Chain, zEdgeText(File.Edge(i(z),j(z))));
+if Verbose > 1,
+  if length(i) > 0,
+    fprintf('Hairpin has these long-range interactions: ===================\n');
+    for z = 1:length(i),
+      NT1 = File.NT(i(z));
+      NT2 = File.NT(j(z));
+      fprintf('Pair %s %s%5s_%s - %s%5s_%s %s\n', File.Filename, NT1.Base,NT1.Number,NT1.Chain,NT2.Base,NT2.Number,NT2.Chain, zEdgeText(File.Edge(i(z),j(z))));
+    end
+  else
+    fprintf('Hairpin has no long-range interactions ***********************\n');
   end
-else
-  fprintf('Hairpin has no long-range interactions ***********************\n');
+
+  c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+  cent = mean(c);
+
+  fprintf('Distance from center of molecule: %8.4f\n', norm(cent-File.NT(a).Center));
+
+  if Verbose > 2,
+    fprintf('Press any key to continue\n');
+    pause
+  end
 end
-
-c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
-cent = mean(c);
-
-fprintf('Distance from center of molecule: %8.4f\n', norm(cent-File.NT(a).Center));
-
-pause

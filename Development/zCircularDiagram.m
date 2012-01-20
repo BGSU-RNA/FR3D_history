@@ -27,6 +27,7 @@
 %  6 = BPh
 %  7 = explanatory text
 %  8 = leave gaps in diagram for breaks in nucleotide chain
+%  9 = display nucleotide numbers in the diagram
 
 function [Tally] = zCircularDiagram(File,Thickness,View)
 
@@ -37,10 +38,10 @@ if nargin < 2,
 end
 
 if nargin < 3,
-  View = [1 1 1 1 1 1 1 1];
+  View = [1 1 1 1 1 1 1 1 1];
 end
 
-while length(View) < 8,
+while length(View) < 9,
   View = [View 1];
 end
 
@@ -54,7 +55,7 @@ B  = E .* (E > 0) .* (E < 24);                 % pairs and stacks
 %R  = File.Range;
 C  = File.Crossing;
 
-Color = (B==1).*(C==0) + 2*(B>1).*(B<14).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 14) .*(C>0) + 5*(B > 20) .* (B < 25);
+Color = (B==1).*(C==0) + 2*(B>1).*(B<13).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 13) .*(C>0) + 5*(B > 20) .* (B < 25);
                                         % disjoint possibilities
 
 BP = abs(File.BasePhosphate);           % 
@@ -135,7 +136,7 @@ axis off
 
 if View(7) > 0,
 
-% Color = (B==1).*(C==0) + 2*(B>1).*(B<14).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 14) .*(C>0) + 5*(B > 20) .* (B < 25);
+% Color = (B==1).*(C==0) + 2*(B>1).*(B<13).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 13) .*(C>0) + 5*(B > 20) .* (B < 25);
 
   text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 

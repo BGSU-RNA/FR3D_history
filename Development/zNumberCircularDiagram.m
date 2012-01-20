@@ -1,3 +1,6 @@
+%
+% View(8) = 1 means to space the chains and gaps in the normal way
+% View(9) = 1 means to display the numbers; 0 means just to calculate
 
 function [A,mA] = zNumberCircularDiagram(File,View,Thickness,r)
 
@@ -7,10 +10,12 @@ if r >= 1,
   ra = 1.02 * r;
   rb = 1.04 * r;
   rc = 1.11 * r;
+  rd = 1.01 * r;
 else
   ra = r/1.02;
   rb = r/1.04;
   rc = r/1.2;
+  rd = r/1.01;
 end
 
 % ------------------------------------- Determine where to plot each NT
@@ -43,6 +48,8 @@ d = [0 d];                              % prepend for the first nucleotide
 A = A * (-2*pi) / mA;                   % convert A to radians
 
 % ---------------------------------- Draw the outside circle
+
+if View(9) == 1,
 
 for m = 1:(length(d)-1),
   theta = [A(d(m)+1):-0.01:A(d(m+1)) A(d(m+1))];
@@ -124,6 +131,19 @@ for k = 1:N,
     end
   end
 
+%  text(ra*cos(theta), ra*sin(theta), File.NT(k).Base,'FontSize',0.5, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','g');
+
+  if k/2 == fix(k/2),
+    rr = rd;
+  elseif r >= 1,
+    rr = rd*1.01;
+  else
+    rr = rd / 1.01;
+  end
+
+  text(rr*cos(theta), rr*sin(theta), File.NT(k).Base,'FontSize',0.5, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','g');
+
+
   if (mod(kk,sstep) == 0) && (mod(kk,step) ~= 0) && (Thickness < 1) && (flag == 0),
     plot([r*cos(theta) ra*cos(theta)], [r*sin(theta), ra*sin(theta)],'k');
     text(rb*cos(theta), rb*sin(theta), File.NT(k).Number,'FontSize',4, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
@@ -132,4 +152,6 @@ for k = 1:N,
     plot([r*cos(theta) rb*cos(theta)], [r*sin(theta), rb*sin(theta)],'k');
     text(rc*cos(theta), rc*sin(theta), File.NT(k).Number, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
   end
+end
+
 end

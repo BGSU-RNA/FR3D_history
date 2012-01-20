@@ -117,7 +117,7 @@ if ~isempty(Candidates),                         % some candidate(s) found
   end
 
    if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0) ...
-     & (Query.NumNT > 2),
+     & (Query.NumNT >= 2),
 
      tt = cputime;
 

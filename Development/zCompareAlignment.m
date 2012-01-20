@@ -7,7 +7,9 @@ if strcmp(class(File),'char'),
   File = zGetNTData(Filename,0);
 end
 
-View(8) = 0;
+View(8) = 0;                              % don't put gaps in circular diagram
+View(9) = 1;                              % display the numbers
+
 Thickness = 0.2;
 
 clf
@@ -35,14 +37,6 @@ end
 
 text(-1.3,-1.4,['Black lines indicate the ' num2str(length(g1)) ' agreements']);
 
-[g1,g2,s] = find(Matrix1 > Matrix2);
-for j = 1:length(g1),
-  plot([cos(A(g1(j))) r*cos(B(g2(j)))], [sin(A(g1(j))) r*sin(B(g2(j)))],'r','LineWidth',Thickness);
-  hold on
-end
-
-text(-1.3,-1.6,['Red lines indicate the ' num2str(length(g1)) ' missing correspondences in ' n2]);
-
 [g1,g2,s] = find(Matrix2 > Matrix1);
 for j = 1:length(g1),
   plot([cos(A(g1(j))) r*cos(B(g2(j)))], [sin(A(g1(j))) r*sin(B(g2(j)))],'c','LineWidth',Thickness);
@@ -50,6 +44,14 @@ for j = 1:length(g1),
 end
 
 text(-1.3,-1.8,['Cyan lines indicate the ' num2str(length(g1)) ' extra correspondences in ' n2]);
+
+[g1,g2,s] = find(Matrix1 > Matrix2);
+for j = 1:length(g1),
+  plot([cos(A(g1(j))) r*cos(B(g2(j)))], [sin(A(g1(j))) r*sin(B(g2(j)))],'r','LineWidth',Thickness);
+  hold on
+end
+
+text(-1.3,-1.6,['Red lines indicate the ' num2str(length(g1)) ' missing correspondences in ' n2]);
 
 axis equal
 axis([-1.2 1.2 -2 1.2]);

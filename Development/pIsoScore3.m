@@ -1,4 +1,4 @@
-% pIsoScore2 returns a 4x4 matrix of scores depending on the specified
+% pIsoScore3 returns a 4x4 matrix of scores depending on the specified
 % interaction category Class and the specified Pair having this interaction.
 
 function [S] = pIsoScore3(Class,Code1,Code2,ExemplarIDI,ExemplarFreq)

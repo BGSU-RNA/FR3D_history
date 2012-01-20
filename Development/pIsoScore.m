@@ -6,6 +6,7 @@
 % method = 1;                 Use Isosteric subclasses according to LSW 2002
 % method = 2;                 Use IDIs mapped into probabilities
 % method = 3;                 Use IDIs times frequencies
+% method = 4;                 Use IDI with classes weighted 85, 10, 4, 1
 
 % Note to add:  AG water inserted is self-isosteric.  Call this class 14???
 
@@ -35,4 +36,5 @@ switch method
   case 1,  S = pIsoScore1(Class,Code1,Code2);
   case 2,  S = pIsoScore2(Class,Code1,Code2,ExemplarIDI);
   case 3,  S = pIsoScore3(Class,Code1,Code2,ExemplarIDI,ExemplarFreq);
+  case 4,  S = pIsoScore4(Class,Code1,Code2,ExemplarIDI);
 end

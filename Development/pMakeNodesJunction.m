@@ -1,16 +1,43 @@
 % pMakeNodesJunction identifies one or more junctions and make nodes for them
 
-      C1 = full(sum(sum(G(r:r+jcdepth,t:t+jcdepth))));   % junction cluster 1-3
-      C2 = full(sum(sum(G(r:r+jcdepth:u-jcdepth:u))));   % junction cluster 1-4
-      C3 = full(sum(sum(G(s-jcdepth:s,t:t+jcdepth))));   % junction cluster 2-3
-      C4 = full(sum(sum(G(s-jcdepth:s,u-jcdepth:u))));   % junction cluster 2-4
+      C1 = full(sum(sum(H(r:r+jcdepth,t:t+jcdepth))));   % junction cluster 1-3
+      C2 = full(sum(sum(H(r:r+jcdepth:u-jcdepth:u))));   % junction cluster 1-4
+      C3 = full(sum(sum(H(s-jcdepth:s,t:t+jcdepth))));   % junction cluster 2-3
+      C4 = full(sum(sum(H(s-jcdepth:s,u-jcdepth:u))));   % junction cluster 2-4
 
-%[C1 C2 C3 C4]
+if C1+C2+C3+C4 > 0,
+  [C1 C2 C3 C4]
+  disp('Junction includes some nested pairs that will be removed.');
+end
+
+
+
+      C1 = sum(sum(G(r:r+jcdepth,t:t+jcdepth)~=0));   % junction cluster 1-3
+      C2 = sum(sum(G(r:r+jcdepth:u-jcdepth:u)~=0));   % junction cluster 1-4
+      C3 = sum(sum(G(s-jcdepth:s,t:t+jcdepth)~=0));   % junction cluster 2-3
+      C4 = sum(sum(G(s-jcdepth:s,u-jcdepth:u)~=0));   % junction cluster 2-4
+
+      [i,j,k] = find(G(r:r+jcdepth,t:t+jcdepth));   % junction cluster 1-3
+      kk = k;
+      [i,j,k] = find(G(r:r+jcdepth:u-jcdepth:u));   % junction cluster 1-4
+      kk = [kk; k];
+      [i,j,k] = find(G(s-jcdepth:s,t:t+jcdepth));   % junction cluster 2-3
+      kk = [kk; k];
+      [i,j,k] = find(G(s-jcdepth:s,u-jcdepth:u));   % junction cluster 2-4
+      kk = [kk; k];
+
+Node(1).JunctionDeletion = [Node(1).JunctionDeletion; kk];
+
+if Verbose > 1,
+  full([C1 C2 C3 C4])
+end
 
       % ------------------ Remove junction clusters --------------------
       % Note:  this is only happening between the two loops identified so
       % far, but there may be more loops, and between them these interactions
-      % are not being removed!
+      % are not being removed!  Maybe this is not actually a problem.
+      % The little study above tells me that in E. coli 16S, no nested pairs
+      % were removed by this.
 
       if C1 > 0,
         G(r:r+jcdepth,t:t+jcdepth) = 0*G(r:r+jcdepth,t:t+jcdepth);
