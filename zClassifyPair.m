@@ -57,6 +57,10 @@ end
       end
     end
 
+    if (fix(abs(Pair.Edge)) == 30) && (Force == 0),% remove unclassified pairs
+      Pair = [];
+    end
+
   else
     Pair = [];
   end   % if small vertical distance or hand classified

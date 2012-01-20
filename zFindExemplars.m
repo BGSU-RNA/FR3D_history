@@ -41,8 +41,6 @@ for j = 1:length(pcodes),
  CLE = CLE(find(CLE));               % leave out empty entries
  for row = 1:length(CLE),
 
-if fix(abs(CLE(row))) == 13,
-
   % specify criteria for selection of pairs ----------------------------------
 
   Param.Paircode = pc;
@@ -89,8 +87,10 @@ if fix(abs(CLE(row))) == 13,
     %hist(dists,30)
     %pause
 
+    PD = sqrt(PD)/2;            % finish discrepancy calculation
+
     bigm = max(max(PD));
-    if bigm > 4,
+    if bigm > 1,
       fprintf('%6.2f maximum pair discrepancy\n',bigm);
     end
 
@@ -129,9 +129,23 @@ if fix(abs(CLE(row))) == 13,
 
 %  save('PairExemplars','Exemplar'); % Matlab version 7 only
 
-  save PairExemplars.mat Exemplar -V6 % for compatibility with older versions
+% add information to speed up the discrepancy calculation
 
-end
+    [s,t] = size(Exemplar);
+    for i = 1:s,
+      for j = 1:t,
+        if ~isempty(Exemplar(i,j).NT1),
+          Exemplar(i,j).R            = Exemplar(i,j).NT2.Rot' * Exemplar(i,j).NT1.Rot;
+          Exemplar(i,j).T1           = (Exemplar(i,j).NT2.Center - Exemplar(i,j).NT1.Center) * Exemplar(i,j).NT1.Rot;
+          Exemplar(i,j).T2           = (Exemplar(i,j).NT1.Center - Exemplar(i,j).NT2.Center) * Exemplar(i,j).NT2.Rot;
+          Exemplar(i,j).AngleWeight  = [1 1];
+          Exemplar(i,j).LDiscCutoff  = Inf;
+        end 
+      end
+    end
+
+
+  save PairExemplars.mat Exemplar -V6 % for compatibility with older versions
 
  end
 end

@@ -179,7 +179,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   % ------------------------ record nearest exemplar if no classification yet
 
-  if (fix(a) == 30) & (Pair.Distances(1) < 4),  % close to SOMETHING at least
+  if (fix(a) == 30) && (Pair.Distances(1) < 0.8), % close to SOMETHING at least
     b = a-fix(a);                          % extract decimal code for reason
     c = Pair.Classes(1);
     a = sign(c) * (100 + abs(c) + b/1000);

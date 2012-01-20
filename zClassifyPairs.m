@@ -22,7 +22,7 @@ end
 
 % -------- First screening of base pairs ------------------------------------ 
 
-DistCutoff = 15;                                % max distance for interaction
+DistCutoff = 10.5;                                % max distance for interaction
 [i,j] = find((File.Distance < DistCutoff).*(File.Distance > 0)); 
                                                 % screen by C-C distance
 k = find(i<j);                                  % look at each pair only once

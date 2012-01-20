@@ -169,7 +169,8 @@ if s > NumToOutput,
 end
 
 if N == 2,
-  figure(1)
+  figure
+  clf
   hist(CP,30)
   fprintf('Average C1''-C1'' distance is: %8.4f\n', mean(CP));
 end

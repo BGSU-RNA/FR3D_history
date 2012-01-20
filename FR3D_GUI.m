@@ -31,6 +31,8 @@ function varargout = FR3D_GUI(varargin)   %By Ali Mokdad - March 2006
 % Last Modified by GUIDE v2.5 17-Jul-2006 19:31:53
 
 % Compiling:
+%   zipfile = buildmcr
+%     puts MCRInstaller in C:\Program Files\MATLAB\R2007a\toolbox\compiler\deploy\win32
 %   mbuild -setup
 %   mcc -m FR3D_GUI
 

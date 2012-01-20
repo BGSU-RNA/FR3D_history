@@ -1,5 +1,5 @@
 % zDistanceToExemplars(Exemplar,Pair) computes the distance to each
-% exemplar for the given Pair
+% exemplar for the given pair of nucleotides
 
 function [c,d,i] = zDistanceToExemplars(Exemplar,NT1,NT2)
 
@@ -11,11 +11,12 @@ F2.NT(1) = NT1;
 F2.NT(2) = NT2;
 
 for j = 1:length(Exemplar(:,pc)),
+  E = Exemplar(j,pc);
   if ~isempty(Exemplar(j,pc).Class),
-    c(k) = Exemplar(j,pc).Class;
-    F1.NT(1) = Exemplar(j,pc).NT1;
-    F1.NT(2) = Exemplar(j,pc).NT2;
-    d(k)     = xDiscrepancy(F1,[1 2], F2, [1 2]);
+    c(k) = E.Class;
+
+    d(k) = sqrt(xDiscrepancyFast(E,[NT1 NT2]))/2;
+
   else
     c(k) = 99;
     d(k) = 99999999;

@@ -67,9 +67,9 @@ for ca = 1:length(Category),
 
 % modify the following line to include or exclude subcategories
 
-     if abs(E.Class) == Category(ca),          % don't include subcategories
+%     if abs(E.Class) == Category(ca),          % don't include subcategories
  
-%     if abs(fix(E.Class)) == Category(ca),     % include subcategories
+     if abs(fix(E.Class)) == Category(ca),     % include subcategories
 
 %       fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
 %       zListPairData(E.Pair,1);
