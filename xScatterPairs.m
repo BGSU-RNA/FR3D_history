@@ -1,6 +1,6 @@
 % xScatterPairs displays multiple 3d scatter plots of pair parameters
 
-function [FigsDone] = xScatterPairs(Search,Candidates,N1,N2,Param,ViewParam)
+function [FigsDone] = xScatterPairs(Search,N1,N2,Param,ViewParam)
 
 if nargin < 3,
   N1 = 1;
@@ -10,6 +10,7 @@ end
 % --------------------------------------------- 
 % --------------------------------------------- Collect basic data
 
+Candidates = Search.Candidates;
 [L,t] = size(Candidates);
 N     = t - 1;                                     % number of nucleotides
 File  = Search.File;

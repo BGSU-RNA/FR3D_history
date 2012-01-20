@@ -102,7 +102,9 @@ while stop == 0,
          'Display marked only', ...                           % 9
          'List to screen','Write to PDB', ...                 % 10,11
          'Sort by centrality', 'Group Candidates', ...        % 12,13
-         'Show Alignment', QuitButton);                       % 14,15
+         'Show Alignment', ...                                % 14
+         'Show Scatterplot', ...                              % 15
+         QuitButton);                                         % 16
 
   ii=gcf;                                 % get current active figure
   if (abs(ii) > 20) | (ii == 0),          % FR3D_GUI could be active window
@@ -202,7 +204,10 @@ while stop == 0,
     case 14                                     % align
       xAlignCandidates(File(FIndex),Search,1)
 
-    case 15                                     % quit Display
+    case 15
+      xScatterPairs(Search,1,2)
+
+    case 16                                     % quit Display
       if exist('fidOUT','var')
         fclose(fidOUT);
       end
