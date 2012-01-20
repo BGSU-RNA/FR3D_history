@@ -1,4 +1,4 @@
-
+% zUniqueRows(M) returns the unique rows of M in b and counts of them in t
 function [b,t] = zUniqueRows(M)
 
 N = sortrows(M);
@@ -17,9 +17,11 @@ for r = 2:length(N(:,1)),
     b(c,:) = n;
     t(c) = 1;
 
-b
-t
-pause
+if 0 > 1,
+  b
+  t
+  pause
+end
 
   end
 end

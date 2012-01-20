@@ -28,7 +28,4 @@ for i = 1:length(Filenums),
 end
 
 Candidates  = Candidates(find(OK),:);
-
-if nargin > 2,
-  Discrepancy = Discrepancy(find(OK));
-end
+Discrepancy = Discrepancy(find(OK));

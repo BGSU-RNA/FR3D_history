@@ -3,44 +3,55 @@
 
 function [NewIndices] = xNeighborhood(File,Indices,v,Display)
 
-MaxDiff = Display.MaxDiff;
-MaxInsert = Display.MaxInsert;
+N = length(Indices);                                 % number of nucleotides
 
-p = Display.p;
-
-N = length(Indices);
-
-switch v,
-  case 0,
-    NewIndices = Indices;
-  case 1,
-    NewIndices = Indices;
-    for n = 1:(N-1),
-      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 16),   % if only few insertions
-        NewIndices = [NewIndices (Indices(n)+1):(Indices(n+1)-1)];
-      end
-    end
-  case 2,
-    NewIndices = Indices;
-    for n = 1:(N-1),
-      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 20),   % if only few insertions
-        NewIndices = [NewIndices (Indices(n)+1):(Indices(n+1)-1)];
-      end
-    end
-  otherwise,
-    d = [1 1 6 8 10];
-    a = zeros(1,File.NumNT);
-    for j=1:length(Indices),
-      a = a + (File.Distance(Indices(j),:) < d(v)) .* ...
-              (File.Distance(Indices(j),:) > 0);
-    end
-    a(Indices) = zeros(1,length(Indices));  % take out ones in Indices
-    B = find(a);
-    NewIndices = [Indices B];
+if nargin < 4,
+  
+else
+  MaxDiff = Display.MaxDiff;
+  MaxInsert = Display.MaxInsert;
 end
 
-NewIndices = sort(NewIndices);
+if ~isfield(File,'Distance'),
+  c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+  File.Distance = zMutualDistance(c,16); % compute distances < 16 Angstroms
+end
 
-% it should make sure there are no duplicates in NewIndices
-% it should check File to make sure that everything in NewIndices really
-% is present in File, otherwise something will crash
+if isempty(File.Distance),
+  c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+  File.Distance = zMutualDistance(c,16); % compute distances < 16 Angstroms
+end
+
+NewIndices = Indices;                                % always start here
+
+if v > 0,                                          % add basepairs
+  for n = 1:N,
+    e = abs(File.Edge(Indices(n),:));              % interactions with n
+    j = find( (e > 0) .* (e < 14) );               % basepairing with n
+    NewIndices = [NewIndices j];
+  end
+  for n = (N+1):length(NewIndices),                % add what these pair with
+    e = abs(File.Edge(NewIndices(n),:));           % interactions with n
+    j = find( (e > 0) .* (e < 14) );               % basepairing with n
+    NewIndices = [NewIndices j];
+  end
+end
+
+if v > 1,                                            % add intervening ones
+  for n = 1:N,
+    NewIndices = [NewIndices (Indices(n)-1):(Indices(n)+1)];
+  end
+end
+
+if v > 2,
+  d = [1 1 8 10 12];
+  a = zeros(1,File.NumNT);
+  for j=1:length(Indices),
+    a = a + (File.Distance(Indices(j),:) < d(v)) .* ...
+            (File.Distance(Indices(j),:) > 0);
+  end
+  NewIndices = [NewIndices find(a)];
+end
+
+NewIndices = unique(NewIndices);
+NewIndices = sort(NewIndices);

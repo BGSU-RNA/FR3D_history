@@ -2,6 +2,10 @@
 
 function [File] = zAttachAlignment(File,Verbose,FASTAFile,LineNumber)
 
+if nargin < 2,
+  Verbose = 1;
+end
+
 [n,t,r] = xlsread(['Alignments' filesep 'StructureToAlignmentMap.xls']);
 
 for f = 1:length(File),

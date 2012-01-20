@@ -27,7 +27,7 @@ t = cputime;
     % 10  G N2-1H2 interacts with oxygen of phosphate, called 1BPh
     % 11  G N2-2H2 interacts with oxygen of phosphate, called 3BPh
     % 12  G N2-2H2 and N1-H1 interacts with 2 oxygens of phosphate, called 4BPh
-    % 19  G N2-2H2 and N1-H1 interact with just one oxygen, called 4BPh
+    % 19  G N2-2H2 and N1-H2 interact with just one oxygen, called 4BPh
     % 13  G N1-H1  interacts with oxygen of phosphate, called 5BPh
     % 14  G C8-H8  interacts with oxygen of phosphate, called 0BPh
     % 15  U N3-H3  interacts with oxygen of phosphate, called 5BPh
