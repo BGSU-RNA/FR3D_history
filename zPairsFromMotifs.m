@@ -1,2 +1,0 @@
-
-function [File] = zPairsFromMotifs(File, 
