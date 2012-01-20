@@ -26,18 +26,22 @@ if length(str) > 0,
 
   lt = strfind(str,'>');
   for i=length(lt):-1:1,
+   if lt(i)+1 <= length(str),
     if any(str(lt(i)+1) == 'gl=<>'),
       str = [str(1:lt(i)) ',' str(lt(i)+1:length(str))];    
     end
+   end
   end
 
 str
 
   lt = strfind(str,'<');
   for i=length(lt):-1:1,
+   if lt(i)+1 <= length(str),
     if any(str(lt(i)+1) == 'gl=<>'),
       str = [str(1:lt(i)) ',' str(lt(i)+1:length(str))];    
     end
+   end
   end
 
 str

@@ -113,6 +113,38 @@ if (min(Model.OKCodes{p}) == 0) | (min(Model.OKCodes{q}) == 0),
     k = find(Model.OKCodes{p}(Codes(i)) .* Model.OKCodes{q}(Codes(j)));
   end
 
+  i = i(k); 
+  j = j(k);
+  d = d(k);
+end
+
+% --------- Screen according to configuration (syn or anti)
+
+if length(Model.Config{p} > 0,
+  switch Model.Config{p}
+    case 'Syn'
+      k = find(cat(1,File.NT(i).Syn) == 1);
+    case 'Anti'
+      k = find(cat(1,File.NT(i).Syn) == 0);
+    otherwise
+      k = 1:length(i);
+  end
+
+  i = i(k);
+  j = j(k);
+  d = d(k);
+end
+
+if length(Model.Config{q} > 0,
+  switch Model.Config{q}
+    case 'Syn'
+      k = find(cat(1,File.NT(j).Syn) == 1);
+    case 'Anti'
+      k = find(cat(1,File.NT(j).Syn) == 0);
+    otherwise
+      k = 1:length(j);
+  end
+
   i = i(k);
   j = j(k);
   d = d(k);

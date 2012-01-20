@@ -8,6 +8,10 @@ Discrepancy = Search.Discrepancy;
 [s,t]       = size(Candidates);
 N           = Model.NumNT;
 
+if N == 2,
+  CP = zeros(1,s);
+end
+
 if nargin < 3,
   NumToOutput = 30;                    % limit on number printed to screen
 end
@@ -42,8 +46,9 @@ for i=1:s,
     end
 
     if N == 2,                        % special treatment for basepairs
-      fprintf('   C1*-C1*: %8.4f', norm(File(f).NT(Candidates(i,1)).Sugar(1,:) - ...
-                            File(f).NT(Candidates(i,2)).Sugar(1,:)));
+      CP(i) = norm(File(f).NT(Candidates(i,1)).Sugar(1,:) - ...
+                            File(f).NT(Candidates(i,2)).Sugar(1,:));
+      fprintf('   C1*-C1*: %8.4f', CP(i));
       NT1 = File(f).NT(Candidates(i,1));
       NT2 = File(f).NT(Candidates(i,2));
       Edge  = File(f).Edge(Candidates(i,1),Candidates(i,2));
@@ -59,4 +64,10 @@ end
 
 if s > NumToOutput,
   fprintf('Only the first %d candidates were listed.\n', NumToOutput);
+end
+
+if N == 2,
+  figure(1)
+  hist(CP,30)
+  fprintf('Average C1''-C1'' distance is: %8.4f\n', mean(CP));
 end

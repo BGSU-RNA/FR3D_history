@@ -9,7 +9,7 @@ if ~exist('GUIactive'),                      % if the GUI is not being used
   Query     = xSpecifyQuery;                 % get search parameters
 end
 
-Query
+% Query
 
 % ----------------------------------------- Load PDB files if needed --------
 

@@ -27,7 +27,7 @@ function [File] = zReadandAnalyze(Filename)
 
 fid = fopen([Filename '.pdb'],'r');
 
-if fid > 0
+if fid > 0,
 
 fclose(fid);
 
@@ -37,7 +37,7 @@ Header = zExtractAtomsPDB(Filename,'##TempPDB');
 
 delete('##TempPDB.pdb');
 
-% Move models in NMR file apart
+% Move models in NMR file apart ---------------------------------------------
 
 if isfield(Header,'Expdata') & (length(Header.ModelStart) > 1)
   if ~isempty(strfind(Header.Expdata,'NMR')),
@@ -225,8 +225,6 @@ while i < length(NTNUMBER),                 % go through all atoms
     NT(n).Sugar = Sugar;
   end
 
-  NT(n).Syn = 0;                              % we'll compute this later
-
   n = n + 1;                                  % next nucleotide index
 end                                           % end while i < ... loop
 
@@ -263,6 +261,7 @@ for n=1:NumNT,                                   % analyze all nucleotides
 
   NT(n).Rot         = r;                         % save the rotation matrix
   NT(n).Fit(1:L2,:) = F;                         % fitted locations of base, H
+  NT(n).Syn         = 0;
 end
 
 % Compute center-center distances -------------------------------------------
@@ -284,6 +283,7 @@ File.CI        = sparse(NumNT,NumNT);
 File.Inter     = sparse(NumNT,NumNT);
 File.Edge      = sparse(NumNT,NumNT);
 File.Modified  = 1;
+File.Header    = Header;
 
 % Calculate configuration (syn or anti) -------------------------------------
 

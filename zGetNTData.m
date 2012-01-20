@@ -60,13 +60,22 @@ for f=1:length(Filenames),
     File = zReadHandFile(File);
   end
 
+  Overlap = 0;
+
   if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
     (ClassifyCode == 1) | (length(fieldnames(File)) < 11) | ...
     (max(max(File.Inter)) < 100),
     File.Edge = sparse(File.NumNT,File.NumNT);
-    File = zClassifyPairs(File);
-    File = zUpdateDistanceToExemplars(File);
-    ClassifyCode = 1;
+
+    d = sort(nonzeros(File.Distance));
+    if d(10) < 1,
+      fprintf('%s has overlapping nucleotides and should be re-read\n',File.Filename);
+      Overlap = 1;
+    else
+      File = zClassifyPairs(File);
+      File = zUpdateDistanceToExemplars(File);
+      ClassifyCode = 1;
+    end
   end
 
   if ~isfield(File.NT(1),'Syn'),
@@ -75,14 +84,22 @@ for f=1:length(Filenames),
       File.NT(k).Syn = SynList(k);
     end
     ClassifyCode = 1;
- end
+  end
+
+  if ~isfield(File,'Header'),
+    File.Header.ModelStart = [];
+    File.Header.ExpData    = '';
+    File.Header.Resolution = '';
+    ClassifyCode = 1;
+  end
 
   File = orderfields(File);
 
-  if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
-    File.Modified = 0;
-    zSaveNTData(File);
-  end
+  if Overlap == 0,
+    if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
+      zSaveNTData(File);
+    end
 
-  Files(f) = File;
+    Files(f) = File;
+  end
 end

@@ -47,9 +47,15 @@ end
 
 % --- Executes just before FR3D_GUI is made visible.
 function FR3D_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
-savedf=ls('SearchSaveFiles/*.mat');
-if isempty(savedf),savedf=' ';end
-set(handles.LOAD,'String',savedf);
+savedf=dir(['SearchSaveFiles' filesep '*.mat']);
+if length(savedf) == 0,
+  savedff=' ';
+else
+  for i = 1:length(savedf),
+    savedff{i,1} = savedf(i).name;
+  end
+end
+set(handles.LOAD,'String',savedff);
 
 mGetPDBfilenames %defines s
 set(handles.SearchPDBs,'String',s);
@@ -70,9 +76,17 @@ varargout{1} = handles.output;
 
 
 function LOAD_Callback(hObject, eventdata, handles)
-savedf=ls('SearchSaveFiles/*.mat');
-if isempty(savedf),savedf=' ';end
-set(handles.LOAD,'String',savedf); %Update without having to reopen GUI
+
+savedf=dir(['SearchSaveFiles' filesep '*.mat']);
+if length(savedf) == 0,
+  savedff=' ';
+else
+  for i = 1:length(savedf),
+    savedff{i,1} = savedf(i).name;
+  end
+end
+set(handles.LOAD,'String',savedff); %Update without having to reopen GUI
+
 v=get(handles.LOAD,'Value');
 f=savedf(v,1:end);
 l=strcat('SearchSaveFiles/',f);

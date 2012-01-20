@@ -5,6 +5,8 @@ function [Header] = zExtractAtomsPDB(Filename,Outputname)
 
 fid = fopen([Filename '.pdb'],'r');
 
+Header.ModelStart = 1;
+
 if fid > 0
 
   out = fopen([Outputname '.pdb'],'w');
@@ -12,8 +14,6 @@ if fid > 0
   L = 1;
 
   c = 1;
-
-  Header.ModelStart = 1;
 
   while L > -1
     L = fgets(fid);
@@ -56,4 +56,12 @@ else
 
   fprintf('Could not open file %s.pdb\n', Filename);
 
+end
+
+if ~isfield(Header,'ExpData'),
+  Header.ExpData = '';
+end
+
+if ~isfield(Header,'Resolution'),
+  Header.Resolution = [];
 end

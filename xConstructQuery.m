@@ -100,8 +100,10 @@ if ~isfield(Query,'Name'),
   Query.Name = num2str(Query.Number);
 end
 
-if ~isfield(Query,'isSyn'),
-  Query.isSyn = zeros(1:Query.NumNT);
+if ~isfield(Query,'Config'),
+  for i=1:Query.NumNT,
+    Query.Config{i} = '';
+  end
 end
 
 if (Query.Geometric == 0) & ~isfield(Query,'Diameter'),
