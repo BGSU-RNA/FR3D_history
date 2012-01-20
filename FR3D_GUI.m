@@ -189,7 +189,7 @@ if length(NT)<=12 %this is a limitation by the size of the GUI
 
     if get(handles.ViewQuery,'Value')==1
         figure(3)
-        zDisplayNT(File(SIndex),NT);
+        zDisplayNT(File(QIndex),NT);
         grid off
         rotate3d on
     end
