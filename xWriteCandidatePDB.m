@@ -22,13 +22,14 @@ end
 
 if length(Search.Candidates) > 0,
 
-fid = fopen([Search.SaveName '-Cand.pdb'],'w');       % open for writing
-
 M = length(Search.Candidates(:,1));            % number of candidates
 
 f     = Search.Candidates(1,N+1);
 Model = File(f).NT(Search.Candidates(1,1:N));  % first cand, taken as model
 
+% ------------------ Write candidates to separate locations
+
+fid = fopen([Search.SaveName '-Cand.pdb'],'w');       % open for writing
 
 a = 1;                                         % atom number
 
@@ -46,5 +47,26 @@ end
 fclose(fid);
 
 fprintf('Wrote %s\n', [Search.SaveName '-Cand.pdb']);
+
+% ------------------ Write candidates superimposed on one another
+
+fid = fopen([Search.SaveName '-Cand-Superimposed.pdb'],'w');       % open for writing
+
+a = 1;                                         % atom number
+
+for c = 1:M,                                   % loop through candidates
+ f     = Search.Candidates(c,N+1);             % file number, this candidate
+ Cand  = File(f).NT(Search.Candidates(c,1:N)); % current candidate
+ [R,Sh] = xSuperimposeCandidates(Model,Cand,LW,AW);
+
+ for i = 1:N,                                  % loop through nucleotides
+  NT = Cand(i);                                % current nucleotide
+  a = zWriteNucleotidePDB(fid,NT,a,0,R,Sh);
+ end
+end
+
+fclose(fid);
+
+fprintf('Wrote %s\n', [Search.SaveName '-Cand-Superimposed.pdb']);
 
 end

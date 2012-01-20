@@ -45,9 +45,23 @@ end
 
 t = 4;
 
-Text{1} = Search.SaveName;
-Text{2} = Search.Query.Name;
-Text{3} = Search.Query.Description;
+if isfield(Search,'SaveName'),
+  Text{1} = Search.SaveName;
+else
+  Text{1} = '';
+end
+
+if isfield(Search.Query,'Name'),
+  Text{2} = Search.Query.Name;
+else
+  Text{2} = '';
+end
+
+if isfield(Search.Query,'Description'),
+  Text{3} = Search.Query.Description;
+else
+  Text{3} = '';
+end
 
 Text{t} = '';
 

@@ -34,14 +34,14 @@ SugarReorder = [10 11 12 9 8 6 7 4 5 2 3 1];
     j = SugarReorder(k);
     fprintf(fid, 'ATOM  %5d', a);
     fprintf(fid,'  %-3s', S{j});
-    fprintf(fid, '  %1s', NT.Base);
-    fprintf(fid, '  %1s', NT.Chain);
-    fprintf(fid, '%4s   ', NT.Number);
+    fprintf(fid, '   %1s', NT.Base);
+    fprintf(fid, ' %1s', NT.Chain);
+    fprintf(fid, '%4s    ', NT.Number);
     L = (NT.Sugar(j,:) - Sh)*R';
     L = L + 30*[x y z];
     fprintf(fid, '%8.3f', L);
     fprintf(fid, '%6.2f', 1);
-    fprintf(fid, '%6.2f\n', 50);
+    fprintf(fid, '%6.2f\n', 99.99);
     a = a + 1;
   end
   for j = 1:Lim(1,NT.Code),                    % loop through base atoms and H
@@ -52,13 +52,13 @@ SugarReorder = [10 11 12 9 8 6 7 4 5 2 3 1];
       case 3, fprintf(fid,'  %-3s', G{j});
       case 4, fprintf(fid,'  %-3s', U{j});
     end
-    fprintf(fid, '  %1s', NT.Base);
-    fprintf(fid, '  %1s',  NT.Chain);
-    fprintf(fid, '%4s   ',   NT.Number);
+    fprintf(fid, '   %1s', NT.Base);
+    fprintf(fid, ' %1s',  NT.Chain);
+    fprintf(fid, '%4s    ',   NT.Number);
     L = (NT.Fit(j,:) - Sh)*R';
     L = L + 30*[x y z];                        % shift 20 Angstroms
     fprintf(fid, '%8.3f', L);                  % write atom location
     fprintf(fid, '%6.2f', 1);
-    fprintf(fid, '%6.2f\n', 50);
+    fprintf(fid, '%6.2f\n', 99.99);
     a = a + 1;
   end
