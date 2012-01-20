@@ -1,6 +1,6 @@
 % xGetEdgeNums parses the entries in the GUI concerning base-base interactions
 
-function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar] = xGetEdgeNums(str)
+function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar,ReqBB,ExBB] = xGetEdgeNums(str)
 
 ReqEdge = [];
 ExEdge  = [];
@@ -15,6 +15,8 @@ Range    = [];
 RRange   = [];
 Coplanar = 0;
 NearCoplanar = 0;
+ReqBB    = [];
+ExBB     = [];
 
 % ------------------------------ Define relevant strings and associated codes
 
@@ -157,7 +159,7 @@ BPStr{4}    = '3BPh';
 basephoscode{4}  = [11];
 
 BPStr{5}    = '4BPh';
-basephoscode{5}  = [12];
+basephoscode{5}  = [12 19];
 
 BPStr{6}    = '5BPh';
 basephoscode{6}  = [13 15];
@@ -166,7 +168,7 @@ BPStr{7}    = '6BPh';
 basephoscode{7}  = [2 5];
 
 BPStr{8}    = '7BPh';
-basephoscode{8}  = [3 6];
+basephoscode{8}  = [3 6 18];
 
 BPStr{9}    = '8BPh';
 basephoscode{9}  = [7];
@@ -182,6 +184,12 @@ basephoscode{12}  = [19];
 
 BPStr{13}    = '8bBP';
 basephoscode{13}  = [18];
+
+BPStr{14}    = '4bBPh';
+basephoscode{14}  = [19];
+
+BPStr{15}    = '8bBPh';
+basephoscode{15}  = [18];
 
 BPStr{21}    = 'PhB';
 basephoscode{21}  = 1:17;
@@ -205,7 +213,7 @@ BPStr{27}    = '6PhB';
 basephoscode{27}  = [2 5];
 
 BPStr{28}    = '7PhB';
-basephoscode{28}  = [3 6];
+basephoscode{28}  = [3 6 18];
 
 BPStr{29}    = '8PhB';
 basephoscode{29}  = [7];
@@ -222,7 +230,16 @@ basephoscode{32}  = [19];
 BPStr{33}    = '8bPB';
 basephoscode{33}  = [18];
 
+BPStr{34}    = '4bPhB';
+basephoscode{34}  = [19];
+
+BPStr{35}    = '8bPhB';
+basephoscode{35}  = [18];
+
 BPequiv{100} = [];
+
+zBackboneCodes;
+BBStr = Codes;
 
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
@@ -284,6 +301,7 @@ for i=1:length(lim)-1                    % loop through tokens
     edgi = find(strcmpi(EdgeStr,Token));   % case insensitive
     pair = find(strcmpi(Pairs,Token));     % case insensitive
     basephos = find(strcmpi(BPStr,Token)); % case insensitive
+    bb   = find(strcmpi(BBStr,Token));
 
     EdgeCode = 99;                         % default; nothing
 
@@ -299,6 +317,8 @@ for i=1:length(lim)-1                    % loop through tokens
       else
         newBP2 = basephoscode{basephos(1)};          
       end
+    elseif ~isempty(bb),
+      BBCode = bb(1);
     end
 
     newRange = [];
@@ -355,12 +375,14 @@ for i=1:length(lim)-1                    % loop through tokens
     OKPairs = [OKPairs PairCode];
     BP1     = [BP1 newBP1];
     BP2     = [BP2 newBP2];
+    ReqBB   = [ReqBB bb];
   else
     ExEdge  = [ExEdge EdgeNum];
     ExPairs = [ExPairs PairCode];
     EBP1    = [EBP1 newBP1];
     EBP2    = [EBP2 newBP2];
     Range   = RRange;
+    ExBB    = [ExBB bb];
   end
 
   if (CP ~= 0),

@@ -101,7 +101,7 @@ if any(WheretoOutput == [1 2 5]),
   end
   
   c = 'Configuration                                      ';
-  Text{t} = [Text{t} sprintf('  %s', c(1:N))];
+  Text{t} = [Text{t} sprintf(' %s', c(1:N))];
   
   for i=1:N,
     for j=(i+1):N,
@@ -112,10 +112,17 @@ if any(WheretoOutput == [1 2 5]),
   for i=1:N,
     for j=1:N,
       if j ~= i,
-        Text{t} = [Text{t} sprintf('%5s', [num2str(i) '-' num2str(j)])];
+        Text{t} = [Text{t} sprintf('%6s', [num2str(i) '-' num2str(j)])];
       end
     end
   end
+
+  for i=1:N,
+    for j=(i+1):N,
+      Text{t} = [Text{t} sprintf('%6s', [num2str(i) '-' num2str(j)])];
+    end
+  end
+  
 end   
 
 if N == 2,
@@ -186,6 +193,14 @@ for i=1:min(s,NumToOutput),
         end
       end
     end
+
+    for k=1:length(Indices),
+      for j=(k+1):length(Indices),
+        bbc = max(File(f).Backbone(Indices(j),Indices(k)),File(f).Backbone(Indices(k),Indices(j)));
+        Text{i+t} = [Text{i+t} sprintf('%6s', zBackboneText(bbc))];
+      end
+    end
+
   end
     
   if N == 2,                        % special treatment for basepairs

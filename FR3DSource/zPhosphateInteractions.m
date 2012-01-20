@@ -21,19 +21,37 @@ t = cputime;
     %  5  C N4-2H4 interacts with oxygen of phosphate, called 6BPh
     %  6  C N4-1H4 interacts with oxygen of phosphate, called 7BPh
     %  7  C N4-1H4 and C5-H5 interact with 2 oxygens of phosphate, called 8BPh
-    % 18  C N4-1H4 and C5-H5 interact with just one oxygen, called 8bBP
+    % 18  C N4-1H4 and C5-H5 interact with just one oxygen, called 7BPh
     %  8  C C5-H5  interacts with oxygen of phosphate, called 9BPh
     %  9  C C6-H6  interacts with oxygen of phosphate, called 0BPh
     % 10  G N2-1H2 interacts with oxygen of phosphate, called 1BPh
     % 11  G N2-2H2 interacts with oxygen of phosphate, called 3BPh
     % 12  G N2-2H2 and N1-H1 interacts with 2 oxygens of phosphate, called 4BPh
-    % 19  G N2-2H2 and N1-H2 interact with just one oxygen, called 4bBP
+    % 19  G N2-2H2 and N1-H2 interact with just one oxygen, called 4BPh
     % 13  G N1-H1  interacts with oxygen of phosphate, called 5BPh
     % 14  G C8-H8  interacts with oxygen of phosphate, called 0BPh
     % 15  U N3-H3  interacts with oxygen of phosphate, called 5BPh
     % 16  U C5-H5  interacts with oxygen of phosphate, called 9BPh
     % 17  U C6-H6  interacts with oxygen of phosphate, called 0BPh
 
+    % Categories 18 and 19 are internal to FR3D.  They are displayed 8BPh, 4BPh
+
+% ------------------------------ temporary cutoffs! 
+
+CarbonDist    = 4.0;                           % max massive - oxygen distance
+nCarbonDist   = 5;                           % near category
+
+NitrogenDist  = 3.5;                           % max massive - oxygen distance
+nNitrogenDist = 5.0;                           % near category
+
+AL = 130;                                      % angle limit for BPh
+nAL = 90;                                     % angle limit for nBPh
+
+DL([4 6 11]) = NitrogenDist;
+DL([7 8 9])  = CarbonDist;
+
+nDL([4 6 11]) = nNitrogenDist;
+nDL([7 8 9])  = nCarbonDist;
 
 % ------------------------------ temporary cutoffs! 
 
@@ -270,7 +288,7 @@ end       % loop over files
 
 if Verbose > 1,
   fprintf('Classifying base-phosphate interactions took %8.2f minutes\n', (cputime-t)/60);
-  zPhosDisplay(D);                     % display parameters graphically
+  zPhosDisplay(D,0);                     % display parameters graphically
 end
 
 

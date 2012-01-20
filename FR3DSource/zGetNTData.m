@@ -95,7 +95,19 @@ for f=1:length(Filenames),
   end
 
   if ~isfield(File,'BasePhosphate'),
-    File.BasePhosphate = 0;
+    File.BasePhosphate = sparse(zeros(length(File.NT)));
+  end
+
+  if isempty(File.BasePhosphate),
+    File.BasePhosphate = sparse(zeros(length(File.NT)));
+  end
+
+  if ~isfield(File,'Covalent'),
+    if length(File.NT) > 1,
+      File = zBackboneContinuity(File);
+    else
+      File.Covalent = sparse(zeros(length(File.NT)));
+    end
   end
 
   if isfield(File,'Inter'),
@@ -141,6 +153,7 @@ for f=1:length(Filenames),
       else
        if d(min(10,length(d))) < 1,
          fprintf('%s has overlapping nucleotides and should be avoided\n',File.Filename);
+
          Overlap = 1;
        else
          t = cputime;
@@ -149,8 +162,6 @@ for f=1:length(Filenames),
          if Verbose > 0,
            fprintf(' Base-phosphate interactions ...');
          end
-
-
 
          File = zPhosphateInteractions(File);
          File.ClassVersion = CurrentVersion;
@@ -168,19 +179,39 @@ for f=1:length(Filenames),
        end
       end
     end
-
-    if ~isfield(File.NT(1),'Syn'),
-      SynList = mSynList(File);
-      for k=1:length(File.NT),
-        File.NT(k).Syn = SynList(k);
-      end
-      ClassifyCode = 1;
-    end
   else
     File.ClassVersion = CurrentVersion;
   end
 
-  if ~isfield(File,'Range'),
+  if length(File.NT) > 0,
+   if ~isfield(File.NT(1),'Syn'),
+    SynList = mSynList(File);
+    for k=1:length(File.NT),
+      File.NT(k).Syn = SynList(k);
+    end
+    SaveCode = 1;
+   end
+  end
+
+  if ~isfield(File,'PDBFilename'),
+    File.PDBFilename = [File.Filename '.pdb'];   % will self-correct the
+                                                 % next time PDB is read
+  end
+
+  if ~isfield(File,'Backbone'),
+    File = zBackboneConformation(File,Verbose);
+    if File.NumNT > 1,
+      File.Backbone(1,1) = 1;                    % register that we checked
+    end
+    SaveCode = 1;
+  end
+
+  if File.NumNT > 1 && sum(sum(File.Backbone)) == 0,
+    File = zBackboneConformation(File,Verbose);
+    SaveCode = 1;
+  end
+
+  if ~isfield(File,'Range') || ~isfield(File,'Crossing'),
     File = zInteractionRange(File,Verbose);
     ClassifyCode = 1;
   end

@@ -20,18 +20,10 @@ for i=1:length(e),
     a = e(i);
   end
 
-  if a == 18,
-    E = [E '8bBP'];
-  elseif a == 19,
-    E = [E '4bBP'];
-  elseif a > 0,
-    E = [E num2str(BPCat(a)) 'BP'];
-  elseif a == -18,
-    E = [E '8bPB'];
-  elseif a == -19,
-    E = [E '4bPB'];
+  if a > 0,
+    E = [E num2str(BPCat(a)) 'BPh'];
   elseif a < 0,
-    E = [E num2str(BPCat(-a)) 'PB'];
+    E = [E num2str(BPCat(-a)) 'PhB'];
   else
     E = [E '  -'];
   end

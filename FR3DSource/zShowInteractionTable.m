@@ -34,7 +34,7 @@ fprintf('\n');
 if nargin == 3,
   fprintf('%6.4f',Disc);                 % display discrepancy if passed
 else
-  fprintf('       ');
+  fprintf('      ');
 end
 
 for j=1:length(Indices),

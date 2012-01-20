@@ -52,7 +52,27 @@ if isfield(Query,'ExPairs'),                 % if screening by paircode
     D = D .* (E == 0);
   end
 end
+
+if isfield(Query,'OKBB'),           % if screening by backbone
+  if length(Query.OKBB{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Query.OKBB{p,q}),
+      E = E + (fix(File.Backbone) + fix(File.Backbone') == Query.OKBB{p,q}(i));
+    end
+    D = D .* (E > 0);                         % include only those that match
+  end
+end
     
+if isfield(Query,'ExBB'),                 % if excluding by backbone
+  if length(Query.ExBB{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Query.ExBB{p,q}),
+      E = E + (fix(File.Backbone) + fix(File.Backbone') == Query.ExBB{p,q}(i));
+    end
+    D = D .* (E == 0);
+  end
+end
+
 if isfield(Query,'BasePhos'),                 % if screening by base-phosphate
   if length(Query.BasePhos{p,q} > 0),
     E = sparse(zeros(size(D)));

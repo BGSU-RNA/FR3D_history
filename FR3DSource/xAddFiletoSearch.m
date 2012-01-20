@@ -34,9 +34,13 @@ else
   
   if ~isempty(File),
     for f = 1:max(Candidates(:,N+1)),            % loop through files
-      Search.File(f).Edge = sparse(zeros(1,1));
+      Search.File(f).Edge     = sparse(zeros(1,1));
       Search.File(f).BasePhosphate = sparse(zeros(1,1));
-      Search.File(f).Range = sparse(zeros(1,1));
+      Search.File(f).Range    = sparse(zeros(1,1));
+      Search.File(f).Crossing = sparse(zeros(1,1));
+      Search.File(f).Covalent = sparse(zeros(1,1));
+      Search.File(f).Backbone = sparse(zeros(1,1));
+
     end
   
     for i = 1:s,
@@ -58,6 +62,12 @@ else
           Search.File(f).BasePhosphate(k,j) = File(f).BasePhosphate(k,j);
           Search.File(f).Range(j,k) = File(f).Range(j,k);
           Search.File(f).Range(k,j) = File(f).Range(k,j);
+          Search.File(f).Covalent(j,k) = File(f).Covalent(j,k);
+          Search.File(f).Covalent(k,j) = File(f).Covalent(k,j);
+          Search.File(f).Crossing(j,k) = File(f).Crossing(j,k);
+          Search.File(f).Crossing(k,j) = File(f).Crossing(k,j);
+          Search.File(f).Backbone(j,k) = File(f).Backbone(j,k);
+          Search.File(f).Backbone(k,j) = File(f).Backbone(k,j);
         end
       end
   

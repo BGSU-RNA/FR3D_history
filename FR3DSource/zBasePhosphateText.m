@@ -6,7 +6,7 @@ E = [];
 
 % The following vector converts internal FR3D codes to Base-phosphate categories0 to 9.  To change the categories, change here and in xGetEdgeNums.m
 
-BPCat = [2 6 7 0 6 7 8 9 0 1 3 4 5 0 5 9 0 8 4];  % updated 8-19-2008
+BPCat = [2 6 7 0 6 7 8 9 0 1 3 4 5 0 5 9 0 7 4];  % updated 8-19-2008
 
 for i=1:length(e),
   if e(i) > 100,
@@ -20,16 +20,8 @@ for i=1:length(e),
     a = e(i);
   end
 
-  if a == 18,
-    E = [E '8BPhb'];
-  elseif a == 19,
-    E = [E '4BPhb'];
-  elseif a > 0,
+  if a > 0,
     E = [E num2str(BPCat(a)) 'BPh'];
-  elseif a == -18,
-    E = [E '8PhBb'];
-  elseif a == -19,
-    E = [E '4PhBb'];
   elseif a < 0,
     E = [E num2str(BPCat(-a)) 'PhB'];
   else

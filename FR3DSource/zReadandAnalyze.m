@@ -306,6 +306,7 @@ end
 
 % Fill in fields of File ----------------------------------------------------
 
+File.PDBFilename = PDBFilename;
 File.Filename  = Filename;
 File.NT        = NT(1:NumNT);
 File.NumNT     = NumNT;
@@ -354,7 +355,7 @@ else
   File.Info.Author      = '';
   File.Info.Keywords    = '';
   File.Info.Source      = '';
-  File.BasePhosphate = [];
+  File.BasePhosphate = sparse(NumNT,NumNT);
 
 end
 

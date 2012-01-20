@@ -138,6 +138,34 @@ for i=1:L,
   Search.Lab{i} = [b n ' ' File(f).Filename];
 end
 
+% ------------------------------------------- Display distance matrix
+
+if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
+
+Search = xMutualIDI(File,Search,Limit); % calculate some discrepancies
+
+for i=1:L,
+  f = Search.Candidates(i,N+1);          % file number
+  b = '';
+  for j = 1:min(4,N),
+    b = [b File(f).NT(Search.Candidates(i,j)).Base];
+  end
+  n = File(f).NT(Search.Candidates(i,1)).Number;
+  n = sprintf('%4s',n);
+  if Search.Query.Geometric > 0,
+      if isfield(Search,'AvgDisc'),
+        d = sprintf('%6.4f',Search.AvgDisc(i));
+      else
+        d = sprintf('%6.4f',Search.Discrepancy(i));
+      end
+    else
+      d = sprintf('%5d',Search.Discrepancy(i)); % orig candidate number
+    end
+  Search.Lab{i} = [b n ' ' File(f).Filename];
+end
+
+end
+
 % --------- if there is no geometric model, align to the central candidate
 
 if Query.Geometric == 0,
@@ -172,6 +200,11 @@ drawnow
 
 % ------------------------------- display menu -----------------------------
 
+if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
+  figure(98)
+  axis([1 Limit+1 1 Limit+1]);
+end
+
 figure(99)
 axis([1 Limit+1 1 Limit+1]);
 
@@ -199,7 +232,56 @@ while stop == 0,
   caxis([0 0.8]);
   colorbar('location','eastoutside');
 
+  if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
+ 
+  figure(98)
+  ax = axis;
+  clf
+  pp = p(1:Limit);
+  zGraphDistanceMatrix(Search.IDI(pp,pp));
+%  zGraphDistanceMatrix(Search.IDI(pp,pp),Search.Lab(pp));
+  hold on
+  co = {'w*','wo','wd','ws','wv','w<','w>','w^','w+','wx'};
+  co = [co co co co co co co co];
+  for j = 1:length(Display),
+    plot(q(Display(j).n)+0.5,q(Display(j).n)+0.5,co{j});
+  end
+  m = q(find(Search.Marked));
+  plot(m+0.5,m+0.5,'w.');
+%  axis(ax);
+  title(['IDI between candidates, ordered by ' OrderText{Order}]);
+  colormap('default');
+  map = colormap;
+  map = map((end-8):-1:8,:);
+  colormap(map);
+  caxis([0 5]);
+  colorbar('location','eastoutside');
 
+
+  fprintf('Counts of base combinations found in this set.\n');
+
+  counts = zeros(4,4);
+  for i = 1:L,
+    f = Search.Candidates(i,3);
+    a = Search.Candidates(i,1);
+    b = Search.Candidates(i,2);
+    c1 = File(f).NT(a).Code;
+    c2 = File(f).NT(b).Code;
+    counts(c1,c2) = counts(c1,c2) + 1;
+  end
+
+  Letters = 'ACGU';
+
+  fprintf('        A      C      G      U\n');
+  for i = 1:4,
+    fprintf('%c   %5d  %5d  %5d  %5d\n', Letters(i), counts(i,1), counts(i,2), counts(i,3), counts(i,4));
+  end
+  fprintf('\n');
+
+
+
+
+  end
 
   if (Display(1).neighborhood == NeighMax),
     Neighborhood = 'No Neighborhood';
@@ -371,6 +453,13 @@ q(p) = 1:L;                                  % inverse permutation
       p((Limit+1):L) = (Limit+1):L;
       q(p) = 1:L;
       Order = 3;
+
+      if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
+        p(1:Limit) = zOrderbySimilarity(Search.IDI(1:Limit,1:Limit));
+        p((Limit+1):L) = (Limit+1):L;
+        q(p) = 1:L;
+        Order = 3;
+      end
 
     case 14                                     % align
       xAlignCandidates(File(FIndex),Search,1);
