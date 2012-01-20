@@ -59,7 +59,7 @@ if isfield(ViewParam,'ClassLimits'),
 
    for row = 1:length(B(:,1)),
      hold on
-     if (B(row,1) < 13) & (abs(B(row,1)) > 0),
+     if (abs(B(row,1)) < 14) & (abs(B(row,1)) > 0),
        zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
        text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
      end
@@ -124,7 +124,7 @@ if isfield(ViewParam,'ClassLimits'),
 
     for row = 1:length(B(:,1)),
       hold on
-      if (B(row,1) < 13) & (abs(B(row,1)) > 0),
+      if (abs(B(row,1)) < 14) & (abs(B(row,1)) > 0),
         if (B(row,10) < B(row,11)),
           zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
           text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);

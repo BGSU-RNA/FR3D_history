@@ -1,11 +1,13 @@
 % zWriteNucleotidePDB(NT,R,Sh) writes the atoms of nucleotide NT, with
 % hydrogens, to the current file id.
-% If specified, it rotates by R, shifts by sh, and by 20*c Angstroms
+% If specified, it rotates by R, shifts by sh, puts each c set off from
+% the others by 20*c Angstroms
 
 function [a] = zWriteNucleotidePDB(fid,NT,a,c,R,Sh)
 
-x = mod(c,30);
-y = fix(c/30);
+x = mod(c,30);                       % shift along x axis
+y = mod(fix(c/30),30);               % shift along y axis
+z = mod(fix(c/900),900);             % shift along z axis
 
 if nargin < 4,
   c = 0;
@@ -36,7 +38,7 @@ S = {'C1*' 'C2*' 'O2*' 'C3*' 'O3*' 'C4*' 'O4*' 'C5*' 'O5*' 'P' 'O1P' 'O2P'};
     fprintf(fid, ' %1s',  NT.Chain);
     fprintf(fid, '%4s',   NT.Number);
     L = (NT.Fit(j,:) - Sh)*R';
-    L = L + [(x-1)*20 y*20 0];% shift 20 Angstroms
+    L = L + 20*[x y z];                        % shift 20 Angstroms
     fprintf(fid, '%8.3f', L);                  % write atom location
     fprintf(fid, '%6.2f', 0);
     fprintf(fid, '%6.2f\n', 0);
@@ -49,7 +51,7 @@ S = {'C1*' 'C2*' 'O2*' 'C3*' 'O3*' 'C4*' 'O4*' 'C5*' 'O5*' 'P' 'O1P' 'O2P'};
     fprintf(fid, ' %1s',  NT.Chain);
     fprintf(fid, '%4s',   NT.Number);
     L = (NT.Sugar(j,:) - Sh)*R';
-    L = L + [(x-1)*20 y*20 0];
+    L = L + 20*[x y z];
     fprintf(fid, '%8.3f', L);
     fprintf(fid, '%6.2f', 0);
     fprintf(fid, '%6.2f\n', 0);

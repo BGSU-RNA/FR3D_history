@@ -39,7 +39,7 @@ end
   if (abs(sh(3)) < 5)                        % if small vertical shift
     Pair = zAnalyzePair(M1,M2,CL,Exemplar,sh); % analyze and classify pair
 
-    if (fix(Pair.Class == 30)) & (M1.Code == M2.Code),  % re-analyze AA CC ...
+    if (abs(Pair.Class) >= 30) & (M1.Code == M2.Code),  % re-analyze AA CC ...
       M2 = N1;                               % reverse roles of nucleotides
       M1 = N2;
       s  = -1;

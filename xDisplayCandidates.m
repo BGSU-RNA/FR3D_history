@@ -3,6 +3,8 @@
 
 function Search = xDisplayCandidates(File,Search,Level)
 
+fontsize = 10;                               % for nucleotide numbers
+
 if isempty(Search.Candidates)
   fprintf('There are no candidates to display\n');
   return
@@ -55,6 +57,7 @@ Display(1).sugar = 1;           % display sugars or not
 Display(1).neighborhood = 0;    % how large a neighborhood to show
 Display(1).superimpose  = 0;    % superimpose the first candidate?
 Display(1).supersugar   = 0;    % show sugars of first when superimposing?
+Display(1).labelbases   = 10;   % show nucleotide numbers
 Display(1).az           = -37.5;% standard view
 Display(1).el           = 30;
 
@@ -73,7 +76,7 @@ while stop == 0,
 
   k=menu(MenuTitle,'Next candidate','Previous Candidate', ... % 1,2
          'Add plot','Larger Neighborhood', ...                % 3,4
-         'Toggle sugar','Toggle superimpose', ...             % 5,6
+         'Toggle sugar','Toggle display', ...                 % 5,6
          'Mark/Unmark current','Reverse all marks', ...       % 7,8
          'Display marked only', ...                           % 9
          'List to screen','Write to PDB', ...                 % 10,11
@@ -124,8 +127,16 @@ while stop == 0,
         Display(1).supersugar = 0;
       end
 
-    case 6                                      % toggle superimpose
-      Display(1).superimpose = 1-Display(1).superimpose;
+    case 6                                      % toggle superimpose/numbers
+      if Display(1).superimpose == 0 & Display(1).labelbases == 0,
+        Display(1).superimpose = 1;
+      elseif Display(1).superimpose == 1 & Display(1).labelbases == 0,
+        Display(1).labelbases = fontsize;
+      elseif Display(1).superimpose == 1 & Display(1).labelbases > 0,
+        Display(1).superimpose = 0;
+      elseif Display(1).superimpose == 0 & Display(1).labelbases > 0,
+        Display(1).labelbases = 0;
+      end
 
     case 7                                      % mark/unmark current cand
       Search.Marked(Display(i).n) = 1-Search.Marked(Display(i).n); %toggle
@@ -233,6 +244,7 @@ function  PlotMotif(File,Search,Model,Display,i)
     MVP.Sugar         = Display(1).supersugar;
     MVP.ConnectSugar  = 0;
     MVP.Grid          = 0;
+    MVP.LabelBases    = Display(1).labelbases;
     zDisplayNT(Model,1:N,MVP);
   end
 
@@ -242,6 +254,7 @@ function  PlotMotif(File,Search,Model,Display,i)
   Indices = double(Search.Candidates(n,1:N));
 
   VP.Sugar    = Display(1).sugar;
+  VP.LabelBases = Display(1).labelbases;
 
   if Model.NumNT > 2,
     MC = Model.WeightedCenteredCenters;          % align to the model

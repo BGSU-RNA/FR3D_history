@@ -542,8 +542,8 @@ elseif (Class == -10) & (Paircode == 15),
   Hydrogen(1).Angle    = zAngle(N1.Fit(11,:),N1.Fit(15,:),N2.Fit(6,:));
   Hydrogen(1).Distance = zDistance(N1.Fit(15,:),N2.Fit(6,:));
 elseif (Class == 11) & (Paircode == 1),
-  Hydrogen(1).Angle    = zAngle(N1.Fit(9,:),N1.Fit(11,:),N2.Fit(3,:));
-  Hydrogen(1).Distance = zDistance(N1.Fit(11,:),N2.Fit(3,:));
+  Hydrogen(1).Angle    = zAngle(N1.Fit(3,:),N2.Fit(11,:),N2.Fit(9,:));
+  Hydrogen(1).Distance = zDistance(N1.Fit(3,:),N2.Fit(11,:));
 elseif (Class == 11) & (Paircode == 9),
   Hydrogen(1).Angle    = zAngle(N1.Fit(3,:),N2.Fit(15,:),N2.Fit(11,:));
   Hydrogen(1).Distance = zDistance(N1.Fit(3,:),N2.Fit(15,:));
@@ -556,8 +556,8 @@ elseif (Class == -11) & (Paircode == 9),
   Hydrogen(2).Angle    = zAngle(N1.Fit(4,:),N2.Fit(15,:),N2.Fit(11,:));
   Hydrogen(2).Distance = zDistance(N1.Fit(4,:),N2.Fit(15,:));
 elseif (Class == 11) & (Paircode == 11),
-  Hydrogen(1).Angle    = zAngle(N1.Fit(11,:),N1.Fit(15,:),N2.Fit(3,:));
-  Hydrogen(1).Distance = zDistance(N1.Fit(15,:),N2.Fit(3,:));
+  Hydrogen(1).Angle    = zAngle(N1.Fit(3,:),N2.Fit(15,:),N2.Fit(11,:));
+  Hydrogen(1).Distance = zDistance(N1.Fit(3,:),N2.Fit(15,:));
 elseif (Class == -11) & (Paircode == 13),
   Hydrogen(1).Angle    = zAngle(N1.Fit(9,:),N1.Fit(11,:),N2.Fit(3,:));
   Hydrogen(1).Distance = zDistance(N1.Fit(11,:),N2.Fit(3,:));
@@ -565,8 +565,8 @@ elseif (Class == -11) & (Paircode == 15),
   Hydrogen(1).Angle    = zAngle(N1.Fit(11,:),N1.Fit(15,:),N2.Fit(3,:));
   Hydrogen(1).Distance = zDistance(N1.Fit(15,:),N2.Fit(3,:));
 elseif (Class == 12) & (Paircode == 1),
-  Hydrogen(1).Angle    = zAngle(N1.Fit(3,:),N2.Fit(11,:),N2.Fit(9,:));
-  Hydrogen(1).Distance = zDistance(N1.Fit(3,:),N2.Fit(11,:));
+  Hydrogen(1).Angle    = zAngle(N1.Fit(9,:),N1.Fit(11,:),N2.Fit(3,:));
+  Hydrogen(1).Distance = zDistance(N1.Fit(11,:),N2.Fit(3,:));
 elseif (Class == 12) & (Paircode == 5),
   Hydrogen(1).Angle    = zAngle(N1.Fit(9,:),N1.Fit(11,:),N2.Fit(3,:));
   Hydrogen(1).Distance = zDistance(N1.Fit(11,:),N2.Fit(3,:));

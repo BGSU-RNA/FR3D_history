@@ -33,7 +33,7 @@ function [void] = zDisplayExemplars(Paircode,Category)
   ViewParam.Sort      = 0;
   ViewParam.LineStyle = '-';
 
-% loop through computer classifications ----------------------
+% loop through pairs and classifications ----------------------
 
 for pc = 1:length(Paircode),
  for ca = 1:length(Category),

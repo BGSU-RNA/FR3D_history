@@ -149,7 +149,7 @@ while (k <= length(SP)),
     elseif (inp(1) == 'a'),                           % re-analyze pair
       N1 = File(f).NT(p);
       N2 = File(f).NT(q);
-      [RevPair,swi] = zClassifyPair(N1,N2);
+      [RevPair] = zClassifyPair(N1,N2);
 
       if ~isempty(RevPair),
         RevPair.Base1Index = p;
@@ -167,7 +167,7 @@ while (k <= length(SP)),
         Pair = RevPair;
 
         File(f).Pair(SP(k).PairIndex) = RevPair;
-        File(f).Modified = 0;                         % flag to save .hand
+        File(f).Modified = 1;                         % flag to save .hand
       end
   
     elseif (inp(1) == 'r') & (max(Pair.Paircode == [1 6 11 16]) == 1),

@@ -170,3 +170,4 @@ else
   grid off
 end
 
+rotate3d on

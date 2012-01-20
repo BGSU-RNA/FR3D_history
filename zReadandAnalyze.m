@@ -280,12 +280,14 @@ File.Header    = Header;
 
 % Calculate configuration (syn or anti) -------------------------------------
 
-SynList = mSynList(File);
+if length(File.NT) > 0,
+  SynList = mSynList(File);
 
-j = find(SynList);
+  j = find(SynList);
 
-for k=1:length(j),
-  File.NT(j(k)).Syn = 1;
+  for k=1:length(j),
+    File.NT(j(k)).Syn = 1;
+  end
 end
 
 %zSaveNTData(File);

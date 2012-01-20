@@ -3,6 +3,8 @@
 
 function [D] = zMutualDistance(A,L)
 
-D = squareform(pdist(A));
+% D = squareform(pdist(A));                  % pdist is in stats toolbox
+
+D = zDistance(A);
 
 D = sparse(D .* (D < L));

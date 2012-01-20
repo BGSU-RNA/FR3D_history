@@ -13,6 +13,10 @@
 
 function [Files] = zGetNTData(Filenames,ReadCode)
 
+if nargin < 2,
+  ReadCode = 0;
+end
+
 path(path,pwd);
 
 if ~(exist('PDBFiles') == 7),        % if directory doesn't yet exist
@@ -79,7 +83,7 @@ for f=1:length(Filenames),
   File.Distance = zMutualDistance(c,35); 
 
   if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
-    (ClassifyCode == 1) | (File.ClassVersion < 1),
+    (ClassifyCode == 1) | (File.ClassVersion < 1.2),
     File.Edge = sparse(File.NumNT,File.NumNT);
 
     d = sort(nonzeros(File.Distance));
@@ -89,7 +93,7 @@ for f=1:length(Filenames),
     else
       File = zClassifyPairs(File);
       File = zUpdateDistanceToExemplars(File);
-      File.ClassVersion = 1.1;
+      File.ClassVersion = 1.2;
       ClassifyCode = 1;
     end
   end

@@ -160,6 +160,11 @@ for f = 1:length(File),                   % Loop through each file
   end
  end
 
+
+ % choice 51 is flawed:  it only looks at pairs that are already in File.Pair,
+ % but those all have i < j, so if you want to match with i > j, it won't
+ % happen.
+
  if any(Param.Category == 51),
    pd = zPairDiscrepancy(MatchPair,p);
    if pd < Param.PairDisc,
