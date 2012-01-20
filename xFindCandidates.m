@@ -51,7 +51,7 @@ for f=1:length(File),
   [s,t] = size(List);
   if s > 0,
     Found = [Found; [List uint16(f*ones(s,1))]];
-    fprintf('Found %7d candidates from %10s in %8.3f seconds\n', s, File(f).Filename, cputime-filestarttime);
+    fprintf('Found %7d possibilities from %10s in %8.3f seconds\n', s, File(f).Filename, cputime-filestarttime);
   end
 
   drawnow
@@ -61,7 +61,7 @@ end  % end of for loop length(File)
 
 [s,t] = size(Found);
 if length(File) > 1,
-  fprintf('Found %7d candidates in %8.3f seconds\n', s, (cputime-starttime));
+  fprintf('Found %7d possible candidates in %8.3f seconds\n', s, (cputime-starttime));
 end
 
 drawnow

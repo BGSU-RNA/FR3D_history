@@ -68,7 +68,6 @@ NewList = NewList(1:c,:);
 NewSS   = NewSS(1:c,:);
 
 if Model.Geometric > 0,
- if Model.DistanceScreen > 0,
   Acceptable = uint16(zeros(size(NewList(:,1))));
   for n = 1:length(NewList(:,1)),
     a = NewList(n,:);
@@ -99,6 +98,5 @@ if Model.Geometric > 0,
   NewSS   = NewSS(OK,:);
 
 %  fprintf('Retained %6d, rejected %5d candidates on nucleotide %1d\n', length(OK), length(Acceptable)-length(OK), r);
- end
 end
 

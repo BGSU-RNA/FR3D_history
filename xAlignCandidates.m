@@ -40,7 +40,7 @@ for j=1:Model.NumNT,
 end
 fprintf('    ');
 for n = 1:(Model.NumNT-1),
-  fprintf('%d',n);
+  fprintf('%d',mod(n,10));
   if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
     for i=1:maxinsert(n),
       fprintf(' ');

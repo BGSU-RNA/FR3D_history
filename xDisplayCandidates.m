@@ -10,11 +10,11 @@ function [Search, File] = xDisplayCandidates(File,Search,Level)
 
 if isempty(File),
   [File,SIndex] = zAddNTData(Search.Filenames,2);   % load PDB data
+  File = File(SIndex);                   % re-order file numbers
 else
   [File,SIndex] = zAddNTData(Search.Filenames,2,File); % add PDB data if needed
+  File = File(SIndex);                   % re-order file numbers
 end
-
-File = File(SIndex);                   % re-order file numbers
 
 fontsize = 10;                               % for nucleotide numbers
 

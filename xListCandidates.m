@@ -10,11 +10,11 @@ function [File] = xListCandidates(File,Search,NumToOutput)
 
 if isempty(File),
   [File,SIndex] = zAddNTData(Search.Filenames,2);   % load PDB data
-else
+  File = File(SIndex);                   % re-order file numbers
+elseif isfield(Search,'Filenames'),
   [File,SIndex] = zAddNTData(Search.Filenames,2,File); % add PDB data if needed
+  File = File(SIndex);                   % re-order file numbers
 end
-
-File = File(SIndex);                   % re-order file numbers
 
 Query       = Search.Query;
 Candidates  = Search.Candidates;
@@ -32,7 +32,7 @@ end
 
 % -------------------------------------- print header line
 if isfield(Search,'AvgDisc'),
-  fprintf('  Filename Avg Discrep  ');
+  fprintf('  Filename Avg Discrep ');
   for i=1:N,
     fprintf('%7d ', i);
   end
@@ -50,7 +50,7 @@ fprintf('%s', c(1:N));
 
 for i=1:N,
   for j=(i+1):N,
-    fprintf('   %d-%d', i,j);
+    fprintf('%6s', [num2str(i) '-' num2str(j)]);
   end
 end
 
@@ -59,7 +59,7 @@ fprintf(' %s', c(1:N));
 
 for i=1:N,
   for j=(i+1):N,
-    fprintf('   %d-%d', i,j);
+    fprintf('%6s', [num2str(i) '-' num2str(j)]);
   end
 end
 

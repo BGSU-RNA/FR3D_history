@@ -199,9 +199,11 @@ function ReadQuery_Callback(hObject, eventdata, handles)
 
     if get(handles.ViewQuery,'Value')==1
         figure(3)
-        zDisplayNT(File(QIndex),NT);
+        clf
+        zDisplayNT(File(QIndex),Indices);
         grid off
         rotate3d on
+        zShowInteractionTable(File(QIndex),Indices)
     end
     set(handles.Status,'String','Choose "Query Chains" and click "Generate Interaction Matrix"');
     set(handles.GenerateMatrix,'Visible','on');
