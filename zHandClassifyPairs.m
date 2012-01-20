@@ -58,7 +58,7 @@ while (k <= length(SP)),
   grid on
  
   if ViewParam.Exemplars == 1,
-    [c,d,h] = zDistanceToExemplars(Exemplar,Pair);
+    [c,d,h] = zDistanceToExemplars(Exemplar,File(f).NT(p),File(f).NT(q));
   fprintf('Distance %5.2f to class %5.2f exemplar (dashed lines)\n',d(1),c(1));
   fprintf('Distance %5.2f to class %5.2f exemplar (dotted lines)\n',d(2),c(2));
   fprintf('Distance %5.2f to class %5.2f exemplar (not shown)\n',d(3),c(3));
@@ -114,7 +114,11 @@ while (k <= length(SP)),
       fprintf(' | r: reverse');
     end
     fprintf('\n');
-    zListPairData(Pair,1);
+
+    sp = SP(k);
+    sp.Filenum = 1;
+    zListPairs(File(f),sp,2,ViewParam);
+
     if length(Pair.Hydrogen) > 0,
       fprintf('Hydrogen bonds: ');
       for i=1:length(Pair.Hydrogen),

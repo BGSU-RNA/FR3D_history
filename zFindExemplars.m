@@ -19,6 +19,7 @@ pcodes = [6 7 13 14 15];
 pcodes = [7 16];
 
 pcodes = [11];
+pcodes = [1];
 pcodes = [1 5 6 7 9 11 13 14 15 16];
 
 % load data ----------------------------------------------------------------
@@ -59,8 +60,6 @@ for j = 1:length(pcodes),
   Param.Decimal  = 1;        % 1 - use 1.0 only; 0 - round to 1; may not work!
   Param.Group    = 1;        % computer classification matches
   Param.Sequential= 0;
-  Param.Inbox    = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % if category = 50,
-                           % only pairs in this box will be selected
 
   fprintf('Paircode %2d Class %5.1f ', pc, CLE(row));
 
@@ -82,14 +81,9 @@ for j = 1:length(pcodes),
   if length(SP) > 0,
     L = min(LMax,length(SP));      % Limit the number of pairs to consider
     PD = zeros(L,L);
-    xd = zeros(L,L);
     for k = 1:L,                   % Very slow nested loop
       for m = (k+1):L,
   
-%        Pair1 = File(SP(k).Filenum).Pair(SP(k).PairIndex);
-%        Pair2 = File(SP(m).Filenum).Pair(SP(m).PairIndex);
-%        PD(k,m) = zPairDiscrepancy(Pair1,Pair2);  % does this match FR3D?
-
         f1 = SP(k).Filenum;
         f2 = SP(m).Filenum;
         Model = [File(f1).Pair(SP(k).PairIndex).Base1Index ...
@@ -100,18 +94,17 @@ for j = 1:length(pcodes),
       end
     end
 
-%a = nonzeros(PD);
-%b = nonzeros(xd);
-%[length(a) length(b)]
+%dists = nonzeros(PD);
 %clf
-%plot(a,b,'.');
-%axis([0 max(a) 0 max(b)])
+%hist(dists,30)
 %pause
 
-%    zListPairs(File,SP(1:L),2);
+bigm = max(max(PD));
+if bigm > 4,
+  fprintf('%6.2f maximum pair discrepancy\n',bigm);
+end
+
     PD = PD + PD';
-%    PD(1:20,1:10)
-%    PD
 
     rs = sum(PD);
 

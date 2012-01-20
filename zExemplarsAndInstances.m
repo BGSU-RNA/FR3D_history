@@ -9,9 +9,9 @@
 
 % Here are some ways to run the program:
 
-% zDisplayExemplars(7,15:18) paircode 7, categories 15 to 18 (stacking)
+% zDisplayExemplars(7,21:23) paircode 7, categories 21 to 23 (stacking)
 % zDisplayExemplars(1:16,1)   all paircodes, category 1
-% zDisplayExemplars(1:16,-12:18) all paircodes, all categories
+% zDisplayExemplars(1:16,-12:23) all paircodes, all categories
 
 % 1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
 
@@ -39,16 +39,18 @@ function [void] = zExemplarsAndInstances(File,Paircode,Category)
 
 for pc = 1:length(Paircode),
  for ca = 1:length(Category),
-   row = find(fix(cat(1,Exemplar(:,Paircode(pc)).Class)) == Category(ca));
+   if fix(Category(ca)) == Category(ca),
+     row = find(fix(cat(1,Exemplar(:,Paircode(pc)).Class)) == Category(ca));
+   else
+     row = find(cat(1,Exemplar(:,Paircode(pc)).Class) == Category(ca));
+   end
    for su = 1:length(row),
 
      E = Exemplar(row(su),Paircode(pc));
      if ~isempty(E),
 
-%       [Pair,s] = zClassifyPair(E.NT1,E.NT2);
-
        fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
-      zListPairData(E.Pair,1);
+       zListPairData(E.Pair,1);
 
 % display the exemplar pair ---------------------------------------------
 
@@ -77,6 +79,38 @@ for pc = 1:length(Paircode),
 
        rotate3d on
 
+% list pairs with the same interaction --------------------------
+
+       P.Paircode  = Paircode(pc); 
+       P.Category  = E.Class;
+       P.Decimal   = 1;        % 1 - use 1.0 only; 0 - round to 1
+       P.Group     = 1;        % hand, computer, both, etc.
+       P.Sequential= 0;
+       P.Expert    = 0;
+       P.Context   = 3;
+
+       VP.Mode      = 2;             
+       VP.Color     = 12;
+       VP.Normal    = 0;
+       aa = Category(ca);
+       ab = Category(ca) + sign(Category(ca));
+       VP.ColorAxis = [min(aa,ab) max(aa,ab)];
+       VP.Nearby    = 0;
+       VP.Sugar     = 0;
+       VP.Hydrogen  = 1;
+       VP.az        = 51;
+       VP.el        = 14;
+       VP.LineStyle = '-';              % default - thick solid lines
+       VP.Exemplars = 0;
+       VP.ClassLimits = 2;
+       VP.FigNum    = 2;
+
+       VP.Sort      = 1;
+       VP.SortKeys  = [20];
+       VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
+
+       PairViewer(File,P,VP);
+
 % scatterplot of pairs with the same interaction --------------------------
 
        P.Paircode  = Paircode(pc); 
@@ -94,17 +128,19 @@ for pc = 1:length(Paircode),
        aa = Category(ca);
        ab = Category(ca) + sign(Category(ca));
        VP.ColorAxis = [min(aa,ab) max(aa,ab)];
-       VP.SortKeys  = [];
        VP.Nearby    = 0;
        VP.Sugar     = 0;
        VP.Hydrogen  = 1;
-       VP.Sort      = 0;
        VP.az        = 51;
        VP.el        = 14;
        VP.LineStyle = '-';              % default - thick solid lines
        VP.Exemplars = 0;
        VP.ClassLimits = 2;
        VP.FigNum    = 2;
+
+       VP.Sort      = 1;
+       VP.SortKeys  = [20];
+       VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
        PairViewer(File,P,VP);
 
@@ -128,7 +164,6 @@ for pc = 1:length(Paircode),
        P.Group     = 8;        % nearest exemplar matches
        P.Sequential= 0;
        P.Expert    = 0;
-       P.Inbox     = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % almost everything
        P.Context   = 3;
 
        VP.Mode      = 1;             
@@ -176,17 +211,19 @@ pause
        aa = Category(ca);
        ab = Category(ca) + sign(Category(ca));
        VP.ColorAxis = [min(aa,ab) max(aa,ab)];
-       VP.SortKeys  = [20];
        VP.Nearby    = 0;
        VP.Sugar     = 0;
        VP.Hydrogen  = 1;
-       VP.Sort      = 1;
        VP.az        = 51;
        VP.el        = 14;
        VP.LineStyle = '-';              % default - thick solid lines
        VP.Exemplars = 1;
        VP.ClassLimits = 1;
        VP.FigNum    = 6;
+
+       VP.Sort      = 1;
+       VP.SortKeys  = [20];
+       VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
        PairViewer(File,P,VP);
 
@@ -208,17 +245,19 @@ pause
        aa = Category(ca);
        ab = Category(ca) + sign(Category(ca));
        VP.ColorAxis = [min(aa,ab) max(aa,ab)];
-       VP.SortKeys  = [-20];
        VP.Nearby    = 0;
        VP.Sugar     = 0;
        VP.Hydrogen  = 1;
-       VP.Sort      = 1;
        VP.az        = 51;
        VP.el        = 14;
        VP.LineStyle = '-';              % default - thick solid lines
        VP.Exemplars = 1;
        VP.ClassLimits = 1;
        VP.FigNum    = 6;
+
+       VP.Sort      = 1;
+       VP.SortKeys  = [-20];
+       VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
        PairViewer(File,P,VP);
 

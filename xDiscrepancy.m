@@ -4,7 +4,7 @@
 % The current sum is returned as a negative discrepancy, shifted to
 % record when the calculation stopped.
 
-% Model and Cand are two list of indices or nucleotides
+% Model and Cand are two list of indices or nucleotide numbers
 
 function [Disc] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 

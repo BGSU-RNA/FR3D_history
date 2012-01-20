@@ -1,8 +1,12 @@
 % zListPairs lists pair data in columns
 
-function [void] = zListPairs(File,SP,ListMode)
+function [void] = zListPairs(File,SP,ListMode,VP)
 
-ListItems = [1 2 3 4 5 6 9 10 12 13 14 15 16 17 21];
+if ~isfield(VP,'ListItems')
+  ListItems = [1 22 2 3 4 5 6 9 10 11 12 13 14 16 17 21];
+else
+  ListItems = VP.ListItems;
+end
 
 Header = ['    '];
 for i = 1:length(ListItems),
@@ -20,13 +24,14 @@ for i = 1:length(ListItems),
     case 11, Header = [Header ' C1*-C1*'];
     case 12, Header = [Header '    Gap'];
     case 13, Header = [Header ' MinDist'];
-    case 14, Header = [Header ' Cutoff'];
+    case 14, Header = [Header '  Class'];
     case 15, Header = [Header '   Hand'];
-    case 16, Header = [Header '   Exem'];
+    case 16, Header = [Header ' N.Exem'];
     case 17, Header = [Header '  EDist'];
     case 18, Header = [Header ' Hydrogen angles'];
     case 19, Header = [Header ' Overlap'];
     case 21, Header = [Header 'PairDisc'];
+    case 22, Header = [Header ' Resol'];
   end
 end
 
@@ -65,7 +70,7 @@ for k=1:length(SP)
                  a = [a p.Normal(3)];
         case 10, fprintf('%6.1f',p.Ang);
                  a = [a p.Ang];
-        case 11, fprintf('%6.1f',SP(k).C1pC1p);
+        case 11, fprintf('%8.2f',SP(k).C1pC1p);
                  a = [a SP(k).C1pC1p];
         case 12, fprintf('%7.2f',p.Gap);
                  a = [a p.Gap];
@@ -84,6 +89,7 @@ for k=1:length(SP)
                  end
         case 19, fprintf('%6.1f',p.StackingOverlap);
         case 21, fprintf('%7.2f',SP(k).PairDisc);
+        case 22, fprintf('%6.2f',File(f).Info.Resolution);
       end
     end
     fprintf('\n')

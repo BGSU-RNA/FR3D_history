@@ -10,11 +10,15 @@ if exist('PairExemplars.mat','file') > 0,
 
   for f = 1:length(File),
     for p = 1:length(File(f).Pair),
-      [c,d,h] = zDistanceToExemplars(Exemplar,File(f).Pair(p));
+      Pair = File(f).Pair(p);
+      NT1 = File(f).NT(Pair.Base1Index);
+      NT2 = File(f).NT(Pair.Base2Index);
+      [c,d,h] = zDistanceToExemplars(Exemplar,NT1,NT2);
       File(f).Pair(p).Classes   = c(1:3);
       File(f).Pair(p).Distances = d(1:3);
-      File(f).Pair(p).ExemIndex = h(1:3);
     end
+    fprintf('Updated %10s\n', File(f).Filename);
+    zSaveNTData(File(f));
   end
 else
   for p = 1:length(File.Pair),                  % fill in fictitious distances

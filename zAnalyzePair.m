@@ -146,14 +146,12 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
   % -------------------------- find distance to nearest exemplar
 
   if ~isempty(Exemplar),
-    [c,d,h] = zDistanceToExemplars(Exemplar,Pair);
+    [c,d,h] = zDistanceToExemplars(Exemplar,N1,N2);
     Pair.Classes   = c(1:3);
     Pair.Distances = d(1:3);
-    Pair.ExemIndex = h(1:3);
   else
     Pair.Classes   = 99 * ones(1,3);
     Pair.Distances = 99999999 * ones(1,3);
-    Pair.ExemIndex = [1 2 3];
   end
 
   % --------------------------- check hydrogen bonds if nearest exemplar
@@ -165,7 +163,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   % ------------------------ record nearest exemplar if no classification yet
 
-  if (fix(a) == 30) & (Pair.Distances(1) < 8),  % close to SOMETHING at least
+  if (fix(a) == 30) & (Pair.Distances(1) < 4),  % close to SOMETHING at least
     b = a-fix(a);                          % extract decimal code for reason
     c = Pair.Classes(1);
     a = sign(c) * (100 + abs(c) + b/1000);

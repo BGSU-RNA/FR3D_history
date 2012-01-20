@@ -49,8 +49,8 @@ while ViewParam.FigNum > 0,
           switch ViewParam.Mode(i),
             case 1, FigsDone = zScatterPairs(File,SP,Param,ViewParam);
                     ViewParam.FigNum = ViewParam.FigNum + FigsDone;
-            case 2, zListPairs(File,SP,2);
-            case 3, zListPairs(File,SP,3);
+            case 2, zListPairs(File,SP,2,ViewParam);
+            case 3, zListPairs(File,SP,3,ViewParam);
             case 4, [File,SP,ViewParam]= zHandClassifyPairs(File,SP,ViewParam);
                     for f=1:length(File),
                       if File(f).Modified == 1,

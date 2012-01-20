@@ -1,10 +1,8 @@
 % zExamplarTable(Cateogry) displays the best known
 % representatives for interactions involving all pairs in
 % interaction category(ies) Category
-
-% Here are some ways to run the program:
-
-% zExemplarTable(1,3.5)
+% Example:  zExemplarTable(1,3.5)
+% Example:  zExemplarTable(1:12,3.5)
 
 function [void] = zExemplarTable(Category,threshold)
 
@@ -118,7 +116,7 @@ for ca = 1:length(Category),
 
       if (E.Count >= 4) && (fix(E.Class) == E.Class),
        B(m) = E;                                % store this exemplar
-       Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' num2str(E.Pair.Class,'%3.1f') ' ' E.Filename ' ' num2str(E.Count)];
+       Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
        m = m + 1;
 
        if any(Category(ca) == [1 2 7 9 11 12]) && (E.NT1.Code == E.NT2.Code),
@@ -126,7 +124,7 @@ for ca = 1:length(Category),
          B(m).NT1 = E.NT2;
          B(m).NT2 = E.NT1;
          B(m).Pair.Edge = -E.Pair.Edge;
-         Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Pair.Edge) ' ' num2str(B(m).Pair.Class,'%3.1f') ' ' B(m).Filename ' ' num2str(B(m).Count) ];
+         Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Pair.Edge) ' ' sprintf('%5.1f',B(m).Pair.Class) ' ' B(m).Filename ' ' sprintf('%4d',B(m).Count) ];
          m = m + 1;
        end
       end
@@ -180,16 +178,21 @@ Y = squareform(full(D));                       % convert to a vector
 
 DD = full(D);
 
-%Z = linkage(Y,'average');                      % compute cluster tree
 Z = linkage(Y,'average');                      % compute cluster tree
 figure(fix(Category(ca))+13)
 [H,T,p] = dendrogram(Z,0,'colorthreshold',threshold,'orientation','left','labels',Lab);
 
-
-
 DDD = DD(p,p);
 [s,t] = size(DDD);
-fprintf('Table %d\n',Category(ca));
+if length(Category) == 1,
+  fprintf('Table %d\n',Category(ca));
+else
+  fprintf('Tables ');
+  for c = 1:length(Category),
+    fprintf('%d ', Category(c));
+  end
+  fprintf('\n');
+end
 for i=1:s,
   fprintf('%24s ', Lab{p(i)});
   for j= 1:t,
@@ -212,6 +215,67 @@ end
 orient landscape
 print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
 
+% ----------------------------------------- Display nearby exemplars
+
+% ------------ display in dendrogram order
+
+[s,t] = size(DDD);
+if length(Category) == 1,
+  fprintf('Table %d\n',Category(1));
+else
+  fprintf('Tables ');
+  for c = 1:length(Category),
+    fprintf('%d ', Category(c));
+  end
+  fprintf('\n');
+end
+
+for i=1:s,
+  fprintf('%24s ', Lab{p(i)});
+  [d,h] = sort(DDD(i,:));
+  a = 2;
+  d = [d 99999];
+
+  while (d(a) < 10),
+    fprintf('%24s %5.2f ', Lab{p(h(a))}, d(a));
+    a = a + 1;
+  end
+
+  fprintf('\n');
+end
+fprintf('\n');
+
+% ------------ display in zClassLimits order
+
+[s,t] = size(DD);
+if length(Category) == 1,
+  fprintf('Table %d\n',Category(1));
+else
+  fprintf('Tables ');
+  for c = 1:length(Category),
+    fprintf('%d ', Category(c));
+  end
+  fprintf('\n');
+end
+
+for i=1:s,
+  fprintf('%24s ', Lab{i});
+  [d,h] = sort(DD(i,:));
+  a = 2;
+  d = [d 99999];
+
+  while (d(a) < 10),
+    fprintf('%24s %5.2f ', Lab{h(a)}, d(a));
+    a = a + 1;
+  end
+  fprintf('\n');
+end
+fprintf('\n');
+
+
+
+return
+
 % ----------------------------------------- Components of isodiscrepancy
 
 Lab{1} = 'Angle';
@@ -231,11 +295,9 @@ for i=2:g,
   end
 end
 
-% ----------------------------------------- Display basepairs by IsoDisc
-
 end
 
-return
+% ----------------------------------------- Display basepairs by IsoDisc
 
 fprintf('Comparison of basepairs, lowest IsoDiscrepancy first\n')
 

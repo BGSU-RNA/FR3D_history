@@ -117,6 +117,8 @@ for f=1:length(Filenames),
       ClassifyCode = 1;
     end
 
+    File = zGetPDBInfo(File);          % get resolution and other info
+
     File = orderfields(File);
 
     if Overlap == 0,
