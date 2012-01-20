@@ -3,7 +3,7 @@
 
 LMax = 500;                % maximum number of pairs to consider in each class
 
-load('PairExemplars','Exemplar');
+%load('PairExemplars','Exemplar');
 
 CL = zClassLimits;
 
@@ -17,6 +17,8 @@ pcodes = [9 11 13 14];
 pcodes = [6 7 13 14 15];
 
 pcodes = [7 16];
+
+pcodes = [1];
 pcodes = [1 5 6 7 9 11 13 14 15 16];
 
 % load data ----------------------------------------------------------------
@@ -46,7 +48,7 @@ end
 
 for j = 1:length(pcodes),
  pc = pcodes(j);
- CLE = [CL(:,1,pc); [15 16 17 18]']; % include stacking, identified differently
+ CLE = [CL(:,1,pc); [21 22 23]'];    % include stacking, identified differently
  CLE = CLE(find(CLE));               % leave out empty entries
  for row = 1:length(CLE),
 
@@ -60,7 +62,7 @@ for j = 1:length(pcodes),
   Param.Inbox    = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % if category = 50,
                            % only pairs in this box will be selected
 
-  fprintf('\nPaircode %2d Class %3.2f', pc, CLE(row));
+  fprintf('Paircode %2d Class %5.1f ', pc, CLE(row));
 
   % select pairs using selection criteria -----------------------------------
 
@@ -80,13 +82,31 @@ for j = 1:length(pcodes),
   if length(SP) > 0,
     L = min(LMax,length(SP));      % Limit the number of pairs to consider
     PD = zeros(L,L);
+    xd = zeros(L,L);
     for k = 1:L,                   % Very slow nested loop
       for m = (k+1):L,
+  
         Pair1 = File(SP(k).Filenum).Pair(SP(k).PairIndex);
         Pair2 = File(SP(m).Filenum).Pair(SP(m).PairIndex);
-        PD(k,m) = zPairDiscrepancy(Pair1,Pair2);
+%        PD(k,m) = zPairDiscrepancy(Pair1,Pair2);  % does this match FR3D?
+        f1 = SP(k).Filenum;
+        f2 = SP(m).Filenum;
+        Model = [File(f1).Pair(SP(k).PairIndex).Base1Index ...
+                 File(f1).Pair(SP(k).PairIndex).Base2Index];
+        Cand  = [File(f2).Pair(SP(m).PairIndex).Base1Index ...
+                 File(f2).Pair(SP(m).PairIndex).Base2Index];
+        PD(k,m) = xDiscrepancy(File(f1),Model,File(f2),Cand);
       end
     end
+
+%a = nonzeros(PD);
+%b = nonzeros(xd);
+%[length(a) length(b)]
+%clf
+%plot(a,b,'.');
+%axis([0 max(a) 0 max(b)])
+%pause
+
 %    zListPairs(File,SP(1:L),2);
     PD = PD + PD';
 %    PD(1:20,1:10)
@@ -110,6 +130,7 @@ for j = 1:length(pcodes),
     Exemplar(row,pc).NT1        = File(f).NT(E.Base1Index);
     Exemplar(row,pc).NT2        = File(f).NT(E.Base2Index);
     Exemplar(row,pc).Pair       = E;
+    Exemplar(row,pc).Count      = length(SP);
 
     % The following is now redundant; can remove these lines later
 
@@ -121,8 +142,8 @@ for j = 1:length(pcodes),
     Exemplar(row,pc).Base2      = File(f).NT(E.Base2Index).Number;
   
   end
+
+ save('PairExemplarsNew','Exemplar');
+
  end
-
- save('PairExemplars','Exemplar');
-
 end

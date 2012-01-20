@@ -1,7 +1,7 @@
-% zPlotHydrogenBonds(File,PairIndex,R,S) draws a dotted line between bases
+% zPlotHydrogen(File,PairIndex,R,S) draws a dotted line between bases
 % corresponding to a hydrogen bond
 
-function [void] = zPlotHydrogenBonds(File,PairIndex,R,S)
+function [void] = zPlotHydrogen(File,PairIndex,R,S)
 
 Pair  = File.Pair(PairIndex);
 p     = Pair.Base1Index;

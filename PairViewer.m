@@ -9,7 +9,13 @@ if nargin == 0,                  % If files haven't already been loaded
   File = zGetNTData(Filenames,0);
 end
 
-ViewParam.FigNum = 2;
+if exist('ViewParam'),
+  if ~isfield(ViewParam,'FigNum'),
+    ViewParam.FigNum = 2;
+  end
+else
+  ViewParam.FigNum = 2;
+end
 
 while ViewParam.FigNum > 0,
   if nargin <= 1,
@@ -37,6 +43,7 @@ while ViewParam.FigNum > 0,
 
       if ViewParam.Sort == 1,
         SP = zSortPairs(File,SP,ViewParam);
+        ViewParam.Sort = 0;
       else
         for i=1:length(ViewParam.Mode),
           switch ViewParam.Mode(i),

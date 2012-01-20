@@ -192,7 +192,7 @@ end  % loop through f
 Pair = {'AA'; 'CA'; 'GA'; 'UA'; 'AC'; 'CC'; 'GC'; 'UC'; 'AG'; 'CG'; ...
         'GG'; 'UG'; 'AU'; 'CU'; 'GU'; 'UU'};
 
-fprintf('\n');
+%fprintf('\n');
 
 if ~exist('SP'),
   fprintf('No ');

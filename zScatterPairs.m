@@ -17,7 +17,7 @@ switch ViewParam.Color,
   case 9, ColorAxis =  [0 4];
   case 10, ColorAxis = [-12 12];
   case 11, ColorAxis = [0 10];
-  case 12, ColorAxis = [Param.Category(1) Param.Category(1)+1];
+  case 12, ColorAxis = [Param.Category(1) Param.Category(1)+0.3];
   otherwise, ColorAxis =  [min(T) max(T)+0.01];
 end
 
@@ -53,17 +53,28 @@ else
 end
 
 if isfield(ViewParam,'ClassLimits'),
- if ViewParam.ClassLimits == 1,
-  ClassLimits = zClassLimits;                   % load class limits
-  B = ClassLimits(:,:,Param.Paircode(1));       % use limits for this paircode
+ if ViewParam.ClassLimits == 1,                  % show all boxes
+   ClassLimits = zClassLimits;                   % load class limits
+   B = ClassLimits(:,:,Param.Paircode(1));       % use limits for this paircode
 
-  for row = 1:length(B(:,1)),
+   for row = 1:length(B(:,1)),
      hold on
-  if (B(row,1) < 13) & (abs(B(row,1)) > 0),
-     zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
-     text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-  end
-  end
+     if (B(row,1) < 13) & (abs(B(row,1)) > 0),
+       zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
+       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+     end
+   end
+ elseif ViewParam.ClassLimits == 2,              % just show one box
+   ClassLimits = zClassLimits;                   % load class limits
+   B = ClassLimits(:,:,Param.Paircode(1));       % use limits for this paircode
+
+   for row = 1:length(B(:,1)),
+     hold on
+     if any(fix(B(row,1)) == fix(Param.Category)),
+       zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
+       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+     end
+   end
  end
 end
 
@@ -85,7 +96,7 @@ zlabel('Vertical with respect to first base');
 figure(ViewParam.FigNum + 1)
 clf
 
-cut = 50;
+cut = 90;
 
 for k = 1:length(SP),                               % Loop through pairs
   p = File(SP(k).Filenum).Pair(SP(k).PairIndex);    % Current pair
@@ -104,27 +115,50 @@ grid on
 view(2)
 
 if isfield(ViewParam,'ClassLimits'),
- if ViewParam.ClassLimits == 1,
-  ClassLimits = zClassLimits;                   % load class limits
-  B = ClassLimits(:,:,Param.Paircode(1));       % use limits for this paircode
+  if ViewParam.ClassLimits == 1,
+    ClassLimits = zClassLimits;                 % load class limits
+    B = ClassLimits(:,:,Param.Paircode(1));     % use limits for this paircode
 
-  B(:,10:11) = mod(B(:,10:11)+cut,360)-cut;
+    B(:,10:11) = mod(B(:,10:11)+cut,360)-cut;
+    B(:,8:9)   = B(:,8:9) + 0.1*(rand(size(B(:,8:9)))-0.5).*(abs(B(:,8:9))>1);
 
-  for row = 1:length(B(:,1)),
-     hold on
-  if (B(row,1) < 13) & (abs(B(row,1)) > 0),
-   if (B(row,10) < B(row,11)),
-     zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
-     text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-   else
-     zSquare([B(row,[10 8]) 0],[270 B(row,9) 0],'k');
-     text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-     zSquare([-90 B(row,8) 0],[B(row,[11 9]) 0],'k');
-     text(-86,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-   end
+    for row = 1:length(B(:,1)),
+      hold on
+      if (B(row,1) < 13) & (abs(B(row,1)) > 0),
+        if (B(row,10) < B(row,11)),
+          zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+        else
+          zSquare([B(row,[10 8]) 0],[270 B(row,9) 0],'k');
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          zSquare([-90 B(row,8) 0],[B(row,[11 9]) 0],'k');
+          text(-86,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+        end
+      end
+    end
+  elseif ViewParam.ClassLimits == 2,            % show only one box
+    ClassLimits = zClassLimits;                 % load class limits
+    B = ClassLimits(:,:,Param.Paircode(1));     % use limits for this paircode
+    B(:,10:11) = mod(B(:,10:11)+cut,360)-cut;
+    B(:,8:9)   = B(:,8:9) + 0.1*(rand(size(B(:,8:9)))-0.5).*(abs(B(:,8:9))>1);
+
+    for row = 1:length(B(:,1)),
+      hold on
+      if any(fix(B(row,1)) == fix(Param.Category)),
+        if (B(row,10) < B(row,11)),
+          zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+        else
+          zSquare([B(row,[10 8]) 0],[270 B(row,9) 0],'k');
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          zSquare([-90 B(row,8) 0],[B(row,[11 9]) 0],'k');
+          text(-86,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+        end
+      end
+    end
+    v = axis;
+    axis([-cut 360-cut -1.1 1.1 -2 2]);
   end
-  end
- end
 end
 
 zoom on

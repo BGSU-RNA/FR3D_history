@@ -76,7 +76,7 @@ if (L == 2),                                % two-nucleotide motif
   t1   = ModelT1 - (Cand(2).Center - Cand(1).Center)*Cand(1).Rot;
   t2   = ModelT2 - (Cand(1).Center - Cand(2).Center)*Cand(2).Rot;
 
-  v    = Model.AngleWeight(1);
+  v    = AngleWeight(1);
 
   Disc = (sqrt(t1*t1' + (v^2)*ang1^2) + sqrt(t2*t2' + (v^2)*ang2^2))/4;
 

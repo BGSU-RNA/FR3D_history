@@ -4,8 +4,6 @@ function [File,SP,ViewParam] = zHandClassifyPairs(File,SP,ViewParam)
 
 load('PairExemplars','Exemplar');
 
-figure(1)
-
 k = 1;
 Oldk = 0;
 
@@ -40,6 +38,12 @@ while (k <= length(SP)),
     zShowInteractionTable(File(f),sort(C));
   end
 
+  if isfield(ViewParam,'FigNum'),
+    figure(ViewParam.FigNum);
+  else
+    figure(1)
+  end
+
   clf
 
   ViewParam.AtOrigin = 1;
@@ -61,9 +65,15 @@ while (k <= length(SP)),
 
     VP = ViewParam;
     VP.LineStyle = '--';
-    zPlotExemplar(Exemplar(h(1),Pair.Paircode),VP);
+    Ex = Exemplar(h(1),Pair.Paircode);
+    F.NT(1) = Ex.NT1;
+    F.NT(2) = Ex.NT2;
+    F.Filename = Ex.Filename;
+    zDisplayNT(F,[1 2],VP);
+    zPlotHydrogenBonds(Ex.NT1,Ex.NT2,Ex.Class,Ex.NT1.Rot,Ex.NT1.Fit(1,:));
+
     VP.LineStyle = ':';
-    zPlotExemplar(Exemplar(h(2),Pair.Paircode),VP);
+%    zPlotExemplar(Exemplar(h(2),Pair.Paircode),VP);
   end
 
   Title = strcat(File(f).NT(p).Base,File(f).NT(p).Number);
@@ -86,6 +96,8 @@ while (k <= length(SP)),
 
   axis equal
 
+  rotate3d on
+
   if (ViewParam.Nearby == 0),
     switch File(f).Pair(SP(k).PairIndex).Class,
       case {1, 2},  axis([-2 10 -2 12 -5 5]);
@@ -97,11 +109,12 @@ while (k <= length(SP)),
 
   if k ~= Oldk,
     fprintf('Pair %3d | ',k);
-    fprintf('q: quit | b: back | s: sugars | n: nearby | j: jump | e: exemplars | m: modify');
+    fprintf('ret: next | q: quit | b: back | s: sugars | n: nearby | j: jump | e: exemplars | m: modify');
     if (max(Pair.Paircode == [1 6 11 16]) == 1),
       fprintf(' | r: reverse');
     end
     fprintf('\n');
+    zListPairData(Pair,1);
     if length(Pair.Hydrogen) > 0,
       fprintf('Hydrogen bonds: ');
       for i=1:length(Pair.Hydrogen),

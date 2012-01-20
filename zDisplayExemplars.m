@@ -45,7 +45,7 @@ for pc = 1:length(Paircode),
 
        [Pair,s] = zClassifyPair(E.NT1,E.NT2);
 
-fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.EdgeText);
+fprintf('%s%s %s %s%s %s     \n',E.NT1.Base,E.NT1.Number,Pair.EdgeText,E.NT2.Base,E.NT2.Number);
 
        cla
        F.NT(1) = E.NT1;

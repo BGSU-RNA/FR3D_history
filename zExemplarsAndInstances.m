@@ -43,9 +43,12 @@ for pc = 1:length(Paircode),
      E = Exemplar(row(su),Paircode(pc));
      if ~isempty(E),
 
-       [Pair,s] = zClassifyPair(E.NT1,E.NT2);
+%       [Pair,s] = zClassifyPair(E.NT1,E.NT2);
 
-fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.EdgeText);
+       fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
+      zListPairData(E.Pair,1);
+
+% display the exemplar pair ---------------------------------------------
 
        figure(1)
        cla
@@ -53,6 +56,8 @@ fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.Ed
        F.NT(2) = E.NT2;
        F.Filename = E.Filename;
        zDisplayNT(F,[1 2],ViewParam);
+       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
+
        view(2)
        grid on
        axis equal
@@ -68,22 +73,21 @@ fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.Ed
        Title = [Title E.NT1.Base E.NT1.Number '-' E.NT2.Base E.NT2.Number];
        title(Title);
 
+       rotate3d on
+
+% scatterplot of pairs with the same interaction --------------------------
 
        P.Paircode  = Paircode(pc); 
-       P.Category  = Category(ca);
+       P.Category  = fix(E.Class);
        P.Decimal   = 0;        % 1 - use 1.0 only; 0 - round to 1
        P.Group     = 1;        % hand, computer, both, etc.
        P.Sequential= 0;
        P.Expert    = 0;
        P.Inbox     = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % almost everything
        P.Context   = 3;
-       P.PairFilename = 'rr0033_23S';
-       P.PairNucleotide1 = '11';
-       P.PairNucleotide2 = '12';
-       P.PairDisc  = 5;
 
        VP.Mode      = 1;             
-       VP.Color     = 2;
+       VP.Color     = 12;
        VP.Normal    = 0;
        aa = Category(ca);
        ab = Category(ca) + sign(Category(ca));
@@ -97,11 +101,127 @@ fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.Ed
        VP.el        = 14;
        VP.LineStyle = '-';              % default - thick solid lines
        VP.Exemplars = 0;
-       VP.ClassLimits = 1;
+       VP.ClassLimits = 2;
+       VP.FigNum    = 2;
 
        PairViewer(File,P,VP);
 
-       fprintf('Press a key to go on\n');
+       fprintf('This is the total number of matches over all subcategories.\n');
+
+       figure(2)
+       e = E.Pair.Displ;
+       scatter3(e(1),e(2),e(3),28,'r','filled')
+       title('Pairs that fall into this category, colored by subcategory, if any')
+       figure(3)
+       cut = 90;
+       scatter3(mod(E.Pair.Ang+cut,360)-cut,E.Pair.Normal(3),E.Pair.Gap,28,'r','filled')
+       hold on
+       title('Pairs that fall into this category, colored by subcategory, if any')
+
+% scatterplot of pairs which do not have the same interaction ------------
+
+       P.Paircode  = Paircode(pc); 
+       P.Category  = fix(E.Class);
+       P.Decimal   = 0;        % 1 - use 1.0 only; 0 - round to 1
+       P.Group     = 8;        % nearest exemplar matches
+       P.Sequential= 0;
+       P.Expert    = 0;
+       P.Inbox     = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % almost everything
+       P.Context   = 3;
+
+       VP.Mode      = 1;             
+       VP.Color     = 9;
+       VP.Normal    = 0;
+       aa = Category(ca);
+       ab = Category(ca) + sign(Category(ca));
+       VP.ColorAxis = [min(aa,ab) max(aa,ab)];
+       VP.SortKeys  = [];
+       VP.Nearby    = 0;
+       VP.Sugar     = 0;
+       VP.Hydrogen  = 1;
+       VP.Sort      = 0;
+       VP.az        = 51;
+       VP.el        = 14;
+       VP.LineStyle = '-';              % default - thick solid lines
+       VP.Exemplars = 0;
+       VP.ClassLimits = 2;
+       VP.FigNum    = 4;
+
+       PairViewer(File,P,VP);
+
+       fprintf('This is the total number of near matches over all subcategories.\n');
+       figure(4)
+       title('Pairs that do not fall into this category, colored by distance to exemplar')
+       figure(5)
+       title('Pairs that do not fall into this category, colored by distance to exemplar')
+
+% view individual pairs that do not have the same classification -----------
+
+disp('Press a key to start examining near misses for this (sub)category, closest to exemplar first')
+pause
+
+       P.Paircode  = Paircode(pc); 
+       P.Category  = E.Class;
+       P.Decimal   = 1;        % 1 - use 1.0 only; 0 - round to 1
+       P.Group     = 8;        % nearest exemplar matches
+       P.Sequential= 0;
+       P.Expert    = 0;
+       P.Context   = 3;
+
+       VP.Mode      = 4;             
+       VP.Color     = 2;
+       VP.Normal    = 0;
+       aa = Category(ca);
+       ab = Category(ca) + sign(Category(ca));
+       VP.ColorAxis = [min(aa,ab) max(aa,ab)];
+       VP.SortKeys  = [20];
+       VP.Nearby    = 0;
+       VP.Sugar     = 0;
+       VP.Hydrogen  = 1;
+       VP.Sort      = 1;
+       VP.az        = 51;
+       VP.el        = 14;
+       VP.LineStyle = '-';              % default - thick solid lines
+       VP.Exemplars = 1;
+       VP.ClassLimits = 1;
+       VP.FigNum    = 6;
+
+       PairViewer(File,P,VP);
+
+% view individual pairs that have the same classification ------------------
+disp('Press a key to start examining matches to this (sub)category, furthest from exemplar first')
+pause
+
+       P.Paircode  = Paircode(pc); 
+       P.Category  = E.Class;
+       P.Decimal   = 1;        % 1 - use 1.0 only; 0 - round to 1
+       P.Group     = 1;        % nearest exemplar matches
+       P.Sequential= 0;
+       P.Expert    = 0;
+       P.Context   = 3;
+
+       VP.Mode      = 4;             
+       VP.Color     = 2;
+       VP.Normal    = 0;
+       aa = Category(ca);
+       ab = Category(ca) + sign(Category(ca));
+       VP.ColorAxis = [min(aa,ab) max(aa,ab)];
+       VP.SortKeys  = [-20];
+       VP.Nearby    = 0;
+       VP.Sugar     = 0;
+       VP.Hydrogen  = 1;
+       VP.Sort      = 1;
+       VP.az        = 51;
+       VP.el        = 14;
+       VP.LineStyle = '-';              % default - thick solid lines
+       VP.Exemplars = 1;
+       VP.ClassLimits = 1;
+       VP.FigNum    = 6;
+
+       PairViewer(File,P,VP);
+
+
+       fprintf('Press a key to go on to the next exemplar\n');
        pause
 
       end
