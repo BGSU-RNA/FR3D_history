@@ -2,7 +2,7 @@
 
 function [void] = zListPairs(File,SP,ListMode)
 
-ListItems = [1 2 3 4 5 6 9 10 12 13 14 15 16 17 20 21];
+ListItems = [1 2 3 4 5 6 9 10 12 13 14 15 16 17 21];
 
 Header = ['    '];
 for i = 1:length(ListItems),
@@ -26,7 +26,6 @@ for i = 1:length(ListItems),
     case 17, Header = [Header '  EDist'];
     case 18, Header = [Header ' Hydrogen angles'];
     case 19, Header = [Header ' Overlap'];
-    case 20, Header = [Header '  Berman'];
     case 21, Header = [Header 'PairDisc'];
   end
 end
@@ -84,7 +83,6 @@ for k=1:length(SP)
                    fprintf('                 ');
                  end
         case 19, fprintf('%6.1f',p.StackingOverlap);
-        case 20, fprintf('%7.2f',SP(k).BermanClass);
         case 21, fprintf('%7.2f',SP(k).PairDisc);
       end
     end

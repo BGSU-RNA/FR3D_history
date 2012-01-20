@@ -10,10 +10,16 @@ for f=1:length(File),
  if File(f).NumNT > 0,                      % if the file is non-empty
   filestarttime = cputime;                  % for this file only
   Codes = cat(1,File(f).NT(:).Code);        % codes to use in nucleotide mask
+  if isfield(Model,'OKPairs') | isfield(Model,'ExPairs'),%  screen by paircode
+    N = length(Codes);
+    PC = Codes * ones(1,N) + 4*(ones(N,1)*(Codes'-1));
+  else
+    PC = [];
+  end
 
   for i=2:min(9,Model.NumNT)                % loop through model nucleotides
     for j=1:(i-1)
-      PS{i,j} = xPairwiseScreen(File(f),Codes,Model,i,j);
+      PS{i,j} = xPairwiseScreen(File(f),Codes,Model,i,j,PC);
       PS{j,i} = PS{i,j}';
       NNZ(i,j) = nnz(PS{i,j});          % number of non-zero entries
       NNZ(j,i) = NNZ(i,j);

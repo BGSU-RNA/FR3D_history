@@ -1,51 +1,80 @@
 % Direction can be +1 or -1; it tells the order in which to put the 1st cand
 
-function [void] = xAlignCandidates(File,Model,Candidates,Discrepancy,Direction)
+function [void] = xAlignCandidates(File,Search,Direction)
+
+Model       = Search.Query;
+Candidates  = Search.Candidates;
+Discrepancy = Search.Discrepancy;
 
 L = length(Discrepancy);
 
-[y,p] = sort(Direction*double(Candidates(1,1:Model.NumNT)));    % put in increasing or decreasing order
-
-if ~isfield(Model,'MaxDiff'),
-  Model.MaxDiff = Inf*ones(1,Model.NumNT-1);
-end
-
-if Direction > 0,
-  MaxDiff = Model.MaxDiff;
-else
-  MaxDiff = fliplr(Model.MaxDiff);
-end
-
+[y,p] = sort(Direction*double(Candidates(1,1:Model.NumNT)));    
+                                    % put in increasing or decreasing order
 Cand = double(Candidates(:,p));               % re-order nucleotides
 F    = Candidates(:,Model.NumNT+1);           % file numbers
 
-maxinsert = zeros(1,Model.NumNT-1);
+if isfield(Model,'MaxDiffMat'),
+  MaxDiff = diag(Model.MaxDiffMat(p,p),1);
+else
+  MaxDiff = Inf*ones(1,Model.NumNT-1);
+end
 
+if Direction > 0,
+  MaxDiff = MaxDiff;
+else
+  MaxDiff = fliplr(MaxDiff);
+end
+
+maxinsert = zeros(1,Model.NumNT-1);
 for c = 1:L,
   maxinsert = max(maxinsert,abs(diff(Cand(c,1:Model.NumNT)))-1);
 end
 
-for c = 1:L,
-  f = F(c);
+% ---------------------------- Print header line
+
+fprintf('               ');
+if Model.Geometric > 0,
+  fprintf('           ');
+end
+for j=1:Model.NumNT,
+  fprintf('       ');
+end
+fprintf('    ');
+for n = 1:(Model.NumNT-1),
+  fprintf('%d',n);
+  if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
+    for i=1:maxinsert(n),
+      fprintf(' ');
+    end
+  else
+    fprintf('    ');
+  end
+end
+fprintf('%d\n', Model.NumNT);
+
+% ----------------------------- Print alignment
+
+for c = 1:L,                                      % loop through candidates
+  f = F(c);                                       % file number
   fprintf('%15s', File(f).Filename);
   if Model.Geometric > 0,
     fprintf('%11.4f',Discrepancy(c));
   end
-  for j=1:Model.NumNT,
+  for j=1:Model.NumNT,                            % print candidate
     fprintf('%3s',File(f).NT(Cand(c,j)).Base);    
     fprintf('%4s',File(f).NT(Cand(c,j)).Number);    
   end
   fprintf('    ');
-  for n = 1:(Model.NumNT-1),
+  for n = 1:(Model.NumNT-1),                      % print alignment
     fprintf('%s', File(F(c)).NT(Cand(c,n)).Base);
-    if MaxDiff(n) < Inf,
-      if Cand(c,n+1) - Cand(c,n) > 1,
+    if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
+      if Cand(c,n+1) - Cand(c,n) > 1,             % increasing order
         for i = (Cand(c,n)+1):(Cand(c,n+1)-1),
-          fprintf('%s', File(F(c)).NT(i).Base);
+          fprintf('%s', File(F(c)).NT(i).Base);   % show insertions
         end
-      elseif Cand(c,n+1) - Cand(c,n) < -1,
+      elseif Cand(c,n+1) - Cand(c,n) < -1,        % decreasing order
         for i = (Cand(c,n)-1):-1:(Cand(c,n+1)+1),
-          fprintf('%s', File(F(c)).NT(i).Base);
+          fprintf('%s', File(F(c)).NT(i).Base);   % show insertions
         end
       end
       for i=1:(1 + maxinsert(n) - abs(Cand(c,n+1)-Cand(c,n))),

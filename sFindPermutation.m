@@ -1,7 +1,5 @@
 %  xFindPermutation(b);
 
-
-
 function [Perm] = xFindPermutation(NNZ);
 
 [m,n] = size(NNZ);
@@ -14,7 +12,6 @@ for i=2:min(9,n)
     LEN(count,2:3)=[i,j];
   end
 end
-
 
 Loc=1;
 i=1:n;

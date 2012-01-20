@@ -38,23 +38,28 @@ if Param.Expert == 0,
 end
 
 if Param.Category == 51,
-  ViewParam.Color = 14;
+  ViewParam.Color = 13;
 end
 
 
-fprintf('Enter view mode(s), 9 to sort, 0 to quit [%1d] ', ViewParam.Mode);
+fprintf('Enter view mode(s), 9 to sort, 8 for a new pair, 0 to quit [%1d] ', ViewParam.Mode);
 inp = input('');
 if ~isempty(inp),
   if inp == 9,
     ViewParam = zEnterSortKeys(ViewParam);
     ViewParam.Sort = 1;
+  elseif inp == 8,
+    ViewParam.Mode = 0;
+  elseif inp == 0,
+    ViewParam.Mode = 0;
+    ViewParam.FigNum = 0;
   else
     ViewParam.Mode = sort(inp);           % do these in a specific order
     ViewParam.Sort = 0;
   end
 end
 
-if (ViewParam.Mode(1) == 1) & (ViewParam.Sort == 0),          % scatterplot
+if ((ViewParam.Mode(1) == 1) | (ViewParam.Mode(1) == 6)) & (ViewParam.Sort == 0),          % scatterplot
   if Param.Expert == 0,
     for k=1:13,
       fprintf('Scheme %1d - %s\n',k,zColorSchemeName(k));

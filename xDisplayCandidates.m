@@ -1,318 +1,305 @@
-% the function xDisplayCandidates(File,Model,Candidates) is used to display
-% the Model and the possible matches to the model
+% the function xDisplayCandidates(File,Search) is used to display
+% the Model and the best matches to the model
 
-function xDisplayCandidates(File,Search)
+function Search = xDisplayCandidates(File,Search,Level)
 
-Model       = Search.Query;
-Candidates  = Search.Candidates;
-Discrepancy = Search.Discrepancy;
+if nargin < 3,
+  MenuTitle = 'Display options';
+  Level     = 0;
+  QuitButton = 'Quit';
+else
+  MenuTitle = ['Level ' num2str(Level)];
+  QuitButton = 'Quit level';
+end
 
-N = Model.NumNT;
+if isempty(Search.Candidates)
+  disp('There are no candidates to display')
+  return
+end
+
+N = Search.Query.NumNT;
 
 warning off
 
-% if there is no model, use the first candidate
+% if there is no geometric model, use the first candidate to align to
 
-if ~isfield(Model,'Filename'),
-  f             = Candidates(1,N+1);
-  Model.Indices = double(Candidates(1,1:N));
-  Model.NT      = File(f).NT(Model.Indices);
-  Model.Centers = cat(1,Model.NT(:).Center);
-end
+Model = Search.Query;
 
 if Model.Geometric == 0,
+  f             = Search.Candidates(1,N+1);
+  Model.Indices = double(Search.Candidates(1,1:N));
+  Model.NT      = File(f).NT(Model.Indices);
+  Model.Centers = cat(1,Model.NT(:).Center);
+  Model.Filename = '';
   Model.WeightedCenter = mean(Model.Centers);
   Model.WeightedCenteredCenters = Model.Centers-ones(N,1)*mean(Model.Centers);
 end
 
-if isempty(Candidates)
-    disp('There are no candidates to display')
-    return
+L = length(Search.Candidates(:,1));  % number of candidates found
+
+if ~isfield(Search,'Marked'),
+  Search.Marked = zeros(1,L);         % allow marking certain candidates
 end
 
-if Model.Sequential == 1,
-  NowSequential = 1;
-else
-  NowSequential = 0;
+if ~isfield(Search,'Align'),
+  Search.Align = zeros(1,L);         % allow marking certain candidates
 end
 
-L = length(Candidates(:,1));
-Sequential=0;
+% -------------------------------------------------------------------------
 
-Written = zeros(1,L);         % keep track of what was written already
-Align   = zeros(1,L);
+Display(1).n = 1;               % which candidate is in display window 1
+Display(1).sugar = 1;           % display sugars or not
+Display(1).neighborhood = 0;    % how large a neighborhood to show
+Display(1).superimpose  = 0;    % superimpose the first candidate?
+Display(1).supersugar   = 0;    % show sugars of first when superimposing?
+Display(1).az           = -37.5;
+Display(1).el           = 30;
 
-for i=1:2
-  Display(i).n = 1;
-  Display(i).sugar = 1;
-  Display(i).neighborhood = 0;
-  Display(i).superimpose  = 0;
-  Display(i).supersugar   = 0;
-end
+Numplots = 1;
+stop     = 0;
+i        = 1;                              % current window
+PlotMotif(File,Search,Model,Display,i);    % graph in display window i
+rotate3d on
 
-PlotMotif(File,Model,Candidates,Discrepancy,Display,1,Written);  % sub function
-PlotMotif(File,Model,Candidates,Discrepancy,Display,2,Written);
+% ------------------------------- display menu -----------------------------
 
-Numplots = 2;
-stop     = 1;
+while stop == 0,                            
 
-while stop>0,                              % display Matches to the Model
+  k=menu(MenuTitle,'Next plot','Previous Plot','',...
+         'Add plot','Larger Neighborhood', ...
+         '','Toggle sugar','Toggle superimpose', ...
+         'List Marked to screen','Mark/Unmark current','Reverse all marks', ...
+         'Write marked to PDB','Display marked','Group marked', ...
+         'Align marked',QuitButton);
 
-    k=menu('Display options','Next plot','Previous Plot','Align Plots',...
-           'Add plot','Toggle Sequential','Larger Neighborhood', ...
-           'Restore original','Toggle sugar','Toggle superimpose', ...
-           'Write Current','Quit');
-    i=gcf;
-    figure(1);
-    [az,el]=view;
-    x=XLim;
-    y=YLim;
-    z=ZLim;
-    switch k
-        case 1                                      % next plot
-            figure(i);
-            [az,el]=view;
-            if i>1
-                Display(i).n=min(L,Display(i).n+1);
-                PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            end
-            view(az,el);
+  ii=gcf;                                 % get current active figure
+  if (abs(ii) > 10) | (ii == 0),
+    ii = i;
+  end
+  i = ii;
 
-        case 2                                      % Previous Plot
-            figure(i);
-            [az,el]=view;
-            if i>1
-                Display(i).n=max(1,Display(i).n-1);
-                PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            end
-            view(az,el);
-        case 3                                      % Align Plot
-            figure(1)
-            % now find the camera angles
-            [az,el]=view;
-            x=XLim;
-            y=YLim;
-            z=ZLim;
-            for i=2:Numplots
-                %if sum(ismember(get(i,'Visible'),'n'))   %check to see if plot is there
-                    figure(i)
-                    % now change figure i's camera angles
-                    view([az,el]);
-                    set(gca,'XLim',x);
-                    set(gca,'YLim',y);
-                    set(gca,'ZLim',z);
-                    %end
-            end
-        case 4                                      % Addplot
-            figure(1)
-            [az,el]=view;
-            Numplots=Numplots+1;
-            Display(Numplots).neighborhood=0;
-            Display(Numplots).n=1;
-            Display(Numplots).sugar=1;
-            Display(Numplots).superimpose = 0;
-            
-            PlotMotif(File,Model,Candidates,Discrepancy,Display,Numplots,Written);
-            view([az,el])
-         case 5      % Toggle Sequential
-            if Model.Sequential == 1,
-              disp('Only sequential motifs have been retained in the search');
-            elseif NowSequential == 0,
-              OrigCandidates = Candidates;
-              Candidates = xSequential(Candidates,N,3);
-              if length(Candidates(:,1)) > 0,
-                NowSequential = 1;
-                figure(i)
-                Display(i).n = 1;
-                PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-              else
-                disp('No sequential motifs were found');
-                Candidates = OrigCandidates;
-              end
-            else
-              Candidates = OrigCandidates;
-              NowSequential = 0;
-              figure(i)
-              Display(i).n = 1;
-              PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            end
 
-        case 6                                      % toggle Neighborhood
-            dn = [4 4 4 4 6 6 8 8 0];
-            Display(i).neighborhood = dn(1+Display(i).neighborhood);
-            PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            view(az,el);
-        case 7                                      % Restore original
-            Display(i).neighborhood=0;
-            Display(i).sugar=1;
-            PlotMotif(File,Model,Candidates,Discrepancy,Display,1,Written);
-        case 8                                      % toggle sugar
-            figure(i)
-            [az,el]=view;
+  [az,el]=view;                          % get current view (orientation)
+  Display(i).az = az;
+  Display(i).el = el;
+  Display(i).x=XLim;                     % current x, y, z limits
+  Display(i).y=YLim;
+  Display(i).z=ZLim;
 
-            if Display(i).superimpose == 0,
-              Display(i).sugar = 1 - Display(i).sugar;
-            elseif (Display(i).sugar == 0) & (Display(i).supersugar == 0),
-              Display(i).sugar = 1;
-            elseif (Display(i).sugar == 1) & (Display(i).supersugar == 0),
-              Display(i).supersugar = 1;
-            elseif (Display(i).sugar == 1) & (Display(i).supersugar == 1),
-              Display(i).sugar = 0;
-            elseif (Display(i).sugar == 0) & (Display(i).supersugar == 1),
-              Display(i).supersugar = 0;
-            end
+  switch k                               % k is the menu choice
+    case 1                                      % next plot
+      Display(i).n = min(L,Display(i).n+1);     % move to next candidate
 
-            PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            view(az,el);
-        case 9                                      % toggle superimpose
-            Display(i).superimpose = 1-Display(i).superimpose;
-            PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            view(az,el);
-        case 10                            % Print Current - Added by Ali
-            if ~exist('fidOUT','var')
-              OUTfile = ['Model_' Model.Name 'Selected.txt'];
-              fidOUT = fopen(OUTfile,'w+');
-                                                % write header
-              fprintf(fidOUT,'%s\t%s','PDB File','Discrepancy');
-              for b=1:Model.NumNT,
-                fprintf(fidOUT,'\t%s',strcat('NT',num2str(b)));
-              end
-              fprintf(fidOUT,'\n');
-            end
+    case 2                                      % Previous Plot
+      Display(i).n = max(1,Display(i).n-1);
 
-            if Written(Display(i).n) < 1,
-              ccc = double(Candidates(Display(i).n,:));
-              f   = ccc(Model.NumNT+1);
-              fprintf(fidOUT,'%s\t%8.4f',File(f).Filename,Discrepancy(Display(i).n));
-              for b=1:Model.NumNT,
-                fprintf(fidOUT,'\t%s%4s',File(f).NT(ccc(b)).Base,File(f).NT(ccc(b)).Number);
-              end
-              fprintf(fidOUT,'\n');
-              Written(Display(i).n) = 1;
-            end
-            for j=2:Numplots
-              PlotMotif(File,Model,Candidates,Discrepancy,Display,j,Written);
-            end
-            figure(i);
-            [az,el]=view;
-            if i>1
-              Display(i).n=min(L,Display(i).n+1);
-              PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written);
-            end
-            view(az,el);
-        case 11                                      % quit Display
-            if exist('fidOUT','var')
-               fclose(fidOUT);
-            end
-            stop=0;
-            for i=1:Numplots
-%                set(figure(i),'Visible','off')
-            end
-    end
-    set(gca,'XLim',x);
-    set(gca,'YLim',y);
-    set(gca,'ZLim',z);
+    case 4                                      % Add plot
+      Numplots = Numplots + 1;                  % increase number of windows
+      Display(Numplots) = Display(i);           % use current settings
+      i = Numplots;
+      figure(i);
+      AlignPlots = 'AlignPlots';
+
+    case 5                                      % toggle Neighborhood
+      dn = [4 4 4 4 6 6 8 8 0];                 % neighborhood setting list
+      Display(i).neighborhood = dn(1+Display(i).neighborhood);
+
+    case 6                                      % 
+
+    case 7                                      % toggle sugar
+      if Display(i).superimpose == 0,
+        Display(i).sugar = 1 - Display(i).sugar;
+      elseif (Display(i).sugar == 0) & (Display(i).supersugar == 0),
+        Display(i).sugar = 1;
+      elseif (Display(i).sugar == 1) & (Display(i).supersugar == 0),
+        Display(i).supersugar = 1;
+      elseif (Display(i).sugar == 1) & (Display(i).supersugar == 1),
+        Display(i).sugar = 0;
+      elseif (Display(i).sugar == 0) & (Display(i).supersugar == 1),
+        Display(i).supersugar = 0;
+      end
+
+    case 8                                      % toggle superimpose
+      Display(i).superimpose = 1-Display(i).superimpose;
+
+    case 9                                      % list marked on screen
+      Search2 = Search;
+      j = find(Search.Marked);
+      Search2.Candidates  = Search.Candidates(j,:);
+      Search2.Discrepancy = Search.Discrepancy(j);
+      if length(j) > 0,
+        fprintf('Marked candidates:\n');
+        xListCandidates(File,Search2);
+      end
+
+    case 10                                      % mark current cand
+      Search.Marked(Display(i).n) = 1-Search.Marked(Display(i).n);  % toggle mark
+      Display(i).n = min(L,Display(i).n+1);             % move to next
+
+    case 11                                    % reverse all marks
+      Search.Marked = 1-Search.Marked;
+      for j=1:Numplots
+        PlotMotif(File,Search,Model,Display,j);
+      end
+
+    case 12                                     % write PDB of marked
+      Search2 = Search;
+      j = find(Search.Marked);
+      Search2.Candidates  = Search.Candidates(j,:);
+      Search2.Discrepancy = Search.Discrepancy(j);
+      Search2.Marked      = Search.Marked(j);
+      if length(j) > 0,
+        xWriteCandidatePDB(File,Search2);
+      end
+
+    case 13                                     % display marked 
+      Search2 = Search;
+      j = find(Search.Marked);
+      if length(j) > 0,
+        Search2.Candidates  = Search.Candidates(j,:);
+        Search2.Discrepancy = Search.Discrepancy(j);
+        Search2.Marked      = Search.Marked(j);
+        xDisplayCandidates(File,Search2,Level+1);
+      end
+
+    case 14                                     % group and display marked 
+      Search2 = Search;
+      j = find(Search.Marked);
+      if length(j) > 0,
+        Search2.Candidates  = Search.Candidates(j,:);
+        Search2.Discrepancy = Search.Discrepancy(j);
+        Search2.Marked      = Search.Marked(j);
+        xGroupCandidates(File,Search2);
+      end
+
+    case 15                                     % align marked 
+      Search2 = Search;
+      j = find(Search.Marked);
+      if length(j) > 0,
+        Search2.Candidates  = Search.Candidates(j,:);
+        Search2.Discrepancy = Search.Discrepancy(j);
+        xAlignCandidates(File,Search2,1)
+      end
+
+    case 16                                     % quit Display
+      if exist('fidOUT','var')
+        fclose(fidOUT);
+      end
+      stop = 1;
+
+    end  % switch statement for menu
+
+  if any([1 2 4 5 6 7 8 9 10 13 14] == k),
+    PlotMotif(File,Search,Model,Display,i);
+    drawnow
+  end
+
+  if Numplots > 1,
+      for j=1:Numplots,
+        figure(j)
+        sh(j) = subplot(1,1,1);
+      end
+      linkobj = linkprop(sh,...
+{'cameraposition',...
+ 'cameraupvector',...
+ 'cameratarget',...
+ 'cameraviewangle'});
+
+      set(gcf, 'UserData', linkobj);
+  end
+
+  figure(i)
+  rotate3d on
+
 end  % end while
 
 %-------------------------------------------------------------------------
+%-------------------------------------------------------------------------
+%-------------------------------------------------------------------------
 
-function  PlotMotif(File,Model,Candidates,Discrepancy,Display,i,Written)
+function  PlotMotif(File,Search,Model,Display,i)
 
-    N = Model.NumNT;
+  N = Model.NumNT;
 
-    figure(i)
-    clf
+  figure(i)
+  clf
 
-    if (i > 1) & (Display(i).superimpose == 1),
-      Indices = Model.Indices;
-      if (Model.NumNT > 2),
-        R = eye(3);
-        S = mean(cat(1,Model.NT.Center));
-      else
-        R = Model.NT(1).Rot;
-        S = mean(cat(1,Model.NT.Center));
-      end
-      MVP.Rotation = R;
-      MVP.Shift    = S;
-      MVP.LineStyle = '-.';
-      MVP.LineThickness = '1';
-      MVP.Sugar    = Display(i).supersugar;
-      MVP.ConnectSugar = 0;
-      zDisplayNT(Model,1:N,MVP);
-    end
-
-    if (i == 1),
-      Indices = 1:N;
-      zShowInteractionTable(Model,1:N);
-    else
-      [s,t] = size(Candidates);
-      n       = Display(i).n;
-      f       = Candidates(n,N+1);
-      Disc    = Discrepancy(n);
-      Indices = double(Candidates(n,1:N));
-      zShowInteractionTable(File(f),double(Indices));
-    end
-
-    [az,el]=view;
-    VP.Sugar    = Display(i).sugar;
-
-    if (i==1) & (Model.NumNT > 2),
+  if (Display(i).superimpose == 1),
+    Indices = Model.Indices;
+    if (Model.NumNT > 2),
       R = eye(3);
-      S = Model.WeightedCenter;
-    elseif (i==1) & (Model.NumNT == 2),
+      S = mean(cat(1,Model.NT.Center));
+    else
       R = Model.NT(1).Rot;
-      S = mean(cat(1,Model.NT(Indices).Center));
-    elseif Model.NumNT > 2,
-      MC = Model.WeightedCenteredCenters;          % align to the model
-      CandiCenters = cat(1,File(f).NT(Indices).Center);
-      CC = CandiCenters - ones(N,1)*mean(CandiCenters);
-
-      R = zBestRotation(MC, CC);
-      S = mean(CandiCenters);
-    else
-      R = File(f).NT(Indices(1)).Rot;
-      S = mean(cat(1,File(f).NT(Indices).Center));
+      S = mean(cat(1,Model.NT.Center));
     end
+    MVP.Rotation = R;
+    MVP.Shift    = S;
+    MVP.LineStyle = '-.';
+    MVP.LineThickness = '1';
+    MVP.Sugar    = Display(i).supersugar;
+    MVP.ConnectSugar = 0;
+    MVP.Grid     = 0;
+    zDisplayNT(Model,1:N,MVP);
+  end
 
-    VP.Rotation = R;
-    VP.Shift    = S;
+  [s,t] = size(Search.Candidates);
+  n       = Display(i).n;
+  f       = Search.Candidates(n,N+1);
+  Disc    = Search.Discrepancy(n);
+  Indices = double(Search.Candidates(n,1:N));
+  zShowInteractionTable(File(f),double(Indices),Disc);
 
-    if Display(i).neighborhood > 0,
-      a = zeros(1,File(f).NumNT);
-      v = Display(i).neighborhood;
-      for j=1:length(Indices),
-        a = a + (File(f).Distance(Indices(j),:) < v) .* ...
-                (File(f).Distance(Indices(j),:) > 0);
-      end
-      a(Indices) = zeros(1,length(Indices));  % take out ones in Indices
-      B = find(a);
-      Indices = [Indices B];
+  drawnow
+
+  VP.Sugar    = Display(i).sugar;
+
+  if Model.NumNT > 2,
+    MC = Model.WeightedCenteredCenters;          % align to the model
+    CandiCenters = cat(1,File(f).NT(Indices).Center);
+    CC = CandiCenters - ones(N,1)*mean(CandiCenters);
+
+    R = zBestRotation(MC, CC);
+    S = mean(CandiCenters);
+  else
+    R = File(f).NT(Indices(1)).Rot;
+    S = mean(cat(1,File(f).NT(Indices).Center));
+  end
+
+  VP.Rotation = R;
+  VP.Shift    = S;
+  VP.Grid     = 0;
+
+  if Display(i).neighborhood > 0,
+    a = zeros(1,File(f).NumNT);
+    v = Display(i).neighborhood;
+    for j=1:length(Indices),
+      a = a + (File(f).Distance(Indices(j),:) < v) .* ...
+              (File(f).Distance(Indices(j),:) > 0);
     end
+    a(Indices) = zeros(1,length(Indices));  % take out ones in Indices
+    B = find(a);
+    Indices = [Indices B];
+  end
 
-    if i==1,
-      VP.ConnectSugar = 0;
-      zDisplayNT(Model,Indices,VP);
-    else
-      zDisplayNT(File(f),Indices,VP);
-    end
+  zDisplayNT(File(f),Indices,VP);
+ 
+  xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Disc: ',...
+          num2str(Disc)]);
+  if Search.Marked(n) == 1;
+    yl = 'Marked';
+  else
+    yl = '';
+  end
+  ylabel(yl);
 
-    if i==1
-      if Model.Geometric == 1,
-        xlabel('Query motif');
-      else
-        xlabel('First candidate');
-      end
-    else
-      xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Disc: ',...
-             num2str(Disc)]);
-      if Written(n) == 1;
-        ylabel('Written to file');
-      else
-        ylabel('');
-      end
-    end
-    grid on
-    set(gcf,'Renderer','OpenGL')
+  axis equal
+  axis vis3d
+  view([Display(i).az Display(i).el]);
+  drawnow
+%  grid off
+
+%    grid on
+%    set(gcf,'Renderer','OpenGL')
 %    set(gcf,'Renderer','zbuffer')
-
 

@@ -26,11 +26,11 @@ function [void] = zDisplayExemplars(Paircode,Category)
   ViewParam.ColorAxis = [-12 30];
   ViewParam.SortKeys  = [];
   ViewParam.Nearby    = 0;
-  ViewParam.Sugar     = 0;
+  ViewParam.Sugar     = 1;
+  ViewParam.ConnectSugar = 0;
+  ViewParam.AtOrigin  = 1;
   ViewParam.Hydrogen  = 1;
   ViewParam.Sort      = 0;
-  ViewParam.az        = 51;
-  ViewParam.el        = 14;
   ViewParam.LineStyle = '-';
 
 % loop through computer classifications ----------------------
@@ -42,9 +42,18 @@ for pc = 1:length(Paircode),
 
      E = Exemplar(row(su),Paircode(pc));
      if ~isempty(E),
-       cla
-       zPlotExemplar(E,ViewParam);
 
+       [Pair,s] = zClassifyPair(E.NT1,E.NT2);
+
+fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.EdgeText);
+
+       cla
+       F.NT(1) = E.NT1;
+       F.NT(2) = E.NT2;
+       F.Filename = E.Filename;
+       zDisplayNT(F,[1 2],ViewParam);
+       view(2)
+       grid on
        axis equal
 
        switch fix(E.Class),

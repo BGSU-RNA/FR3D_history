@@ -42,7 +42,7 @@ end
 
 % List base using dominant edge first
 if display == 1,
-    switch abs(Class)
+    switch abs(fix(Class))
         case   1,    Text = ['cWW'];
         case   2,    Text = ['tWW'];
         case   3,    Text = ['cWH'];
@@ -60,7 +60,7 @@ if display == 1,
         otherwise,   Text = ['-'];  % add cases later
     end
 else 
-    switch abs(Class)
+    switch abs(fix(Class))
         case   1,    Text = ['Cis   ' Dom  'WC - ' Sec 'WC'];
         case   2,    Text = ['Trans ' Dom  'WC - ' Sec 'WC'];
         case   3,    Text = ['Cis   ' Dom  'WC - ' Sec 'H '];

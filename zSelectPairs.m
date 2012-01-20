@@ -15,9 +15,9 @@ k = 1;                                    % index of kept pairs
 if any(Param.Category == 51),             % match a given pair
   Pf = zFileNumberLookup(File,Param.PairFilename);  % must already be loaded
   if Pf > 0,
-    PNTList = {Param.PairNucleotide1,Param.PairNucleotide2};
-    PIndices = zIndexLookup(File(Pf),PNTList);
-    MatchPair =zAnalyzePair(File(Pf).NT(PIndices(1)),File(Pf).NT(PIndices(2)));
+    PIndex1 = zIndexLookup(File(Pf),{Param.PairNucleotide1});
+    PIndex2 = zIndexLookup(File(Pf),{Param.PairNucleotide2});
+    MatchPair =zAnalyzePair(File(Pf).NT(PIndex1(1)),File(Pf).NT(PIndex2(1)));
   end
 end
 

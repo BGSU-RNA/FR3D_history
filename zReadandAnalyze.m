@@ -31,11 +31,24 @@ if fid > 0
 
 fclose(fid);
 
-zExtractAtomsPDB(Filename,'##TempPDB');
+Header = zExtractAtomsPDB(Filename,'##TempPDB');
 
 [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P] = zReadPDBTextRead('##TempPDB');
 
 delete('##TempPDB.pdb');
+
+% Move models in NMR file apart
+
+if isfield(Header,'Expdata') & (length(Header.ModelStart) > 1)
+  if ~isempty(strfind(Header.Expdata,'NMR')),
+    Header.ModelStart = [Header.ModelStart length(NTNUMBER)+1];
+    for m = 1:(length(Header.ModelStart)-1),
+      a = Header.ModelStart(m);
+      b = Header.ModelStart(m+1)-1;
+      P(a:b,1) = P(a:b,1) + (m-1)*1000;     % shift by 1000 for each model
+    end
+  end
+end
 
 % Extract locations of base and sugar atoms ---------------------------------
 
@@ -219,7 +232,7 @@ NumNT = n - 1;                                % total number of nucleotides
 
 % Read standard bases from Sponer QM calculations --------------------------
 
-zSponer_Locations                 % read in QM locations of atoms in 4 bases
+zStandardBases                % read in QM locations of atoms in 4 bases
 
 Lim(1,:) = [10 8 11 8];       % number of base atoms, excluding hydrogen
 Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
@@ -231,13 +244,13 @@ warning off MATLAB:divideByZero
 for n=1:NumNT,                                   % analyze all nucleotides
   C  = NT(n).Code;                               % A is 1, C is 2, ...
   L  = Lim(1,C);                                 % number of atoms in base
-  X  = Sponer_Base(1:L,:,C);                     % ideal base atom locations
+  X  = StandardLoc(1:L,:,C);                     % ideal base atom locations
   Y  = NT(n).Loc(1:L,:);                         % observed atom locations
 
   [r, sc, sh] = zBestTransformation(X,Y);        % find best rotation, shift
 
   L2 = Lim(2,C);                                 % num of atoms and hyd in base
-  X2 = Sponer_Base(1:L2,:,C);                    % ideal base & hyd locations
+  X2 = StandardLoc(1:L2,:,C);                    % ideal base & hyd locations
   F  = (sh*ones(1,L2) + r*X2')';                 % best fit without scaling
   e  = sqrt(sum(sum((Y - F(1:L,:)).^2)))/L;      % error measure;
                                                  % should be between 0 and 10
@@ -267,6 +280,7 @@ File.HandClass = [];
 File.Comment   = [];
 File.CI        = sparse(NumNT,NumNT);
 File.Inter     = sparse(NumNT,NumNT);
+File.Edge      = sparse(NumNT,NumNT);
 File.Modified  = 1;
 
 %zSaveNTData(File);

@@ -1,7 +1,6 @@
 % zPlotHydrogenBonds(File,PairIndex,R,S) draws a dotted line between bases
 % corresponding to a hydrogen bond
-%
-%
+
 function [void] = zPlotHydrogenBonds(File,PairIndex,R,S)
 
 Pair  = File.Pair(PairIndex);
@@ -16,7 +15,7 @@ if (abs(Class) < 14),
 else
   ci = File.CI(p,q);                           % Comment index
   if ci > 0,                                   % Pair is in hand file
-    HandClass = File.HandClass(ci);         % Use the hand class
+    HandClass = File.HandClass(ci);            % Use the hand class
   else
     HandClass = 0;                             % Hand class 0
   end

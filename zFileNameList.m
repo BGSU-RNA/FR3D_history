@@ -3,7 +3,7 @@
 
 function [Filenames] = zFileNameList;
 
-Filenames = {'1s72';
-             };  % add additional filenames here, separated by semicolons
+Filenames = {'1s72' ...
+             };  % add additional filenames here
 
 

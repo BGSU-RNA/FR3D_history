@@ -63,7 +63,7 @@ count = 0;
 SS=0;
 switch num
     case 2
-        TList   = [j i];
+        TList   = [i j];
         count=length(i);
     case 3
         [TList,count]=Case3(Cutoff,TList,LL,i,j,count,A,B,C); 
@@ -90,7 +90,7 @@ end
 TList = TList(1:count,:);
 
 %---------------------------------------------------------------
-function [TList,count]=Case3(Cutoff,TList,LL,i,j,count,A,B,C); 
+function [TList,count]=Case3(Cutoff,TList,LL,i,j,count,A,B,C)
     
 
 TList = uint16(zeros(LL,3));
@@ -105,7 +105,7 @@ for n=1:length(i),
     TList = [TList; uint16(zeros(AddLL,3))];
     LL    = length(TList(:,1));
 if count > 1000000,
-  fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
   end
   for p = 1:K,
@@ -131,7 +131,7 @@ function [TList,count]=Case4(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F)
         TList = [TList; uint16(zeros(AddLL,4))];
         LL    = length(TList(:,1));
 if count > 1000000,
-  fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
       end
       for p = 1:length(kk),
@@ -174,7 +174,7 @@ function [TList,count]=Case5(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J)
                           TList = [TList; uint16(zeros(AddLL,5))];
                           LL    = length(TList(:,1));
 if count > 1000000,
-  fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
                         end
                         count = count + 1;
@@ -215,7 +215,7 @@ function [TList,count]=Case6(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M
                           TList = [TList; uint16(zeros(AddLL,6))];
                           LL    = length(TList(:,1));
 if count > 1000000,
-  fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
                         end                   
                         SSrs = SSkm + G(rrrrsq,in)+H(rrrrsq,jn)+I(rrrrsq,kkkp)+J(rrrrsq,mmmp)+...
@@ -266,7 +266,7 @@ function [TList,count]=Case7(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M
                                   TList = [TList; uint16(zeros(AddLL,7))];
                                   LL    = length(TList(:,1));
 if count > 1000000,
-  fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
                                 end        
                                 count = count + 1;
@@ -328,7 +328,7 @@ end
                                   TList = [TList; uint16(zeros(AddLL,8))];
                                   LL    = length(TList(:,1));
 if count > 1000000,
-fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
                                 end
                                 count = count + 1;
@@ -393,7 +393,7 @@ end
                                           TList = [TList; uint16(zeros(AddLL,9))];
                                           LL    = length(TList(:,1));
 if count > 1000000,
-fprintf('Found %1d candidates so far\n',count);
+  fprintf('Found %2d million candidates so far\n',fix(count/1000000));
 end
                                         end
                                         count = count + 1;

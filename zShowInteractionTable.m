@@ -1,7 +1,7 @@
 % zShowInteractionTable(File,NTList) displays a table of interactions
 % among the bases listed in Indices
 
-function [void] = zShowInteractionTable(File,NTList)
+function [void] = zShowInteractionTable(File,NTList,Disc)
 
 % if File is a text string (filename), load the file and display
 
@@ -22,21 +22,34 @@ else
   Indices = NTList;
 end
 
-fprintf('      ');
-for j=2:length(Indices),
+if nargin == 3,
+  fprintf('%6.4f',Disc);                 % display discrepancy if passed
+else
+  fprintf('       ');
+end
+
+for j=1:length(Indices),
   fprintf('%6s',[File.NT(Indices(j)).Base File.NT(Indices(j)).Number]);
+end
+fprintf('  File %s',File.Filename);         % display filename
+fprintf(' Chain ');
+for j=1:length(Indices),
+  fprintf('%s',File.NT(Indices(j)).Chain);
 end
 fprintf('\n');
 
-for i=1:(length(Indices)-1),
+for i=1:length(Indices),
   fprintf('%6s',[File.NT(Indices(i)).Base File.NT(Indices(i)).Number]);
-  for j=2:length(Indices),
+  for j=1:length(Indices),
     if j > i,
-      fprintf('%6.1f', File.Inter(Indices(i),Indices(j)))
+      fprintf('%6s', zEdgeText(File.Edge(Indices(i),Indices(j))));
+    elseif j == i,
+      fprintf('%6s', File.NT(Indices(i)).Base);
     else
-      fprintf('      ');
+      fprintf('%6d', abs(Indices(i)-Indices(j)));
     end
   end
   fprintf('\n');
 end
-   
+
+drawnow

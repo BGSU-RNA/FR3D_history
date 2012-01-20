@@ -7,7 +7,8 @@ T = cat(1,SP(:).Color);
 switch ViewParam.Color,
   case 1, ColorAxis =  [0 8];
           fprintf('Blue - computer matches; Green - hand matches; Orange - both match\n');
-  case 2, ColorAxis =  [-12 12];
+  case 2, ColorAxis =  [1 12];
+%  case 2, ColorAxis =  [-12 12];
   case 3, ColorAxis =  [15 19];
   case 4, ColorAxis =  [-12 30];
   case 5, ColorAxis =  [1 16];
@@ -41,20 +42,12 @@ for k = 1:length(SP),                               % Loop through pairs
   end
 end
 
-modcode = mod(Param.Paircode,4);
+modcode = mod(Param.Paircode,4) + 4*(mod(Param.Paircode,4)==0);
 
 if max(modcode) == min(modcode),             % all have same first base
-  p = File(SP(1).Filenum).Pair(SP(1).PairIndex);   % use the first pair
-  n = File(SP(1).Filenum).NT(p.Base1Index);        % use the first base
-  R = n.Rot;                                       % Rotation matrix for first
-  S = n.Fit(1,:)';                                 % Location of glycosidic
-  L = length(n.Fit(:,1));                          % number of atoms in base
-  m.Code = n.Code;
-  m.Fit = (R'*(-S*ones(1,L) + n.Fit'))';           % rotated into position
-  VP = ViewParam;
-  VP.Sugar = 0;
-  zPlotOneNT(m,VP);                                 % plot this nucleotide
-  Title =[n.Base ' shown at the origin, N1/N9 atom of second base shown by dots'];
+  zPlotStandardBase(modcode);
+  Lett = 'ACGU';  
+  Title =[Lett(modcode) ' shown at the origin, N1/N9 atom of second base shown by dots'];
 else
   Title = ['N1/N9 atom of second base shown by dots'];
 end
@@ -92,15 +85,17 @@ zlabel('Vertical with respect to first base');
 figure(ViewParam.FigNum + 1)
 clf
 
+cut = 50;
+
 for k = 1:length(SP),                               % Loop through pairs
   p = File(SP(k).Filenum).Pair(SP(k).PairIndex);    % Current pair
   c = SP(k).Color;
-  scatter3(p.Ang,p.Normal(3),p.Gap,18,c,'filled')
+  scatter3(mod(p.Ang+cut,360)-cut,p.Normal(3),p.Gap,18,c,'filled')
   hold on
 end
 
-xlabel('Appropriate angle of rotation');
-ylabel('Third component of normal vector');
+xlabel('Angle of rotation (in degrees)');
+ylabel('Vertical component of normal');
 zlabel('Gap');
 title('');
 caxis(ColorAxis);
@@ -112,6 +107,8 @@ if isfield(ViewParam,'ClassLimits'),
  if ViewParam.ClassLimits == 1,
   ClassLimits = zClassLimits;                   % load class limits
   B = ClassLimits(:,:,Param.Paircode(1));       % use limits for this paircode
+
+  B(:,10:11) = mod(B(:,10:11)+cut,360)-cut;
 
   for row = 1:length(B(:,1)),
      hold on

@@ -100,7 +100,7 @@ end
 fprintf('\n');
 if ~any(P.Category == 0) & all(P.Category < 40),
   if P.Expert == 0,
-    for k=1:14,
+    for k=1:10,
       fprintf('Group %1d - %s\n',k,zGroupNames(k));
     end  
   end

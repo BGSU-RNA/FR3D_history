@@ -43,6 +43,7 @@ while (k <= length(SP)),
   clf
 
   ViewParam.AtOrigin = 1;
+
   zDisplayNT(File(f),C,ViewParam);
 
   R = File(f).NT(C(1)).Rot;                   % Rotation matrix for first base
@@ -132,66 +133,54 @@ while (k <= length(SP)),
       k = abs(str2num(inp(2:length(inp))));
     elseif inp(1) == 'e',
       ViewParam.Exemplars = 1-ViewParam.Exemplars;
-    elseif (inp(1) == 'a'),
+    elseif (inp(1) == 'a'),                           % re-analyze pair
       N1 = File(f).NT(p);
       N2 = File(f).NT(q);
-      RevPair = zAnalyzePair(N1,N2);
+      [RevPair,swi] = zClassifyPair(N1,N2);
 
-      [c,d,h] = zDistanceToExemplars(Exemplar,Pair);
-      RevPair.Classes = c(1:3);
-      RevPair.Distances = d(1:3);
-      RevPair.ExemIndex = h(1:3);
+      if ~isempty(RevPair),
+        RevPair.Base1Index = p;
+        RevPair.Base2Index = q;
 
-      if (length(Pair.Hydrogen) == 0) & (abs(Pair.Classes(1)) < 14),
-        Pair.Hydrogen = zCheckHydrogen(N1,N2,Pair.Classes(1));
+        File(f).Inter(p,q)  = RevPair.Class;          % record this interaction
+        File(f).Inter(q,p)  = RevPair.Class;
+        File(f).Edge(p,q)   =  RevPair.Edge;
+        File(f).Edge(q,p)   = -RevPair.Edge;
+
+        SP(k).B1Index = p;
+        SP(k).B2Index = q;
+
+        zListPairData(RevPair,1);      
+        Pair = RevPair;
+
+        File(f).Pair(SP(k).PairIndex) = RevPair;
+        File(f).Modified = 0;                         % flag to save .hand
       end
-
-      RevPair.Base1Index = p;
-      RevPair.Base2Index = q;
-
-      File(f).Inter(p,q)  = RevPair.Class;            % record this interaction
-      File(f).Inter(q,p)  = RevPair.Class;
-
-      SP(k).B1Index = p;
-      SP(k).B2Index = q;
-
-      zListPairData(RevPair,1);      
-      Pair = RevPair;
-
-      File(f).Pair(SP(k).PairIndex) = RevPair;
-      File(f).Modified = 0;                          % flag to save .hand
-      
+  
     elseif (inp(1) == 'r') & (max(Pair.Paircode == [1 6 11 16]) == 1),
-      N1 = File(f).NT(q);
+      N1 = File(f).NT(q);                             % reverse this pair
       N2 = File(f).NT(p);
-      RevPair = zAnalyzePair(N1,N2);
+      [RevPair] = zAnalyzePair(N2,N1);            % analyze
 
-      [c,d,h] = zDistanceToExemplars(Exemplar,Pair);
-      RevPair.Classes = c(1:3);
-      RevPair.Distances = d(1:3);
-      RevPair.ExemIndex = h(1:3);
+      if ~isempty(RevPair),
+        RevPair.Base1Index = q;
+        RevPair.Base2Index = p;
 
-      if (length(Pair.Hydrogen) == 0) & (abs(Pair.Classes(1)) < 14),
-        Pair.Hydrogen = zCheckHydrogen(N1,N2,Pair.Classes(1));
+        File(f).Inter(p,q)  = RevPair.Class;         % record this interaction
+        File(f).Inter(q,p)  = RevPair.Class;
+        File(f).Edge(p,q)   =  RevPair.Edge;
+        File(f).Edge(q,p)   = -RevPair.Edge;
+
+        SP(k).B1Index = q;
+        SP(k).B2Index = p;
+
+        zListPairData(RevPair,1);      
+        Pair = RevPair;
+
+        File(f).Pair(SP(k).PairIndex) = RevPair;
+        File(f).Modified = 1;                          % flag to save data
       end
 
-      RevPair.Base1Index = q;
-      RevPair.Base2Index = p;
-
-      File(f).Inter(p,q)  = RevPair.Class;            % record this interaction
-      File(f).Inter(q,p)  = RevPair.Class;
-
-      SP(k).B1Index = q;
-      SP(k).B2Index = p;
-
-      zListPairData(RevPair,1);      
-      Pair = RevPair;
-
-Pair
-RevPair
-
-      File(f).Pair(SP(k).PairIndex) = RevPair;
-      File(f).Modified = 1;                          % flag to save .hand
     elseif inp(1) == 'm',
       fprintf('Modify current hand classification [%4.2f] ',SP(k).HandClass);
       inp1 = input('','s');

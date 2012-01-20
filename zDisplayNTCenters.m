@@ -10,7 +10,7 @@
 % One can also use ranges of nucleotide numbers, as in
 % zDisplayNT('rr0033_23S',{'2548:2555','2557','2559:2566'},VP);
 
-function [void] = zDisplayNT(File,NTList,ViewParam)
+function [void] = zDisplayNTCenters(File,NTList,ViewParam)
 
 % set default values
 
@@ -26,7 +26,7 @@ VP.FontSize  = 10;               % will use Matlab's default unless overridden
 VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
 VP.LabelBases = 1;
-VP.Color     = ViewParam.Color;
+VP.Color     = [0 0 1];
 
 if nargin == 2,
   ViewParam = VP;
@@ -36,6 +36,10 @@ end
 
 if isfield(ViewParam,'Sugar'),
   VP.Sugar = ViewParam.Sugar;
+end
+
+if isfield(ViewParam,'Color'),
+  VP.Sugar = ViewParam.Color;
 end
 
 if isfield(ViewParam,'az'),

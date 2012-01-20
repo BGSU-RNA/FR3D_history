@@ -14,10 +14,10 @@ count = 0;
 
 tic
 
-fprintf('Seconds remaining: ');
+fprintf('Seconds remaining:');
 
 for i=1:s,
-  A = xDiscrepancy(Model,File(Cand(i,N+1)).NT(Cand(i,[1:N])));
+  A = xDiscrepancyFast(Model,File(Cand(i,N+1)).NT(Cand(i,[1:N])));
 
   if A >= 0,
     count = count + 1;
@@ -26,9 +26,8 @@ for i=1:s,
   end
 
   if (mod(i,round(s/10)) == 0)
-    fprintf(' %4d', fix((s-i)*toc/i)); 
+    fprintf(' %d', fix((s-i)*toc/i)); 
     drawnow
-    tic
   end
 end
 

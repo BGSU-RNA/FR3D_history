@@ -1,0 +1,110 @@
+% zExamplarsAndInstances(File,Paircode,Cateogry) displays the best known
+% representatives for interactions involving pairs with the given Paircode
+% and interaction Category
+
+% zDisplayExemplars(Paircode,Category), where Paircode and Category can be
+% vectors, will loop through all possible Paircode, Category pairs from the
+% two vectors.  If a certain category has subcategories, like 1, 1.1, and
+% 1.2, it will loop through all of those.
+
+% Here are some ways to run the program:
+
+% zDisplayExemplars(7,15:18) paircode 7, categories 15 to 18 (stacking)
+% zDisplayExemplars(1:16,1)   all paircodes, category 1
+% zDisplayExemplars(1:16,-12:18) all paircodes, all categories
+
+function [void] = zExemplarsAndInstances(File,Paircode,Category)
+
+% load exemplars -------------------------------------
+
+  load('PairExemplars','Exemplar');
+
+% specify parameters for viewing -------------------------------------------
+
+  ViewParam.Mode      = 1; 
+  ViewParam.Normal    = 1;
+  ViewParam.ColorAxis = [-12 30];
+  ViewParam.SortKeys  = [];
+  ViewParam.Nearby    = 0;
+  ViewParam.Sugar     = 1;
+  ViewParam.ConnectSugar = 0;
+  ViewParam.AtOrigin  = 1;
+  ViewParam.Hydrogen  = 1;
+  ViewParam.Sort      = 0;
+  ViewParam.LineStyle = '-';
+
+% loop through computer classifications ----------------------
+
+for pc = 1:length(Paircode),
+ for ca = 1:length(Category),
+   row = find(fix(cat(1,Exemplar(:,Paircode(pc)).Class)) == Category(ca));
+   for su = 1:length(row),
+
+     E = Exemplar(row(su),Paircode(pc));
+     if ~isempty(E),
+
+       [Pair,s] = zClassifyPair(E.NT1,E.NT2);
+
+fprintf('%s%s-%s%s %s\n',E.NT1.Base,E.NT1.Number,E.NT2.Base,E.NT2.Number,Pair.EdgeText);
+
+       figure(1)
+       cla
+       F.NT(1) = E.NT1;
+       F.NT(2) = E.NT2;
+       F.Filename = E.Filename;
+       zDisplayNT(F,[1 2],ViewParam);
+       view(2)
+       grid on
+       axis equal
+
+       switch fix(E.Class),
+         case {1, 2},  axis([-2 10 -2 12 -5 5]);
+         case 15,      axis([-5 3 -3 5 -5 5]);
+         case 16,      axis([-4 4 -3 5 -3 5]);
+         otherwise,    axis([-6 10 -6 10 -6 10]);
+       end
+
+       Title = [E.NT1.Base E.NT2.Base ' ' num2str(E.Class) ' ' strrep(E.Filename,'_','\_') ' '];
+       Title = [Title E.NT1.Base E.NT1.Number '-' E.NT2.Base E.NT2.Number];
+       title(Title);
+
+
+       P.Paircode  = Paircode(pc); 
+       P.Category  = Category(ca);
+       P.Decimal   = 0;        % 1 - use 1.0 only; 0 - round to 1
+       P.Group     = 1;        % hand, computer, both, etc.
+       P.Sequential= 0;
+       P.Expert    = 0;
+       P.Inbox     = [-5 5 -5 5 -5 5 -1.1 1.1 -95 275];  % almost everything
+       P.Context   = 3;
+       P.PairFilename = 'rr0033_23S';
+       P.PairNucleotide1 = '11';
+       P.PairNucleotide2 = '12';
+       P.PairDisc  = 5;
+
+       VP.Mode      = 1;             
+       VP.Color     = 2;
+       VP.Normal    = 0;
+       aa = Category(ca);
+       ab = Category(ca) + sign(Category(ca));
+       VP.ColorAxis = [min(aa,ab) max(aa,ab)];
+       VP.SortKeys  = [];
+       VP.Nearby    = 0;
+       VP.Sugar     = 0;
+       VP.Hydrogen  = 1;
+       VP.Sort      = 0;
+       VP.az        = 51;
+       VP.el        = 14;
+       VP.LineStyle = '-';              % default - thick solid lines
+       VP.Exemplars = 0;
+       VP.ClassLimits = 1;
+
+       PairViewer(File,P,VP);
+
+       fprintf('Press a key to go on\n');
+       pause
+
+      end
+    end
+  end
+end

@@ -1,45 +1,46 @@
 % FR3D conducts the search given in xSpecifyQuery in the PDB files listed
+% in zFileNameList
+
 % Change the list of PDB files to be searched by editing zFileNameList
 % Change the query by editing xSpecifyQuery
 
-Search.SaveName = datestr(now,31);  % use date and time to identify this search
-
-if ~exist('GUIactive'),
-
-  % ----------------------------------------- Specify PDB files to search -
-
-  Filenames = zFileNameList;                   % PDB Filenames to search
-
-  % ------------------------------------------- Read search parameters --------
-
-  Query = xSpecifyQuery;                       % get search parameters
-
+if ~exist('GUIactive'),                      % if the GUI is not being used
+  Filenames = zFileNameList;                 % specify PDB Filenames to search
+  Query     = xSpecifyQuery;                 % get search parameters
 end
+
+Query
 
 % ----------------------------------------- Load PDB files if needed --------
 
-if ~exist('File'),
+if ~exist('File'),                           % if no molecule data is loaded,
   [File,SIndex] = zAddNTData(Filenames,0);   % load PDB data
 else
-  [File,SIndex] = zAddNTData(Filenames,0,File); % add PDB data  
-end
+  [File,SIndex] = zAddNTData(Filenames,0,File); % add PDB data if needed
+end                           % SIndex tells which elements of File to search
 
 % ------------------------------------------- Construct details of search ---
 
-if isfield(Query,'Filename'),                 % if query motif is from a file
+if isfield(Query,'Filename'),                % if query motif is from a file
   [File,QIndex] = zAddNTData(Query.Filename,0,File);  
-                                              % load data for Query, if needed
-  Query = xConstructQuery(Query,File(QIndex));
-                                              % preliminary calculations
+                                             % load data for Query, if needed
+  Query = xConstructQuery(Query,File(QIndex)); % preliminary calculations
 else
-  Query = xConstructQuery(Query);             % preliminary calculations
+  Query = xConstructQuery(Query);              % preliminary calculations
 end
 
-if isfield(Query,'NumNT'),
+clear Search
+Search.SaveName = [datestr(now,31) '-' Query.Name];  
+                                  % use date and time to identify this search
+
+%Query
+%Search
+
+if isfield(Query,'NumNT'),                    % if query is specified OK
 
 % ------------------------------------------- Display query information------
 
-fprintf('Query %s:', Query.Name);
+fprintf('Query %s:', Query.Name);             % display query name
 
 if isfield(Query,'Description'),
   fprintf(' %s\n', Query.Description);
@@ -50,12 +51,12 @@ end
 % ------------------------------------------- Calc more distances if needed -
 
 if Query.Geometric > 0,                       % if a geometric search
-  tic
-  CalcFlag = 0;
+  tic                                         % keep track of time
+  CalcFlag = 0;                               % if more distances were needed
   for f=1:length(SIndex),
     i = SIndex(f);
     if ceil(Query.DistCutoff) > ceil(max(max(File(i).Distance))),
-      c        = cat(1,File(i).NT(1:File(i).NumNT).Center);
+      c = cat(1,File(i).NT(1:File(i).NumNT).Center);
       File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
              % sparse matrix of center-center distances, up to Query.DistCutoff
       if length(File(i).NT) > 10,
@@ -76,14 +77,14 @@ drawnow
 
 starttime = cputime;
 
-Candidates = xFindCandidates(File(SIndex),Query);  % find candidates
+Candidates = xFindCandidates(File(SIndex),Query);  % screen for candidates
 
-if ~isempty(Candidates),
+if ~isempty(Candidates),                         % some candidate(s) found
  if Query.Geometric > 0,
   [Discrepancy, Candidates] = xRankCandidates(File(SIndex),Query,Candidates);
   fprintf('Found %d candidates in the desired discrepancy range\n',length(Discrepancy));
 
-   if Query.ExcludeOverlap > 0,
+   if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0),
      [Candidates, Discrepancy] = xReduceOverlap(Candidates,Discrepancy); 
                                                  % quick reduction in number
      [Candidates, Discrepancy] = xExcludeOverlap(Candidates,Discrepancy,400); 
@@ -96,7 +97,7 @@ if ~isempty(Candidates),
   N = Query.NumNT;                           % number of nucleotides
   [y,i] = sortrows(A,[N+1 N+2 1:N]);         % sort by this sum
   Candidates = Candidates(i,:);              % put all permutations together
-  Discrepancy = zeros(length(Candidates(:,1)),1);
+  Discrepancy = (1:length(Candidates(:,1)))';% helps identify candidates
  end
 
 % -------------------------------------------------- Save results of search
@@ -121,10 +122,10 @@ if ~isempty(Candidates),
 
  fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
 
-if ~exist('GUIactive'),
-  xListCandidates(File(SIndex),Search,1);
-  xDisplayCandidates(File(SIndex),Search);
-%  xGroupCandidates(File(SIndex),Search);  % doesn't work very well yet!
+if (~exist('GUIactive')) & (~isempty(Candidates)),
+  xListCandidates(File(SIndex),Search,Inf);
+  Search = xDisplayCandidates(File(SIndex),Search);
+  save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
 end
 
 end

@@ -1,29 +1,36 @@
 % zPairViewer loads one or more pdb files, allows the user to specify
 % selection criteria, then displays pair information in various formats
 
-clear ViewParam
+function [File] = PairViewer(File,Param,ViewParam)
 
-if ~exist('File'),                  % If files haven't already been loaded
-  zSpecifyPDBFiles;        % The master list
+if nargin == 0,                  % If files haven't already been loaded
+  Filenames = zFileNameList;        % The master list
   File = zGetNTData(Filenames,0);
 end
 
 ViewParam.FigNum = 2;
 
 while ViewParam.FigNum > 0,
-  if exist('Param'),
-    Param = zEnterPairSelection(Param);
-  else
-    Param = zEnterPairSelection([]);
+  if nargin <= 1,
+    if exist('Param'),
+      Param = zEnterPairSelection(Param);
+    else
+      Param = zEnterPairSelection([]);
+    end
   end
-  SP    = zSelectPairs(File,Param);
+
+  SP = zSelectPairs(File,Param);
 
   if length(SP) > 0,
-    ViewParam.Mode   = 1;
+    if nargin < 3,
+      ViewParam.Mode = 1;
+    end
     while ViewParam.Mode(1) > 0,
-      ViewParam = zEnterViewMode(Param,ViewParam);
+      if nargin < 3,
+        ViewParam = zEnterViewMode(Param,ViewParam);
+      end
 
-      if any(ViewParam.Mode == 1),
+      if any(ViewParam.Mode == 1) || any(ViewParam.Mode == 6),
         SP = zColorPairs(File,SP,Param,ViewParam);
       end
 
@@ -45,9 +52,32 @@ while ViewParam.FigNum > 0,
                       end
                     end
             case 5, zContextViewer(File,SP,Param,ViewParam);
+            case 6, 
+  CL = zClassLimits;
+  for k=1:length(SP),
+    f  = SP(k).Filenum;
+    p  = File(f).Pair(SP(k).PairIndex);        % Current pair
+    N1 = File(f).NT(p.Base2Index);             % reverse order of nucleotides
+    N2 = File(f).NT(p.Base1Index);
+    sh = (N2.Fit(1,:)-N1.Fit(1,:)) * N1.Rot;   % vector shift from 1 to 2
+    p2 = zAnalyzePairFast(N1,N2,CL,sh);        % analyze and classify pair
+    F.Pair(k) = p2;                            % make a new file with pairs
+    sp2(k) = SP(k);
+    sp2(k).Filenum = 1;
+    sp2(k).PairIndex = k;
+  end
+  FigsDone = zScatterPairs(F,sp2,Param,ViewParam);
+  ViewParam.FigNum = ViewParam.FigNum + FigsDone;
           end
+        end
+        if nargin == 3,
+          ViewParam.Mode = 0;
         end
       end
     end
+  end
+
+  if nargin == 3,
+    ViewParam.FigNum = 0;
   end
 end  

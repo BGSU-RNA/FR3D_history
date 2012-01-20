@@ -1,166 +1,62 @@
-% xListCandidates(File,Candidates,NumToOutput,ModelNumber)
+% xListCandidates prints a candidate list to the screen
 
-function [] = xListCandidates(File,Search,SortOrder)
+function [] = xListCandidates(File,Search,NumToOutput)
 
 Model       = Search.Query;
 Candidates  = Search.Candidates;
 Discrepancy = Search.Discrepancy;
+[s,t]       = size(Candidates);
+N           = Model.NumNT;
 
-NumToOutput = 30;
-
-[s,t] = size(Candidates);
-
-N = Model.NumNT;
-
-if SortOrder == 2,
-  Candidates = sortrows(Candidates,[N+1 1 2 N+2]);
+if nargin < 3,
+  NumToOutput = 30;                    % limit on number printed to screen
 end
 
 Notify = 1;
 
-switch SortOrder
+% ------------------------------- Print to screen
 
-case 1,
+if Model.Geometric > 0,
+  fprintf('       Filename Discrepancy Nucleotides ... Chains\n');
+else
+  fprintf('       Filename Number Nucleotides ... Chains\n');
+end
 
 for i=1:s,
   if (Discrepancy(i) >= 0) & (i <= NumToOutput),
-    if (Model.Geometric > 0),
-      if (Discrepancy(i) > Model.DiscCutoff) & (Notify == 1),
-        fprintf('\nSome candidates with discrepancy below %7.4f might not appear below\n\n', Model.RelCutoff);
-        Notify = 0;
-      end
-    end
     f = double(Candidates(i,N+1));
     fprintf('%15s', File(f).Filename);
     if Model.Geometric > 0,
       fprintf('%11.4f',Discrepancy(i));
+    else
+      fprintf('%4d',Discrepancy(i));            % original candidate number
     end
-    for j=1:N
+    for j=1:N,
       fprintf('%3s',File(f).NT(Candidates(i,j)).Base);    
       fprintf('%4s',File(f).NT(Candidates(i,j)).Number);    
     end
-    if N == 2,
+
+    fprintf(' ');
+    for j=1:N,
+      fprintf('%s',File(f).NT(Candidates(i,j)).Chain);
+    end
+
+    if N == 2,                        % special treatment for basepairs
       fprintf('   C1*-C1*: %8.4f', norm(File(f).NT(Candidates(i,1)).Sugar(1,:) - ...
                             File(f).NT(Candidates(i,2)).Sugar(1,:)));
+      NT1 = File(f).NT(Candidates(i,1));
+      NT2 = File(f).NT(Candidates(i,2));
+      Edge  = File(f).Edge(Candidates(i,1),Candidates(i,2));
+      fprintf('%s ', zEdgeText(Edge));
     end
     fprintf('\n');
   end
-  LastOK = i;
-
 end
 
-case 2,
-
-for i=1:s,
-  if (Discrepancy(i) >= 0) & (i <= 50),
-    f = Candidates(i,N+1);
-    fprintf('%15s', File(f).Filename);
-    if Model.Geometric > 0,
-      fprintf('%11.4f',Discrepancy(i));
-    end
-    for j=1:N
-      fprintf('%3s',File(f).NT(Candidates(i,j)).Base);    
-      fprintf('%4s',File(f).NT(Candidates(i,j)).Number);    
-    end
-    fprintf('\n');
-  end
-  LastOK = i;
+if (Model.Geometric > 0) & (Model.RelCutoff > Model.DiscCutoff),
+  fprintf(fidOUT,'Some motifs with discrepancy between %7.4f and %7.4f might not appear above\n\n', Model.DiscCutoff, Model.RelCutoff);
 end
 
-end
-
-
-
-OUT   = strcat(['Query_' Model.Name '_Results.txt']);
-fidOUT      = fopen(OUT,'w+');
-
-fprintf(fidOUT,'%s\n','FR3D last results');
-
-fprintf(fidOUT,'Model information\n');
-if isfield(Model,'Filename'),
-  fprintf(fidOUT,'  Filename %s\n', Model.Filename);
-  fprintf(fidOUT,'  Nucleotides');
-  for j=1:Model.NumNT,
-    fprintf(fidOUT,'%3s',Model.NT(j).Base);    
-    fprintf(fidOUT,'%4s',Model.NT(j).Number);    
-  end
-  fprintf(fidOUT,'\n');
-  if isfield(Model,'ChainList'),
-    fprintf(fidOUT,'  Chain');
-    for j=1:Model.NumNT,
-      fprintf(fidOUT,'%3s',Model.ChainList{j});    
-    end
-    fprintf(fidOUT,'\n');
-  end
-end
-
-fprintf(fidOUT,'  Mask %s\n', Model.Mask);
-
-if isfield(Model,'MaxDiff'),
-  fprintf(fidOUT,'  Differences');
-  for j=1:(Model.NumNT-1),
-    fprintf(fidOUT,'%4d',Model.MaxDiff(j));    
-  end
-  fprintf(fidOUT,'\n');
-end
-
-if isfield(Model,'ReqInter'),
-  fprintf(fidOUT,'  Interactions\n');
-  for i=1:Model.NumNT,
-   for j=(i+1):Model.NumNT,
-     if ~isempty(Model.ReqInter{i,j}),
-       fprintf(fidOUT,'   Nucleotides %3d and %3d interact as',i,j);
-       for k=1:length(Model.ReqInter{i,j}),
-         fprintf(fidOUT,' %4.1f',Model.ReqInter{i,j}(k));
-       end
-       fprintf(fidOUT,'\n');
-     end
-   end
-  end
-  fprintf(fidOUT,'\n');
-end
-
-if Model.Geometric > 0,
-  fprintf(fidOUT,'  AngleWeight   '); 
-  fprintf(fidOUT,' %4.2f', Model.AngleWeight); 
-  fprintf(fidOUT,'\n');
-  fprintf(fidOUT,'  LocationWeight'); 
-  fprintf(fidOUT,' %4.2f', Model.LocWeight); 
-  fprintf(fidOUT,'\n');
-  fprintf(fidOUT,'  Guaranteed Cutoff %7.4f\n', Model.DiscCutoff);
-  fprintf(fidOUT,'  Relaxed    Cutoff %7.4f\n', Model.RelCutoff);
-end
-fprintf(fidOUT,'\n');
-
-Notify = 1;
-for i=1:s,
-  if Discrepancy(i) >= 0,
-
-    if Model.Geometric > 0,
-      if (Discrepancy(i) > Model.DiscCutoff) & (Notify == 1),
-        fprintf(fidOUT,'\nSome candidates with discrepancy below %7.4f might not appear below\n\n', Model.RelCutoff);
-        Notify = 0;
-      end
-    end
-    f = Candidates(i,N+1);
-    fprintf(fidOUT,'%15s', File(f).Filename);
-    if Model.Geometric > 0,
-      fprintf(fidOUT,'%9.4f',Discrepancy(i));
-    end
-    for j=1:N
-      fprintf(fidOUT,'%3s',File(f).NT(Candidates(i,j)).Base);    
-      fprintf(fidOUT,'%4s',File(f).NT(Candidates(i,j)).Number);    
-    end
-    fprintf(fidOUT,'\n');
-  end
-end
-
-fclose(fidOUT);
-
-if s > 0,
-  if LastOK > NumToOutput,
-    fprintf('This list is incomplete; see %s for the complete list\n', OUT);
-  else
-    fprintf('This list is also printed in %s\n',OUT);
-  end
+if s > NumToOutput,
+  fprintf('Only the first %d candidates were listed.\n', NumToOutput);
 end

@@ -1,30 +1,82 @@
 
-function [Screen] = xPairwiseScreen(File,Codes,Model,p,q);
+function [Screen] = xPairwiseScreen(File,Codes,Model,p,q,PC);
 
 % --------- Screen according to interaction between nucleotides
 
-D = File.Distance;
-%D = tril(File.Distance) + tril(File.Distance)';  % only saved lower tri part
+if Model.Geometric == 0,
+  D = File.Distance .* (File.Distance < Model.Diameter);
+                                        % cap distance for non-geometric search
+else
+  D = File.Distance;
+end
 
 if isfield(Model,'ReqInter'),                 % if screening by interaction
-
   if length(Model.ReqInter{p,q}) > 0 & all(Model.ReqInter{p,q} ~= 0),
                                            % 0 means no screening for p,q
-    E = zeros(size(D));
+    E = sparse(zeros(size(D)));
     for i=1:length(Model.ReqInter{p,q}),
       E = E + (fix(File.Inter) == Model.ReqInter{p,q}(i));
     end
     D = D .* (E > 0);
   end
 end
+
+if isfield(Model,'EdgeNums'),                 % if screening by edges
+  if length(Model.EdgeNums{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.EdgeNums{p,q}),
+      E = E + (fix(File.Edge) == Model.EdgeNums{p,q}(i));
+    end
+    D = D .* (E > 0);
+  end
+end
+    
+if isfield(Model,'ExcludeEdges'),                 % if screening by edges
+  if length(Model.ExcludeEdges{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.ExcludeEdges{p,q}),
+      E = E + (fix(File.Edge) == Model.ExcludeEdges{p,q}(i));
+    end
+    D = D .* (E == 0);
+  end
+end
+    
+if isfield(Model,'OKPairs'),                 % if screening by paircode
+  if length(Model.OKPairs{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.OKPairs{p,q}),
+      E = E + sparse(PC == Model.OKPairs{p,q}(i));
+    end
+    D = D .* (E > 0);
+  end
+end
+    
+if isfield(Model,'ExPairs'),                 % if screening by paircode
+  if length(Model.ExPairs{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.ExPairs{p,q}),
+      E = E + sparse(PC == Model.ExPairs{p,q}(i));
+    end
+    D = D .* (E == 0);
+  end
+end
     
 [i,j] = find(D);         % nucleotide pairs with OK distances and interactions
 d = nonzeros(D);         % distances below the large cutoff
 
-% --------- Screen according to the sequential mask
+% --------- Screen according to maximum difference in nucleotide numbers
 
-if Model.Sequential > 0,
-  k = find(abs(i-j) <= Model.DiffMat(p,q)); %retain pairs close enough together
+if isfield(Model,'MaxDiffMat'),
+  k = find(abs(i-j) <= Model.MaxDiffMat(p,q)); %retain pairs close enough together
+  i = i(k);
+  j = j(k);
+  d = d(k);
+end
+
+% --------- Screen according to maximum difference in nucleotide numbers
+
+if isfield(Model,'MinDiffMat'),
+  k = find(abs(i-j) >= Model.MinDiffMat(p,q)); %retain pairs close enough together
   i = i(k);
   j = j(k);
   d = d(k);
@@ -32,10 +84,10 @@ end
 
 % --------- Screen according to the nucleotide mask
 
-if (Model.Mask(p) ~= 'N') | (Model.Mask(q) ~= 'N'),
-  if (Model.Mask(p) == 'N') & (Model.Mask(q) ~= 'N'),
+if (min(Model.OKCodes{p}) == 0) | (min(Model.OKCodes{q}) == 0),
+  if (min(Model.OKCodes{p}) == 1) & (min(Model.OKCodes{q}) == 0),
     k = find(Model.OKCodes{q}(Codes(j)));
-  elseif (Model.Mask(p) ~= 'N') & (Model.Mask(q) == 'N'),
+  elseif (min(Model.OKCodes{p}) == 0) & (min(Model.OKCodes{q}) == 1),
     k = find(Model.OKCodes{p}(Codes(i)));
   else
     k = find(Model.OKCodes{p}(Codes(i)) .* Model.OKCodes{q}(Codes(j)));

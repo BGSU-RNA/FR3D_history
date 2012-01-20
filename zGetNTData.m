@@ -48,16 +48,27 @@ for f=1:length(Filenames),
       ClassifyCode = 1;
   end
 
+  if isfield(File,'BI'),
+    File = rmfield(File,'BI');
+  end
+
+  if isfield(File,'BermanClass'),
+    File = rmfield(File,'BermanClass');
+  end
+
   if (ReadCode == 2) | (ReadCode == 3) | (ReadCode == 4),
     File = zReadHandFile(File);
   end
 
-  if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | (ClassifyCode == 1),
+  if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | (ClassifyCode == 1) | (~isfield(File,'Edge')) | (max(max(File.Inter)) < 100),
+    File.Edge = sparse(File.NumNT,File.NumNT);
     File = zClassifyPairs(File);
     File = zUpdateDistanceToExemplars(File);
+    ClassifyCode = 1;
   end
 
   if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
+    File.Modified = 0;
     zSaveNTData(File);
   end
 
