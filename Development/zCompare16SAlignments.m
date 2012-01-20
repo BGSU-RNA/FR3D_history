@@ -1,8 +1,8 @@
 
 AnalyzeList = [1:8];
-AnalyzeList = [1 9];
+AnalyzeList = [1:9];
 
-% File = zAddNTData({'2avy','1j5e'});
+File = zAddNTData({'2avy','1j5e'});
 if isempty(File(1).Distance),
   for f = 1:length(File),
     c = cat(1,File(f).NT(1:File(f).NumNT).Center); % nucleotide centers

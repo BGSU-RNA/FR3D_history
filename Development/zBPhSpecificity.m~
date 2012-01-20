@@ -21,9 +21,9 @@ for f = 1:length(File),
   end
 
   E = abs(fix(File(f).Edge));
-  E = (E > 0) .* (E < 25);               % basepairing indicator
+  E = (E > 0) .* (E < 25);                    % basepairing indicator
 
-  File(f).BaseInter = E + E^2;              % direct or indirect connection
+  File(f).BaseInter = E + E^2;                % direct or indirect connection
 end
 
 for r = 1:length(n(:,1)),

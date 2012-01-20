@@ -2,7 +2,7 @@
 
 function [R] = pAdjustSubsProb(File,i1,i2,P,method,ExclList)
 
-Verbose = 2;
+Verbose = 1;
 
 if nargin < 6,
   ExclList = [];
@@ -87,7 +87,7 @@ for a = 1:length(j),                         % loop through BPh inter
     Q
     q
     R = R / sum(sum(R))
-    pause
+%    pause
   end
 end
 
@@ -112,7 +112,7 @@ for a = 1:length(j),                         % loop through BPh inter
     Q
     q
     R = R / sum(sum(R))
-    pause
+%    pause
   end
 end
 

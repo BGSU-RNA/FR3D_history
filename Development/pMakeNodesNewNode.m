@@ -29,3 +29,4 @@ Node(n).InsertionComment = '';
 Node(n).IBases = [];
 Node(n).InteractionComment = '';
 Node(n).JunctionDeletion = [];
+Node(n).InterIndices = [];

@@ -1,7 +1,7 @@
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
-AlignmentList = 6;
+AlignmentList = 1:4;
 
 if ~exist('File')
   File = zAddNTData({'2avy','1j5e'});
@@ -112,7 +112,7 @@ end
 
 % ----------------------------------------------- JAR3D 4 alignment
 %        NIH BISTI Method 1 scoring with extension of stems, and adjustment
-%        of basepairing probabilities due to LR interactions
+%        of basepairing probabilities due to LR interactions and BPh
 
 jj = 4;
 
@@ -134,8 +134,8 @@ if any(jj == AlignmentList),
 end
 
 % ----------------------------------------------- JAR3D 5 alignment
-%        NIH BISTI Method 1 scoring with extension of stems, and adjustment
-%        of basepairing probabilities due to LR interactions, and GU packing
+%      NIH BISTI Method 1 scoring with extension of stems, adjustment
+%      of basepairing probabilities due to LR, BPh interactions, and GU packing
 
 jj = 5;
 
@@ -160,7 +160,7 @@ end
 
 % ----------------------------------------------- JAR3D 6 alignment
 %        NIH BISTI Method 1 scoring with extension of stems, adjustment
-%        of basepairing probabilities due to LR interactions, GU packing,
+%        of basepairing probabilities due to LR, BPh interactions, GU packing,
 %        and nothing but cWW and vague hairpins in extensible stems
 
 jj = 6;
