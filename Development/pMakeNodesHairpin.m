@@ -100,7 +100,7 @@ if Verbose > 1,
     fprintf('Hairpin has no long-range interactions ***********************\n');
   end
 
-  c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+  c = cat(1,File.NT(1:length(File.NT)).Center); % nucleotide centers
   cent = mean(c);
 
   fprintf('Distance from center of molecule: %8.4f\n', norm(cent-File.NT(a).Center));

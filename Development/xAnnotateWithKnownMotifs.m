@@ -64,6 +64,9 @@ for ff = 1:length(File),
     end
   end
 
+  fid = fopen([pwd filesep 'Web' filesep 'AnalyzedStructures' filesep 'All' filesep FN '_motifs.txt']);
+  fprintf(fid,'PDB_ID\tMotif_name\tNucleotide_1_PDB_Number\tNucleotide_1_Chain\tNucleotide_1_Sequence_Position\n');
+
   end
 
   for m = 1:length(Motif),

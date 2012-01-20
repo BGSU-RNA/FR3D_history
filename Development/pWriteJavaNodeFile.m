@@ -17,8 +17,10 @@ end
 
 if NumChar == 4,
   Text = 'Character Definition | A,C,G,U // Define characters here';
-else
+elseif NumChar == 5,
   Text = 'Character Definition | A,C,G,U,* // Define characters here';
+elseif NumChar == 6,
+  Text = 'Character Definition | A,C,G,U,N // Define characters here';
 end
 fprintf(fid,'%s\n',Text);
 

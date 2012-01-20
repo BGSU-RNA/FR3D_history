@@ -130,6 +130,13 @@ for f=1:length(Filenames),
 
   File.Distance = [];                        % only compute this if needed
 
+  if File.ClassVersion == 6.2,
+    File = zEdgeMakesMultiplePairs(File,0);
+    File.ClassVersion = 6.3;
+    SaveCode = 1;
+  end
+
+
   if length(File.NT) > 1,                    % if it has nucleotides,
     if length(File.NT(1).Sugar(:,1)) < 13,
       File = zStoreO3(File);
@@ -239,7 +246,7 @@ for f=1:length(Filenames),
 
   % ----------------- If it just read the .pdb file and no pairs, look at BUC
 
-  if (ReadPDB == 1) && (isempty(strfind(PDBFilename,'.pdb1'))),
+  if (ReadPDB == 1) && (isempty(strfind(PDBFilename,'.pdb1'))) && length(File.NT) > 0,
     E = abs(File.Edge);                       % all interactions
     bp = full(sum(sum((E > 0) .* (E < 15))));       % number of basepairs
     r  = bp / length(File.NT);                % ratio of bp to nt

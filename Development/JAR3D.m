@@ -27,7 +27,7 @@ A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY.txt
 
 
 DNA = 0;
-FASTA = [
+FASTA = [];
 
 System.setProperty('user.dir','C:\Documents and Settings\zirbel\My Documents\JAR3D\bin');
 

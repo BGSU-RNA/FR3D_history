@@ -5,7 +5,7 @@
 % bases in the candidate are also displayed.
 
 % Direction can be +1 or -1; it tells the order in which to put the
-% nucleotides in the first candidate
+% nucleotides in the first candidate.  0 means not to reorder them.
 
 function [Text] = xFASTACandidates(File,Search,Direction,ModelName)
 
@@ -21,9 +21,15 @@ N          = Query.NumNT;
 
 [L,t] = size(Candidates);
 
-[y,p] = sort(Direction*double(Candidates(1,1:N)));    
+if Direction ~= 0,
+  [y,p] = sort(Direction*double(Candidates(1,1:N)));    
                                     % put nucleotides in inc/decreasing order
-Cand = double(Candidates(:,p));     % re-order nucleotides
+else
+  p = 1:N;                          % do not re-order
+end
+
+Cand = double(Candidates(:,p));   % re-order nucleotides
+
 F    = Candidates(:,N+1);           % file numbers
 
 if isfield(Query,'MaxDiffMat'),
@@ -32,7 +38,7 @@ else
   MaxDiff = Inf*ones(1,N-1);
 end
 
-if Direction > 0,
+if Direction >= 0,
   MaxDiff = MaxDiff;
 else
   MaxDiff = fliplr(MaxDiff);

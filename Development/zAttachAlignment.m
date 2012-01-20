@@ -6,7 +6,6 @@ function [File] = zAttachAlignment(File,Verbose)
 
 for f = 1:length(File),
   p = find(ismember(upper(t(:,1)),upper(File(f).Filename)));  % find line(s)
-
   if length(p) > 0,                                 % if one or more,
     for a = 1:length(p),                            % loop through them
       if r{p(a),4} >= 0,
@@ -24,7 +23,6 @@ for f = 1:length(File),
           fprintf('Incorporated sequence data with %s\n', File(f).Filename);
         end
       end
-pause
     end
   else
     if Verbose > 0,

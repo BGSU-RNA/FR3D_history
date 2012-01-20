@@ -6,10 +6,13 @@
 % load LIB00014_IL_tSH-tSH-tHS-tHS.mat
 % pMakeModelFromSearchSaveFile(Search,'IL',1);
 
-function [Node,Truncate] = pMakeModelFromSearchSaveFile(Search,Verbose)
+function [Node,Truncate] = pMakeModelFromSearchSaveFile(Search,Param)
 
-if nargin < 3,
+if nargin < 2,
+  Param   = 0;
   Verbose = 0;
+else
+  Verbose = Param(1);
 end
 
 % ----------------------------------- Load Search from filename, if applicable
@@ -36,7 +39,7 @@ File = Search.File(f(1));                      % file of query motif
 NTNumber = double(Search.Candidates(1,1));     % index of first NT
 LastNTNumber = double(Search.Candidates(1,N)); % index of last NT
 
-% ----------------------------------- Find locations of truncations
+% --------------------------------------- Find locations of truncations
 
 Direction = 1;                          % which order to put nucleotides
 [y,p] = sort(Direction*double(Search.Candidates(1,1:N))); % 
@@ -60,7 +63,7 @@ for n = 1:(N-1),
   end
 end
 
-% ---------------------------- Find consensus interaction list
+% ------------------------------------------- Find consensus interaction list
 
 for a = 1:N,                                    % first NT of possible pair
   for b = 1:N,                                  % second NT of possible pair
@@ -81,14 +84,14 @@ for a = 1:N,                                    % first NT of possible pair
 
     if max(abs(e)) > 0 && min(abs(e)) < 30,     % there was some bp interaction
 %  e
-      F.Edge(a,b) = mode(e);                        % use the most common one
+      F.Edge(a,b) = mode(e);                    % use the most common one
   % a more sophisticated method for determining the consensus is needed
   % count how many times each one occurs, giving maybe 0.5 for near
     end
   end
 end
 
-% ---------------------------- Make the model for the consensus structure
+% -------------------------------- Make the model for the consensus structure
 
 i = Search.Candidates(1,1:N);                   % indices of query motif
 
@@ -103,7 +106,7 @@ end
 F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
 F.Crossing = zeros(N,N);                    % small enough, pretend none
 
-Node = pMakeNodes(F,Verbose,1,N,Truncate);          % make the SCFG/MRF model
+Node = pMakeNodes(F,Param,1,N,Truncate);          % make the SCFG/MRF model
 
 % ---------------------------- Set parameters for the nodes from instances
 
@@ -116,7 +119,7 @@ for n = 1:length(Node),
   case 'Basepair'
     a = Node(n).LeftIndex;                   % which NT of the query motif
     b = Node(n).RightIndex;                  % right NT of the query motif
-    Score = pConsensusPairSubstitution(a,b,f,Search.File,F,Node(n).Delete,L,Search,Verbose);
+    Score = pConsensusPairSubstitution(a,b,f,Search.File,F,L,Search,Verbose);
 
     if Verbose > 0,
       fprintf('Original substitution probabilities\n');
@@ -176,7 +179,7 @@ for n = 1:length(Node),
     for ii = 1:length(Node(n).IBases(:,1)),
       a = Indices(Node(n).IBases(ii,1));
       b = Indices(Node(n).IBases(ii,2));
-      Score = pConsensusPairSubstitution(a,b,f,Search.File,F,0,L,Search,Verbose);
+      Score = pConsensusPairSubstitution(a,b,f,Search.File,F,L,Search,Verbose);
       Node(n).SubsProb(:,:,ii) = Score;
       if Verbose > 0,
         fprintf('\n');

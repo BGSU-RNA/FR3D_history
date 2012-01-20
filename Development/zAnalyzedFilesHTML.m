@@ -6,7 +6,16 @@ function [void] = zAnalyzedFilesHTML(File)
 zBackboneCodes;                           % load conformation codes
 
 for f = 1:length(File),
+ if length(File(f).NT) > 1,
+  clear chainoffset
+
   FN = upper(File(f).Filename);
+
+  Vers = num2str(File(f).ClassVersion);
+
+  DataHeader1 = sprintf('# PDB_ID_FR3D_Version_%s\tSuitename_version_suitename.0.3.070628\tDangle_version_chiropraxis.0.63.070705',Vers);
+
+  DataHeader2 = sprintf('PDB_ID\tInteraction\tNucleotide_1_Base\tNucleotide_1_PDB_Number\tNucleotide_1_Chain\tNucleotide_1_Sequence_Position\tNucleotide_2_Base\tNucleotide_2_PDB_Number\tNucleotide_2_Chain\tNucleotide_2_Sequence_Position');
 
   LText{1} = ['<a href = "index.html">Return to FR3D home page for ' FN '</a><br>'];
   LText{2} = ['<a href = "' FN '_interactions.html">List of all pairwise interactions in ' FN '</a><br>'];
@@ -44,20 +53,43 @@ for f = 1:length(File),
 
   HText{10} = '<pre>';
 
-% --------------------------------------------- Produce interaction list
+  % -------------------------------------------------- Set paths
 
-  c = 1;                                 % counter for pairs
+  warning off
+
+  mypath = [pwd filesep 'Web' filesep 'AnalyzedStructures'];
+
+  mkdir(mypath, FN);
+  warning on
+
+  mypath = [mypath filesep FN filesep];
+
+  datapath = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep 'All' filesep];
+  % ------------------------------------------- Write chains and sequences
+
+  fid = fopen([datapath FN '_chain_sequence_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'Chain\tNucleotide_sequence_in_chain\n');
+  Chain = cat(2,File(f).NT.Chain);
+  U     = unique(Chain);
+  for u = 1:length(U),
+    k = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'%s\t%s\n',U(u),cat(2,File(f).NT(k).Base));
+    chainoffset(u) = min(k);                    % first index in this chain
+  end
+  fclose(fid);
+
+  % ------------------------------------------- Produce interaction list
+
+  c = 1;                                    % counter for interactions
 
   IText{1} = '';
+  DText{1} = '';
   InterType = [];
 
-  E = File(f).Edge;
-  E = E .* (abs(E)>0) .* (abs(E) < 30);     % basepairing and stacking
-
+  E   = File(f).Edge;
   BPh = File(f).BasePhosphate;
-  BPh = BPh .* (BPh < 20) .* (BPh > 0);     % base phosphates
-
-  BC = File(f).Covalent;                    % covalent connections
+  BC  = File(f).Covalent;                    % covalent connections
 
   for i = 1:File(f).NumNT,
     N1 = File(f).NT(i);
@@ -69,6 +101,15 @@ for f = 1:length(File),
       N2 = File(f).NT(j(k));
       r = sprintf('%4d', File(f).Crossing(i,j(k)));
       IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %7s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0,N1.Code,N2.Code),r);
+
+      u  = find(U==N1.Chain);              % which chain i is in
+      ii = i - chainoffset(u) + 1;        % position of i in chain u
+      u  = find(U==N2.Chain);              % which chain j(k) is in
+      jj = j(k) - chainoffset(u) + 1;     % position of j(k) in chain u
+
+      T = zEdgeText(File(f).Edge(i,j(k)),0,N1.Code,N2.Code);
+
+      DText{c} = sprintf('%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n', File(f).Filename, T, N1.Base, N1.Number, N1.Chain, ii, N2.Base, N2.Number, N2.Chain, jj);
 
       InterType(c) = abs(File(f).Edge(i,j(k)));
 
@@ -84,7 +125,18 @@ for f = 1:length(File),
 
       IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %7s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBasePhosphateText(BPh(i,j(k)),1), r);
 
-      if i == j(k),
+      u  = find(U==N1.Chain);              % which chain i is in
+      ii = i - chainoffset(u) + 1;        % position of i in chain u
+      u  = find(U==N2.Chain);              % which chain j(k) is in
+      jj = j(k) - chainoffset(u) + 1;     % position of j(k) in chain u
+
+      T = zBasePhosphateText(BPh(i,j(k)),1);
+
+      DText{c} = sprintf('%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n', File(f).Filename, T, N1.Base, N1.Number, N1.Chain, ii, N2.Base, N2.Number, N2.Chain, jj);
+
+      if abs(BPh(i,j(k))) > 100,
+        InterType(c) = abs(BPh(i,j(k)));      % near interaction
+      elseif i == j(k),
         InterType(c) = 200.1;                 % self interaction
       else
         InterType(c) = 200;                   % non-self interaction
@@ -102,6 +154,15 @@ for f = 1:length(File),
 
       IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %6s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBackboneContinuityText(BC(i,j(k))),r);
 
+      u  = find(U==N1.Chain);              % which chain i is in
+      ii = i - chainoffset(u) + 1;        % position of i in chain u
+      u  = find(U==N2.Chain);              % which chain j(k) is in
+      jj = j(k) - chainoffset(u) + 1;     % position of j(k) in chain u
+
+      T = zBackboneContinuityText(BC(i,j(k)));
+
+      DText{c} = sprintf('%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n', File(f).Filename, T, N1.Base, N1.Number, N1.Chain, ii, N2.Base, N2.Number, N2.Chain, jj);
+
       InterType(c) = 300;                 % code for later
 
       c = c + 1;
@@ -116,21 +177,20 @@ for f = 1:length(File),
 
       IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %6s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, Codes{File(f).Backbone(i,j(k))},r);
 
+      u  = find(U==N1.Chain);              % which chain i is in
+      ii = i - chainoffset(u) + 1;        % position of i in chain u
+      u  = find(U==N2.Chain);              % which chain j(k) is in
+      jj = j(k) - chainoffset(u) + 1;     % position of j(k) in chain u
+
+      T = Codes{File(f).Backbone(i,j(k))};
+
+      DText{c} = sprintf('%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n', File(f).Filename, T, N1.Base, N1.Number, N1.Chain, ii, N2.Base, N2.Number, N2.Chain, jj);
+
       InterType(c) = 400;                 % code for later
 
       c = c + 1;
     end
   end
-
-% -------------------------------------------------- Write html files
-
-  warning off
-
-  mypath = [pwd filesep 'Web' filesep 'AnalyzedStructures'];
-  mkdir(mypath, FN);
-  warning on
-
-  mypath = [mypath filesep FN filesep];
 
 % -------------------------------------------------- Write index.html file
 
@@ -172,7 +232,7 @@ for f = 1:length(File),
 
   fclose(fid);
 
-% ----------------------------------------------- Write FN_interactions file  
+  % --------------------------------------------- Write FN_interactions file  
 
   fid = fopen([mypath FN '_interactions.html'],'w'); % open for writing
 
@@ -189,15 +249,60 @@ for f = 1:length(File),
     fprintf(fid,'%s\n',HText{i});
   end
 
-  for i = 1:length(IText),
-    fprintf(fid,'%5d %s\n',i,IText{i});
+  k = find((InterType < 30) + (InterType >= 200));  % exclude near pairs, BPh
+
+  for i = 1:length(k),
+    fprintf(fid,'%5d %s\n',i,IText{k(i)});
   end
 
   fprintf(fid,'</pre>\n</html>\n');
 
   fclose(fid);
 
-% ----------------------------------------------- Write FN_basepairs file  
+  fid = fopen([datapath FN '_interactions_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
+  fclose(fid);
+
+  % --------------------------------------------- Write FN_interactions file  
+
+  fid = fopen([mypath FN '_near_interactions.html'],'w'); % open for writing
+
+  fprintf(fid,'<html>\n<head>\n<title>%s near interactions from FR3D</title>\n</head>\n<body>',FN);
+  fprintf(fid,'%s\n',['<h1>FR3D list of near pairwise interactions in ' FN '</h1>']);
+
+  for L = 1:length(LText),
+    if L ~= 2,
+      fprintf(fid,'%s\n', LText{L});
+    end
+  end
+
+  for i = 1:length(HText),
+    fprintf(fid,'%s\n',HText{i});
+  end
+
+  k = find((InterType > 100) .* (InterType < 200) .* (fix(InterType) ~= 114));  % exclude near pairs, BPh
+
+  for i = 1:length(k),
+    fprintf(fid,'%5d %s\n',i,IText{k(i)});
+  end
+
+  fprintf(fid,'</pre>\n</html>\n');
+
+  fclose(fid);
+
+  fid = fopen([datapath FN '_near_interactions_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
+  fclose(fid);
+
+  % ----------------------------------------------- Write FN_basepairs file  
 
   fid = fopen([mypath FN '_basepairs.html'],'w'); % open for writing
 
@@ -214,14 +319,22 @@ for f = 1:length(File),
     fprintf(fid,'%s\n',HText{i});
   end
 
-  k = find(InterType < 15);
+  k = find(InterType < 14);                    % exclude Rib pairs
 
-  for i = 1:length(IText(k)),
+  for i = 1:length(k),
     fprintf(fid,'%5d %s\n',i,IText{k(i)});
   end
 
   fprintf(fid,'</pre>\n</html>\n');
 
+  fclose(fid);
+
+  fid = fopen([datapath FN '_basepairs_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
   fclose(fid);
 
 % ----------------------------------------------- Write FN_stacking file  
@@ -249,6 +362,14 @@ for f = 1:length(File),
 
   fprintf(fid,'</pre>\n</html>\n');
 
+  fclose(fid);
+
+  fid = fopen([datapath FN '_stacking_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
   fclose(fid);
 
 % --------------------------------------------- Write FN_base_phosphate file  
@@ -294,6 +415,15 @@ for f = 1:length(File),
 
   fclose(fid);
 
+  fid = fopen([datapath FN '_base_phosphate_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  k = find(fix(InterType) == 200);               % all BPh interactions
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
+  fclose(fid);
+
 % --------------------------------------- Write FN_backbone_connectivity file  
 
   fid = fopen([mypath FN '_backbone_connectivity.html'],'w'); % open for writing
@@ -319,6 +449,14 @@ for f = 1:length(File),
 
   fprintf(fid,'</pre>\n</html>\n');
 
+  fclose(fid);
+
+  fid = fopen([datapath FN '_backbone_connectivity_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
   fclose(fid);
 
 % --------------------------------------- Write FN_backbone_conformation file  
@@ -349,9 +487,17 @@ for f = 1:length(File),
 
   fclose(fid);
 
+  fid = fopen([datapath FN '_backbone_conformation_FR3D.txt'],'w'); % open for writing
+  fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'%s\n',DataHeader2);
+  for i = 1:length(k),
+    fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
+  end
+  fclose(fid);
 
-  clear IText HText 
 
+  clear IText HText DText
+ end
 end
 
 

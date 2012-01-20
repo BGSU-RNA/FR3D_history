@@ -1,8 +1,14 @@
-% pConsensusPairSubstitution(a,b,f,File,F,Delete,L,Search) looks at the letter pairs corresponding to nucleotides a and b of the query motif in Search, 
+% pConsensusPairSubstitution(a,b,f,File,F,L,Search) looks at the letter pairs corresponding to nucleotides a and b of the query motif in Search, 
 
-function [Score] = pConsensusPairSubstitution(a,b,f,File,F,Delete,L,Search,Verbose)
+function [Score] = pConsensusPairSubstitution(a,b,f,File,F,L,Search,Param)
 
-method = 2;
+method          = 4;             % method for assigning pair subst probs
+
+if length(Param) > 1,
+  method  = Param(2);
+end
+
+Verbose = Param(1);
 
 load PairExemplars
 

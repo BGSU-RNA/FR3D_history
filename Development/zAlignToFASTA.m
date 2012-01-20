@@ -11,6 +11,8 @@
 
 function [File] = zAlignToFASTA(File,Chain,FASTA,Entry,Verbose)
 
+File.Filename
+
 if nargin < 5,
   Verbose = 0;
 end
@@ -89,10 +91,10 @@ end
   m = cumsum(k);
   
   x = zInvertFunction(align1);                        % map 
-  y = [align2 (length(FASTA(Entry).Sequence)+1)]; 
-  z = [zInvertFunction(m) length(FASTA(Entry).Aligned)]; % maps elements of seq to columns
 
-z
+  y = [align2 (length(FASTA(Entry).Sequence)+1)]; 
+  z = [zInvertFunction(m) length(FASTA(Entry).Aligned)]; 
+  % ---------- z maps elements of FASTA sequence to columns of the alignment
 
 %align1
 
@@ -100,19 +102,26 @@ z
 %length(y)
 %length(z)
 
-  FastaCol = z(y(x));  
+  FastaCol = z(y(x));                     % maps index in 3D structure to
+                                          % column in FASTA file
 
-  Alignment = cat(1,FASTA.Aligned);
+  Alignment = cat(1,FASTA.Aligned);       % put together alignment into matrix
 
 %FastaCol
 %min(FastaCol)
 %max(FastaCol)
 
+  L = length(Alignment(1,:));                               % max num columns
+
   for i = a,
-%[i i-a(1)+1]
-    File.NT(i).FASTA = Alignment(:,FastaCol(i-a(1)+1));
-    File.NT(i).FASTACol = FastaCol(i-a(1)+1);
-  end
+    colnum  = FastaCol(min(length(FastaCol),i-a(1)+1));                   % current FASTA col
+    nextgap = min(colnum+1,L);                      % next column
+    lastgap = min(FastaCol(min(length(FastaCol),i+1-a(1)+1))-1,L);        % 
+    File.NT(i).FASTA     = Alignment(:,colnum);     % pull out column
+    File.NT(i).FASTACol  = colnum;                  % record column #
+    File.NT(i).GapsAfter = Alignment(:,nextgap:lastgap);
+                % pull out columns between those aligned to the 3D structure
+  end 
 
   if Verbose > 1,
     fprintf('Structure: %s\n', StructureSequence);

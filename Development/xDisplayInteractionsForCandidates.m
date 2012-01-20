@@ -2,10 +2,6 @@
 
 function [File] = xDisplaySequenceForCandidates(File,Search,NofI)
 
-MaxVariants = Inf;
-IncludeGaps = 1;
-
-
 if strcmp(class(Search),'double'),
 
   % ---------------------------------------- Load a saved search by number
@@ -70,53 +66,36 @@ end
 
 for f = 1:length(File),
   if ~isfield(File(f).NT(1),'FASTA'),
-    File(f) = zAttachAlignment(File(f),1);          
+%    File(f) = zAttachAlignment(File(f),1);          
   end
 end
 
 % ------------------------------------------------ Loop through candidates
 
-for c = 1:L,                                     % loop through candidates
- f = find(Search.Candidates(c,N+1)==FN);         % new file number
+for n = 1:N,                                     % loop through nucleotides
+ f  = find(Search.Candidates(1,N+1)==FN);
+ NT = File(f).NT(Search.Candidates(1,n));
+ fprintf('Nucleotide %d of the query is %s%4s.\n', n, NT.Base, NT.Number);
 
- s = [];
+ for c = 1:L,                                     % loop through candidates
+  f = find(Search.Candidates(c,N+1)==FN);         % new file number
 
- if isfield(File(f).NT(Cand(c,1)),'FASTA'),  % File(f) has sequence info
+  s = [];
 
-  for j = 1:N,                               % get FASTA column lengths
-    s(j) = length(File(f).NT(Cand(c,j)).FASTA);
-  end
+  i = Search.Candidates(c,1:N);                   % indices
 
-  if min(s) == max(s) && min(s) > 0,
-    seq = [];
-    for j = NofI,                            % paste together FASTA columns
-      seq = [seq File(f).NT(Cand(c,j)).FASTA];
-      if IncludeGaps > 0 && j < NofI(end),
-        seq = [seq File(f).NT(Cand(c,j)).GapsAfter];
-      end
-    end
-    
-    fprintf('Candidate %d is',c);
-    for j = 1:N,
-      fprintf(' %s%4s', File(f).NT(Cand(c,j)).Base,File(f).NT(Cand(c,j)).Number);
-    end
-    fprintf(' from %s chain %s\n', File(f).Filename, File(f).NT(Cand(c,1)).Chain);
-    fprintf('Candidate %d has relevant sequence %s\n', c, cat(2,File(f).NT(Cand(c,NofI)).Base));
-    fprintf('Summary of sequence variants found in alignment:\n');
+  e = File(f).Edge(i(n),:);
+  e(i) = zeros(1,N);                              % remove inter. with cand.
 
-    [b,t] = zUniqueRows(seq);
+  j = find(e);                                    % interaction partners    
 
-    L = min(MaxVariants,length(t));
+  NT = File(f).NT(i(n));
 
-    for r = 1:L,
-      fprintf('Sequence %s occurs %4d times\n', b(r,:), t(r));
-    end
+  fprintf('  Candidate %d from %s; this is %s%4s.\n', c, File(f).Filename, NT.Base, NT.Number);
 
-    if L < length(t),
-      fprintf('The remaining variants account for %8.2f%% of the sequences\n', 100*(1-sum(t(1:L))/sum(t)));
-    end
-
-    fprintf('\n');
+  for k = 1:length(j),
+    NT2 = File(f).NT(j(k));
+    fprintf('    %4s with %s%4s\n', zEdgeText(e(j(k))), NT2.Base, NT2.Number);
   end
  end
 end

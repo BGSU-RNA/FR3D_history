@@ -10,7 +10,7 @@
 
 function [ClassLimits, CurrentVersion] = zClassLimits;
 
-CurrentVersion = 6.2;                       % version number of class limits
+CurrentVersion = 6.3;                       % version number of class limits
 
 ClassLimits = zeros(50,12,16);
 
