@@ -11,7 +11,7 @@ end
 if nargin < 3,
   MenuTitle = 'Display options';
   Level     = 0;
-  QuitButton = 'Quit';
+  QuitButton = 'Quit display';
 else
   MenuTitle = ['Level ' num2str(Level)];
   QuitButton = 'Quit level';

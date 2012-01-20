@@ -35,9 +35,6 @@ for f=1:length(File),
     List(:,Perm) = List(:,1:min(9,Model.NumNT));     % re-order nucleotides
   end
 
-size(List)
-size(SS)
-
   %-----------------------------------------------------------------------
   for r = 10:Model.NumNT,              % additional nucleotides, if needed
     if length(List(:,1)) > 0,

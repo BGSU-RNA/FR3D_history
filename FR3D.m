@@ -13,7 +13,7 @@ if ~exist('GUIactive'),                      % if the GUI is not being used
   end
 end
 
-Query
+%Query
 
 % ----------------------------------------- Load PDB files if needed --------
 
