@@ -3,16 +3,15 @@
 % from File1 and NTList2 from File2, rotated to align as well as possible
 % It displays all nucleotides from both lists.
 
-% This is not totally relevant:
-% It can be called in several ways, for example,
-% zDisplayNT('1s72',{'27','28','29'},ViewParam), and it will load the
-% named datafile and plot the nucleotides by nucleotide number.  Or, if
-% data files have already been loaded, one can use zDisplayNT(File(1),[32
-% 34 35],ViewParam) to plot the nucleotides in File(1) having indices 32,
-% 34, and 35.  Defaults for ViewParam are defined in zDisplayNT; see there
-% for the fields of ViewParam.
-% One can also use ranges of nucleotide numbers, as in
-% zDisplayNT('rr0033_23S',{'2548:2555','2557','2559:2566'},VP);
+% If ViewParam.Write > 0, it writes PDB files
+
+% If L = 0, it makes a Needleman-Wunsch alignment of the base sequences
+% and uses the aligned bases to do the superposition
+
+% File1 = zAddNTData('1j5e');
+% File2 = zAddNTData('2avy');
+% VP.Write = 0;
+% zSuperimposeNucleotides(File1,'122:129,232:239',File2,'122:129,232:239',VP,8);
 
 function [disc,Shift,SuperR] = zSuperimposeNucleotides(File1,NTList1,File2,NTList2,ViewParam,L)
 
@@ -134,7 +133,7 @@ else
   Indices1 = NTList1;
 end
 
-% --------------------------------------- File22 ----------------------------
+% --------------------------------------- File2 ----------------------------
 % if File2 is a text string (filename), load the file and display
 
 if strcmp(class(File2),'char'),
@@ -158,13 +157,43 @@ else
   Indices2 = NTList2;
 end
 
-% ---------------- Check that the lists are the same length
+% ---------------- Determine which nucleotides to superimpose
 
 if nargin < 6,
   L = length(Indices1);
 end
 
 L = min([L length(Indices1) length(Indices2)]);
+
+% ---------------- Align nucleotides, if desired
+
+if L == 0,
+  Bases1 = cat(2,File1.NT(Indices1).Base);
+  Bases2 = cat(2,File2.NT(Indices2).Base);
+
+  [m,a,b] = nw(Bases1, Bases2, 0.99, 2);  % align bases from the two lists
+  
+  L = length(a);
+  I1 = Indices1(a);                   % indices to superimpose
+  I2 = Indices2(b);                   % indices to superimpose
+
+  E1 = [];
+  for i = 1:length(Indices1),
+    if ~any(Indices1(i) == I1),
+      E1 = [E1 Indices1(i)];
+    end
+  end
+
+  E2 = [];
+  for i = 1:length(Indices2),
+    if ~any(Indices2(i) == I2),
+      E2 = [E2 Indices2(i)];
+    end
+  end
+
+  Indices1 = [I1 E1];
+  Indices2 = [I2 E2];
+end
 
 % ---------------- Check that the lists are long enough
 
@@ -173,9 +202,23 @@ if L < 3
 end
 
 if isfield(ViewParam,'Phosphate'),
-  LW = ViewParam.Phosphate;
+  LW = ViewParam.Phosphate;           % set location weight for phosphates
 else
   LW = ones(1,L);
+end
+
+% ---------------- List what is being aligned
+
+if L > 100,
+  fprintf('Listing the first 100 aligned nucleotides\n');
+else
+  fprintf('Listing the aligned nucleotides\n');
+end
+
+for i = 1:min(L,100),
+  N1 = File1.NT(Indices1(i));
+  N2 = File2.NT(Indices2(i));
+  fprintf('Aligning %s%s of %s with %s%s of %s\n',N1.Base,N1.Number,File1.Filename,N2.Base,N2.Number,File2.Filename);
 end
 
 % ---------------- Calculate the discrepancy between the two structures --
@@ -196,17 +239,25 @@ if VP.Plot > 0
 
   clf
 
-  VP.Color = [1 0 0];
-  zPlotNTsRotated(File1,Indices1(1:L),VP,R,CC1);
+  VP.Color = [1 0 0];                   % color nucleotides differently
+  for k=1:L,                            % Loop through all nucleotides
+    zPlotOneNTRotated(File1.NT(Indices1(k)),VP,R,CC1);
+  end
 
   VP.Color = [0.5 0 0];
-  zPlotNTsRotated(File1,Indices1((L+1):end),VP,R,CC1);
+  for k=(L+1):length(Indices1),         % Loop through all nucleotides
+    zPlotOneNTRotated(File1.NT(Indices1(k)),VP,R,CC1);
+  end
 
   VP.Color = [0 1 0];
-  zPlotNTsRotated(File2,Indices2(1:L),VP,SuperR*R,CC2);
+  for k=1:L,                            % Loop through all nucleotides
+    zPlotOneNTRotated(File2.NT(Indices2(k)),VP,SuperR*R,CC2);
+  end
 
   VP.Color = [0 0.5 0];
-  zPlotNTsRotated(File2,Indices2((L+1):end),VP,SuperR*R,CC2);
+  for k=(L+1):length(Indices2),         % Loop through all nucleotides
+    zPlotOneNTRotated(File2.NT(Indices2(k)),VP,SuperR*R,CC2);
+  end
 
   Title = [File1.Filename '(red) versus ' File2.Filename '(green)'];
   title(Title);
@@ -226,37 +277,26 @@ end
 
 if VP.Write > 0,
 
-Filename = File1.Filename;
-Filename = [Filename '_' File1.NT(min(Indices1(1:L))).Number '_' File1.NT(max(Indices1(1:L))).Number];
-Filename = [Filename '.pdb'];
+  L1 = strrep(NTList1{1},':','-');
+  L2 = strrep(NTList2{1},':','-');
 
-fid = fopen(Filename,'w');                     % open for writing
+  Filename = ['Superimpose_' File1.Filename '_' L1 '_' File2.Filename '_' L2 '.pdb'];
 
-a = 1;                                         % atom number
+  fid = fopen(Filename,'w');                     % open for writing
 
-for i=1:length(Indices1(1:L))
-  a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
-end
+  a = 1;                                         % atom number
 
-fclose(fid);
-fprintf('Wrote %s\n', Filename);
+  for i=1:length(Indices1)
+    a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
+  end
 
-% ---------------- Write PDB file for second set of nucleotides
+  for i=1:length(Indices2)
+    a = zWriteNucleotidePDB(fid,File2.NT(Indices2(i)),a,0,SuperR*R,CC2);
+  end
 
-Filename = File2.Filename;
-Filename = [Filename '_' File2.NT(min(Indices2(1:L))).Number '_' File2.NT(max(Indices2(1:L))).Number];
-Filename = [Filename '.pdb'];
+  zWritePDBColorInformation(fid,[L (length(Indices1)-L) L (length(Indices2)-L)],[[1 0 0]; [0.5 0 0]; [0 1 0]; [0 0.5 0]]);
 
-fid = fopen(Filename,'w');                     % open for writing
-
-a = 1;                                         % atom number
-
-for i=1:length(Indices2)
-  a = zWriteNucleotidePDB(fid,File2.NT(Indices2(i)),a,0,SuperR*R,CC2);
-  a = a + 1;
-end
-
-fclose(fid);
-fprintf('Wrote %s\n', Filename);
+  fclose(fid);
+  fprintf('Wrote %s\n', Filename);
 
 end

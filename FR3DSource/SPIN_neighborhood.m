@@ -23,9 +23,9 @@ while current_score ~= previous_score,
 
   [i,c] = assignmentoptimal(M);
 
-i'
-  c
-M
+%i'
+%  c
+%M
 
   [z,q] = sort(i);            % permutation q tells how to sort i
   p = p(q);                   % compose previous permutation with this
@@ -34,13 +34,13 @@ M
   previous_score = current_score;
   current_score = trace(M);   % sum down the diagonal
 
-  subplot(2,2,4);
-  zClusterGraph(D,Lab,[5 2],p,0);
+%  subplot(2,2,4);
+  zClusterGraph(D,Lab,5,p,0);
   shading flat
   axis ij
+  drawnow
 
   current_score
-  pause
 
 end
 

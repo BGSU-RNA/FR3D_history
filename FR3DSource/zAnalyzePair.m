@@ -195,15 +195,15 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
   % ------------------------ record nearest exemplar if no classification yet
 
   if (fix(a) == 30),
-    if (Pair.Distances(1) < 0.8) && (Pair.Normal(3) * Exemplar(ff(1),gg(1)).Pair.Normal(3) > 0), % same flip
+    if (Pair.Distances(1) < 0.8) && (Pair.Normal(3) * Exemplar(ff(1),gg(1)).R(3,3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(1);
       a = sign(c) * (100 + abs(c) + b/1000);
-    elseif (Pair.Distances(2) < 0.8) && (Pair.Normal(3) * Exemplar(ff(2),gg(2)).Pair.Normal(3) > 0), % same flip
+    elseif (Pair.Distances(2) < 0.8) && (Pair.Normal(3) * Exemplar(ff(2),gg(2)).R(3,3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(2);
       a = sign(c) * (100 + abs(c) + b/1000);
-    elseif (Pair.Distances(3) < 0.8) && (Pair.Normal(3) * Exemplar(ff(3),gg(3)).Pair.Normal(3) > 0), % same flip
+    elseif (Pair.Distances(3) < 0.8) && (Pair.Normal(3) * Exemplar(ff(3),gg(3)).R(3,3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(3);
       a = sign(c) * (100 + abs(c) + b/1000);
@@ -215,6 +215,8 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
   Pair.Class = a;
 
   % ------------------------ store the edge information
+
+  % reverse classification for GC and CG pairs, but why, exactly????
 
   if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (abs(Pair.Class) < 14),
     Pair.Edge = -Pair.Class;

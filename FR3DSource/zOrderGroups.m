@@ -42,22 +42,6 @@ end
 
 q = Group{end};
 
-
-return
-
-
-
-
-DDD = DD(q,q);                          % re-order according to p
-DDDD = zeros(s+1,t+1);
-DDDD(1:s,1:t) = DDD;
-
-figure
-pcolor(-DDDD)
-shading flat
-axis ij
-view(2)
-
 % -----------------------------------------------------------------------
 
 function [S] = Score(M)

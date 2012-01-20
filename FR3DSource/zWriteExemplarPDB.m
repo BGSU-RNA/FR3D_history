@@ -14,7 +14,7 @@ if Separate == 0,
 
   % loop through pairs and classifications ----------------------
 
-  fid = fopen('Isostericity\PairExemplarPDB.pdb','w');       % open for writing
+  fid = fopen(['PDBFiles' filesep 'ExemplarPairs.pdb'],'w');       % open for writing
 
   a = 1;                                         % atom number
   c = 1;                                         % pair number
@@ -40,9 +40,13 @@ if Separate == 0,
 
   fclose(fid);
 
-  fprintf('Wrote one pair exemplar PDB file.pdb\n');
+  fprintf('Wrote one pair exemplar PDB file, ExemplarPairs.pdb\n');
 
 else                                       % write to separate PDB files
+
+ efid = fopen(['Isostericity' filesep 'Exemplar_list.txt'],'w');
+
+ fprintf('Edge Pair NT1   NT2    Source Structure C1  Count Class PDB_file_for_pair\n');
 
  for c1 = 1:4,
   for c2 = 1:4,
@@ -53,7 +57,7 @@ else                                       % write to separate PDB files
       E = Exemplar(row,pc);
   
       if ~isempty(E.NT1),
-        WriteOneExemplar(E,pc);
+        WriteOneExemplar(E,pc,efid);
       end
 
       if (any(pc == [2 3 4 8 10 12])),     % need to produce symmetric version
@@ -61,7 +65,7 @@ else                                       % write to separate PDB files
         if ~isempty(E.Class),
           if any(fix(E.Class) == [1 2 7 8])  % but only for these families
             E.Class = -E.Class;            % other side of diagonal
-            WriteOneExemplar(E,pc2);
+            WriteOneExemplar(E,pc2,efid);
           end
         end
       end
@@ -72,13 +76,14 @@ else                                       % write to separate PDB files
   end
  end
 
- fprintf('Wrote individual pair exemplar PDB files.pdb\n');
+ fprintf('Wrote individual pair exemplar PDB files\n');
+ fclose(efid);
 
 end
 
 % ---------------------------------------------------------------------------
 
-function [void] = WriteOneExemplar(E,pc)
+function [void] = WriteOneExemplar(E,pc,efid)
 
 if (E.Class < 0),
   Tem   = E.NT1;                       % reverse order of nucleotides
@@ -112,10 +117,27 @@ if ~isempty(strfind(E.Filename, 'Model')),
   E.NT2.Number = '2';
 end
 
-fprintf('%5s %s%s %s%5s %s%5s %5s %4.1f %5d %4.1f %s\n', ET, E.NT1.Base, E.NT2.Base, E.NT1.Base, E.NT1.Number, E.NT2.Base, E.NT2.Number, E.Filename(1:min(end,5)), CP, E.Count, abs(E.Class), FN);
+Source = '         ';
+
+if strcmp(lower(E.Filename(1:4)),'cura'),
+  Source = 'Curated  ';
+  if strcmp(lower(E.Filename(9:12)),'mode'),
+    Structure = 'Model';
+  else
+    Structure = [upper(E.Filename(9:12))];
+  end
+elseif strcmp(lower(E.Filename(1:4)),'mode')
+  Structure = 'Model';
+  Source    = 'Model    ';
+else
+  Structure = E.Filename(1:4);
+  Source    = 'Structure';
+end
+
+fprintf('%5s %s%s %s%5s %s%5s %9s %5s %4.1f %5d %4.1f %s\n', ET, E.NT1.Base, E.NT2.Base, E.NT1.Base, E.NT1.Number, E.NT2.Base, E.NT2.Number, Source, Structure, CP, E.Count, abs(E.Class), FN);
 
 
-fid = fopen(['Isostericity\' ET '_' E.NT1.Base E.NT2.Base '_Exemplar.pdb'],'w');
+fid = fopen(['Isostericity' filesep ET '_' E.NT1.Base E.NT2.Base '_Exemplar.pdb'],'w');
 
 a = 1;                                 % atom number
 

@@ -109,10 +109,7 @@ else
   set(handles.SearchPDBs,'Min',1);
   set(handles.SearchPDBs,'Max',length(s)+1);
   
-  p = find(ismember(s,'Starter_list'));
-  if ~isempty(p),
-    set(handles.SearchPDBs,'Value',p);
-  end
+  set(handles.SearchPDBs,'Value',1);
 
   set(handles.QueryPDB,'String',snolist);
 

@@ -8,15 +8,33 @@
 
 function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull)
 
+if strcmp(class(Search),'double'),
+  S = Search;
+  clear Search
+  Search.Candidates = S;
+end
+
 if isempty(Search.Candidates)
   fprintf('There are no candidates to display\n');
   File = FullFile;
   return
 end
 
-UsingFull = 0;
-File = Search.File;
-FIndex = 1:length(Search.File);
+[L,N] = size(Search.Candidates);
+N = N - 1;
+
+if ~isfield(Search,'File'),
+  UsingFull = 1;
+  File = FullFile;
+  Search.Query.Geometric = 0;
+  Search.Query.NumNT = N;
+  Search.Discrepancy = 1:L;
+  FIndex = 1:length(FullFile);
+else
+  UsingFull = 0;
+  File = Search.File;
+  FIndex = 1:length(Search.File);
+end
 
 fontsize = 10;                               % for nucleotide numbers
 
@@ -29,8 +47,6 @@ else
   QuitButton = 'Quit level';
 end
 
-N     = Search.Query.NumNT;
-L     = length(Search.Candidates(:,1));  % number of candidates found
 Query = Search.Query;
 
 warning off
@@ -117,10 +133,11 @@ while stop == 0,
          'Mark/Unmark current','Reverse all marks', ...       % 7,8
          'Display marked only', ...                           % 9
          'List to screen','Write to PDB', ...                 % 10,11
-         'Sort by centrality', 'Group Candidates', ...        % 12,13
+         'Sort by centrality', 'Order by similarity', ...     % 12,13
          'Show Alignment', ...                                % 14
          'Show Scatterplot', ...                              % 15
-         QuitButton);                                         % 16
+         'Use Figure 25', ...                                % 16
+         QuitButton);                                         % 17
 
   ii=gcf;                                 % get current active figure
   if (abs(ii) > 20) | (ii == 0),          % FR3D_GUI could be active window
@@ -231,7 +248,7 @@ while stop == 0,
     case 12                                     % sort by centrality
       Search = xSortByCentrality(File(FIndex),Search,Level,UsingFull);
 
-    case 13
+    case 13                                     % group candidates
       Search = xGroupCandidates(File(FIndex),Search,Level,UsingFull);
 
     case 14                                     % align
@@ -245,7 +262,23 @@ while stop == 0,
       ViewParam.ClassLimits = 1;
       xScatterPairs(Search,1,2,ViewParam);
 
-    case 16                                     % quit Display
+    case 16
+      figure(25)
+      pt = get(gca,'CurrentPoint')
+
+      if abs(pt(1,1)-pt(1,2)) > L/15,           % clicked off the diagonal
+        Search.Marked = 0 * Search.Marked;
+        a = sort(pt(1,[1 2]));
+        j = max(1,floor(a(1))):min(L,floor(a(2)));      % 
+        Search.Marked(j) = ones(1,length(j));   % select these candidates
+        fprintf('Marked candidates %d to %d\n', j(1), j(end));
+      else                                      % clicked near the diagonal
+        newn = max(min(floor(pt(1,1)),L),1);
+        Display(i).n = newn;
+        fprintf('Jumped to candidate %d\n', newn);
+      end
+
+    case 17                                     % quit Display
       if exist('fidOUT','var')
         fclose(fidOUT);
       end
@@ -253,7 +286,7 @@ while stop == 0,
 
     end  % switch statement for menu
 
-  if any([1 2 3 7] == k),
+  if any([1 2 3 7 16] == k),
       PlotMotif(File(FIndex),Search,Query,Display,i);
   end
 
@@ -360,6 +393,10 @@ function  PlotMotif(File,Search,Query,Display,i)
     Indices = xNeighborhood(File(f),Indices,v,Display(1));
   end
 
+  if exist('amal.txt','file') > 0,
+     VP.AtOrigin = 1;
+  end
+
   zDisplayNT(File(f),Indices,VP);
 
   if isfield(Search,'AvgDisc'),   
@@ -382,6 +419,36 @@ function  PlotMotif(File,Search,Query,Display,i)
   axis vis3d
   view([Display(1).az Display(1).el]);
   drawnow
+
+  % Commands for Amal's study of base triples:
+
+  if exist('amal.txt','file') > 0,
+
+    N1 = File(f).NT(Indices(1));
+    N2 = File(f).NT(Indices(2));
+    N3 = File(f).NT(Indices(3));
+
+    ytext = 'Interactions ';
+    ytext = [ytext ' ' zEdgeText(File(f).Edge(Indices(1),Indices(2))) ' '];
+    ytext = [ytext ' ' zEdgeText(File(f).Edge(Indices(2),Indices(3))) ' '];
+    ytext = [ytext ' ' zEdgeText(File(f).Edge(Indices(1),Indices(3))) ' '];
+
+    xlabel(ytext);
+    view(2)
+
+    if isfield(Search,'AvgDisc'),   
+      ylabel(['Plot ',int2str(n),' of ',int2str(s),'   Average discrepancy from others ', num2str(Search.AvgDisc(n))]);
+    elseif Query.Geometric > 0,
+      ylabel(['Plot ',int2str(n),' of ',int2str(s),'   Discrepancy ',...
+          num2str(Search.Discrepancy(n))]);
+    else
+      ylabel(['Plot ',int2str(n),' of ',int2str(s)]);
+    end
+
+
+  end
+  % end of commands for Amal
+
 
 %    set(gcf,'Renderer','OpenGL')
 %    set(gcf,'Renderer','zbuffer')

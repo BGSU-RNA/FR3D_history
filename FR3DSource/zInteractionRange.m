@@ -18,13 +18,6 @@ for i = 1:length(C(:,1)),
   C(i,i) = 0;               % remove phosphate self interactions
 end
 
-if Verbose > 3,
-  figure(1)
-  clf
-  zNussinovPlot(triu(E.*(abs(E)<20)), E.*(E<20));
-  title('Locations of basepair interactions of all types');
-end
-
 C = triu(C);                % sparse matrix of pairwise interactions
 
 [i,j,c] = find(C);          % locations of all pairwise interactions
@@ -82,21 +75,6 @@ i = [i; length(File(f).NT)];
 j = [j; length(File(f).NT)];
 d = [d; 0];
 c = [c; 0];
-
-if Verbose > 1,
-  figure(3)
-  clf
-  S = sparse(i,j,d);
-  zNussinovPlot(triu((E == 1)), 1+2*(S > 0));
-  title(['cis Watson-Crick interactions in ' File(f).Filename]);
-
-  figure(4)
-  clf
-  B = E .* (E > 0) .* (E < 24);                 % pairs and stacks
-  zNussinovPlot(triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.8);
-%  title(['All basepairs in ' File(f).Filename]);
-
-end
 
 S = sparse(i,j,d);
 S = S + S';

@@ -1,4 +1,6 @@
 
+
+
 function [matches,align1,align2,s1,s2] = NeedlemanWunsch(seq1,seq2,p,d)
 
 N = length(seq1);

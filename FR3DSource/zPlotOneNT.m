@@ -139,7 +139,8 @@ if Sugar == 1,
   k = [2 1]; 
   plot3(Z(k,1),Z(k,2),Z(k,3),'Color',bc,'LineWidth',2,'LineStyle',LS);
 
-  if Z(13,1) < Inf,                % O3' from previous nucleotide is known
+  % connect backbone, if distance is small enough
+  if norm(Z(13,1)-Z(10,1)) < 6,       % O3' from previous nucleotide is known
     k = [10 13];
     plot3(Z(k,1),Z(k,2),Z(k,3),'Color',bc,'LineWidth',2,'LineStyle',LS);
   end  

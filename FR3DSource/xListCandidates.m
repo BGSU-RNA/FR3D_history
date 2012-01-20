@@ -14,8 +14,9 @@
 
 function [Text] = xListCandidates(Search,NumToOutput,WheretoOutput,Param)
 
-File        = Search.File;
 
+
+File        = Search.File;
 Query       = Search.Query;
 Candidates  = Search.Candidates;
 

@@ -61,13 +61,17 @@ for k = 1:length(Numb),
   end
 end
 
-% check for chain indicated by underscore
+% check for element or chain indicated by underscore
 
 for k = 1:length(Numb),
-  if ~isempty(strfind(Numb{k},'_')),
-    a = strfind(Numb{k},'_');
-    Chai{k} = Numb{k}(a(end)+1:end);        % extract chain
-    Numb{k} = Numb{k}(1:a(end)-1);          % remove chain reference
+  if any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz'),
+    % this is an element, leave it alone
+  else                      % check for chain indicated by underscore
+    if ~isempty(strfind(Numb{k},'_')),
+      a = strfind(Numb{k},'_');
+      Chai{k} = Numb{k}(a(end)+1:end);        % extract chain
+      Numb{k} = Numb{k}(1:a(end)-1);          % remove chain reference
+    end
   end
 end
 
@@ -85,22 +89,7 @@ Numbers = cat(1,{File.NT(:).Number});
 allchains = [];
 
 for k = 1:length(Numb)                      % loop through nucleotide numbers
-  if isempty(strfind(Numb{k},':')),         % a single number, not a range
-    L   = LookUpOne(File,Numbers,Numb{k},Chai{k});
-
-    if length(L) > 0,
-      ind = [ind L(1)];                       % add the first hit to the list
-
-      m = length(ind);
-      ch = [];
-
-      for i=1:length(L),
-        ch{i} = File.NT(L(i)).Chain;
-      end
-
-      allchains{m} = ch;
-    end
-  else                                      % process a range of numbers
+  if ~isempty(strfind(Numb{k},':')),        % a range of numbers
     n = Numb{k};                            % kth specified number or range
     i = strfind(n,':');                     % find the colon
     Numb1 = n(1:(i-1));                     % first nucleotide number
@@ -134,7 +123,38 @@ for k = 1:length(Numb)                      % loop through nucleotide numbers
     for j = (m+1):mm,
       allchains{j} = ch;
     end
+  elseif any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz') && isfield(File.NT(1),'Hierarchy'),
+    c = 1;                        % counter for number of indices found
+    newind = [];
+    for n = 1:length(File.NT),
+      p = find(ismember(File.NT(n).Hierarchy,Numb{k}));
+      if ~isempty(p),
+        newind(c) = n;
+        c = c + 1;
+      end
+    end
 
+    if ~isempty(newind),
+      for j = 1:length(newind),
+        allchains{length(ind)+j} = File.NT(newind(j)).Chain;
+      end
+      ind = [ind newind];
+    end
+  else
+    L = LookUpOne(File,Numbers,Numb{k},Chai{k});
+
+    if length(L) > 0,
+      ind = [ind L(1)];                       % add the first hit to the list
+
+      m = length(ind);
+      ch = [];
+
+      for i=1:length(L),
+        ch{i} = File.NT(L(i)).Chain;
+      end
+
+      allchains{m} = ch;
+    end
   end
 end
 

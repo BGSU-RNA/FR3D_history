@@ -39,7 +39,7 @@ w = exp(-(((1-N):(N-1)).^2)/c);    % large near diagonal, 0 far away
 w = [w w];
 
 format long
-w'
+%w'
 format short
 
 W = zeros(N,N);
@@ -58,26 +58,43 @@ end
 figure(1)
 clf
 
-subplot(2,2,1)
+subplot(3,2,1)
 plot(x,y,'.');
-title('Data points');
+title('Data points','FontSize',12);
 
-subplot(2,2,2)
-zClusterGraph(D,Lab,[5 2],1:N,0);
+subplot(3,2,2)
+zClusterGraph(D,Lab,5,1:N,0);
 axis ij
 shading flat
-title('Original distance matrix');
+title('Original distance matrix using original ordering','FontSize',12);
 
-subplot(2,2,3)
-zClusterGraph(D,Lab,[5 2],[],0);
+Y = squareform(full(D));                       % convert to a vector
+Z = linkage(Y,'average');                      % compute cluster tree
+
+subplot(3,2,3)
+[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',Lab);
+title('Dendrogram from cluster analysis','FontSize',12);
+FS = 2;
+set(gca,'FontSize',FS)
+
+
+subplot(3,2,4)
+zClusterGraph(D,Lab,5,p,0);
+title('Distance matrix using order from cluster analysis','FontSize',12);
+
+subplot(3,2,5)
+zClusterGraph(D,Lab,5,[],0);
 axis ij
 shading flat
-title('Distance matrix from zClusterGraph');
+title('Distance matrix using order from zClusterGraph','FontSize',12);
 
+subplot(3,2,6)
 p = SPIN_neighborhood(D,Lab,W);
-
-subplot(2,2,4)
-zClusterGraph(D,Lab,[5 2],p,0);
+zClusterGraph(D,Lab,5,p,0);
 axis ij
 shading flat
-title('Distance matrix from SPIN\_neighborhood');
+title('Distance matrix using order from SPIN\_neighborhood','FontSize',12);
+
+set(gcf,'Renderer','painters');
+orient tall
+saveas(gcf,['Order test ' num2str(pattern) '.pdf'],'pdf');

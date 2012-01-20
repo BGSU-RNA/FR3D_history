@@ -32,7 +32,6 @@ end
 
 Y = squareform(full(D));                       % convert to a vector
 Z = linkage(Y,'average');                      % compute cluster tree
-figure(25)
 
 L = length(Search.Candidates(:,1));
 ClusterNum = L+1;
@@ -93,7 +92,38 @@ for i = 1:L,
   FLabel{i} = [Lab{i} ' ' SLabel{i}];
 end
 
-[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',FLabel);
+%figure(25)
+%[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',FLabel);
+%set(gca,'FontSize',1)
+%set(gcf,'Renderer','painters');
+%saveas(gcf,[ 'Temp0.pdf'],'pdf');
+
+%figure(26)
+%zClusterGraph(D,FLabel,15,p,0);
+%set(gcf,'Renderer','painters');
+%saveas(gcf,[ 'Temp1.pdf'],'pdf');
+
+figure(25)
+clf
+p = zClusterGraph(D,FLabel,15,[],0);
+title('Table of discrepancies between candidates');
+
+colormap('default');
+map = colormap;
+map = map((end-8):-1:8,:);
+colormap(map);
+caxis([0 0.8]);
+colorbar('location','eastoutside');
+
+
+%set(gcf,'Renderer','painters');
+%saveas(gcf,[ 'Temp2.pdf'],'pdf');
+
+if length(p) < -100,
+  figure(28)
+  clf
+  SPIN_neighborhood(D,FLabel,15);
+end
 
 Search.GroupLabel = SLabel;
 
@@ -103,23 +133,8 @@ q = Done(p);                                      % reverse order
 
 % ----------------------------------- List and display results
 
-fprintf('Candidates sorted by centrality within these candidates:\n');
+fprintf('Candidates are listed in order of groups:\n');
 fprintf('\n');
-
-S.Query        = Search.Query;                      % set up new "Search" data
-S.Candidates   = Search.Candidates(r,:);            % re-order candidates
-S.Discrepancy  = Search.Discrepancy(r);
-S.Disc         = Search.Disc(r,r);
-S.DiscComputed = Search.Disc(1,r);
-S.File         = Search.File;
-S.GroupLabel   = Search.GroupLabel(r);
-
-S.CandidateFilenames = Search.CandidateFilenames;
-if isfield(Search,'AvgDisc'),
-  S.AvgDisc = Search.AvgDisc(r);
-end
-
-xListCandidates(S,Inf);                 % show on screen
 
 S.Query        = Search.Query;                      % set up new "Search" data
 S.Candidates   = Search.Candidates(q,:);            % re-order candidates
@@ -132,4 +147,8 @@ if isfield(Search,'AvgDisc'),
   S.AvgDisc = Search.AvgDisc(q);
 end
 
-xDisplayCandidates(File,S,Level+1,UsingFull);          % display, level 1
+S.CandidateFilenames = Search.CandidateFilenames;
+
+xListCandidates(S,Inf);                             % show on screen
+
+xDisplayCandidates(File,S,Level+1,UsingFull);       % display, level 1

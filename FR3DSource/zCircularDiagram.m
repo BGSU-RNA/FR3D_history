@@ -1,7 +1,7 @@
-% zNussinovPlot(Edge,Color) plots the basepairs in Edge using Color as
+% zCircularDiagram(Edge,Color) plots the basepairs in Edge using Color as
 % chords of a circle
 
-function [void] = zNussinovPlot(File,Edge,Color,Thickness)
+function [void] = zCircularDiagram(File,Edge,Color,Thickness)
 
 if nargin < 2,
   Edge = File.Edge;

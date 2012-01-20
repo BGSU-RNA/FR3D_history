@@ -27,7 +27,11 @@ File(f).BasePhosphate = sparse(zeros(File(f).NumNT));
 % -------- First screening of base pairs ------------------------------------ 
 
 DistCutoff = 16;                                % max distance for interaction
-[i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance >= 0)); 
+[i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance > 0)); 
+
+i = [i; (1:length(File.NT))'];                      % self interactions
+j = [j; (1:length(File.NT))'];
+
 %[i,j] = find(((File(f).Distance == 0))); 
                                                 % screen by C-C distance
                                                 % allow self interactions

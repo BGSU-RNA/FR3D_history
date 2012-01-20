@@ -64,7 +64,7 @@ for c1 = 1:4,
 
       % ------- in some symmetric families, store AA, CC, GG, UU pairs twice
 
-      if (E.NT1.Code == E.NT2.Code) && any(fix(E.Class) == [1 7 8]),
+      if (E.NT1.Code == E.NT2.Code) && any(fix(E.Class) == [1 7 8 11 12]),
         E.HydrogenClass = 0;
         E.subplot  = 0;
         E.original = 0;
@@ -227,9 +227,9 @@ end
 % ------------------------------------------ Display graph of isodiscrepancies
 
 if length(Category) > 1,
-  p = zClusterGraph(D, Lab, 12, 1:length(B), 0);
+  zClusterGraph(D, Lab, 12, 1:length(B), 0);
 else
-  p = zClusterGraph(D, Lab, [12 2], [], Verbose);
+  zClusterGraph(D, Lab, [12 2], [], Verbose);
 end
 
 colormap('default');
@@ -251,31 +251,6 @@ title(Title,'FontSize',10);
 
 saveas(gcf,['Isostericity' filesep Title '.pdf'],'pdf');
 saveas(gcf,['Isostericity' filesep Title '.png'],'png');
-
-if 1 > 0,
-  figure
-  w = [1.55 2.25 3.3 4.5 5.5 8];
-  w = [2 2.6 3.3 4.5 5.5 8];
-  E = (0 * (D < w(1))) + w(2) * (D > w(1)) .* (D < w(3)) + w(4) * (D > w(3)) .* (D < w(5)) + w(6) * (D > w(5));
-  zClusterGraph(E,Lab,[12 2],p,0);
-end
-
-colormap('default');
-map = colormap;
-map = map((end-8):-1:8,:);
-colormap(map);
-caxis([0 8]);
-colorbar('location','eastoutside');
-
-Title = [];
-for i = 1:length(Category),
-  Title = [Title ' ' zEdgeText(abs(Category(i)))];
-end
-Title = [Title 'family isodiscrepancy map'];
-if Subcat > 0,
-  Title = [Title ' with subcategories'];
-end
-title(Title,'FontSize',10);
 
 % ----------------------------------------- Calculate avg dist btw families
 

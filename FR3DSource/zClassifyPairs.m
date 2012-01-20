@@ -73,32 +73,14 @@ for k = 1:length(i),                            % loop through possible pairs
       end
     end
 
-    % --------------------------- record interaction
-
-    File.Pair(pc) = Pair;                           % store in File data
-
     pc = pc + 1;                                    % increment pair counter
 
   end
 end   % loop over pairs
-
-if pc > 1,                                         % if pairs were found
-  A = cat(1, File.Pair(:).Base1Index);
-  B = cat(1, File.Pair(:).Base2Index);
-  C = min(A,B);
-
-  [y,ii] = sort(C);
-
-  File.Pair = File.Pair(ii);                       % order by lower base index
-else
-  File.Pair = [];
-end
 
 if Verbose > 1,
   fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
   fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
 end
 
-else                                                % no nucleotides
-  File.Pair = [];
 end

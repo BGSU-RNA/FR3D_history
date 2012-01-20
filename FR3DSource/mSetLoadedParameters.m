@@ -4,9 +4,12 @@ Query=Search.Query;
 
 s=get(handles.SearchPDBs,'String');
 ss=get(handles.QueryPDB,'String');
+
 v=[];
+
 for i=1:length(Search.Filenames)
-    v=[v find(strcmp(upper(s),upper(Search.Filenames{i})))];
+    ff = find(strcmp(upper(s),upper(Search.Filenames{i})));
+    v=[v ff(1)];
 end
 set(handles.SearchPDBs,'Value',v);
 

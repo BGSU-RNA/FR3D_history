@@ -8,10 +8,10 @@ end
 
 NewNames = '';
 
-if strcmpi(Filename,'AllFiles_list'),
-  [s,NewNames] = mGetPDBFilenames;
-elseif isempty(strfind(Filename,'_list')),
+if isempty(strfind(Filename,'_list')),
   NewNames = {Filename};
+elseif strcmpi(Filename,'AllFiles_list'),
+  [s,NewNames] = mGetPDBFilenames;
 elseif ~isempty(Filename),
   Filename = strrep(Filename,'.pdb','');
   fid = fopen(['PDBFiles' filesep Filename '.pdb'],'r');

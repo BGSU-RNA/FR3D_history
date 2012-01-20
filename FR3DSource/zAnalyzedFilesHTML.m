@@ -99,7 +99,7 @@ for f = 1:length(File),
 
   fprintf(fid,'<tr>\n<td>\n%s\n</td>\n', DiagramText);
 
-  fprintf(fid,'<td><a href="%s_RNA.pdb>Click here</a> to download the RNA coordinate file.\n</td>\n</tr>\n</table>\n',FN);
+  fprintf(fid,'<td><a href="%s_RNA.pdb">Click here</a> to download the RNA coordinate file.\n</td>\n</tr>\n</table>\n',FN);
 
   fprintf(fid,'</html>\n');
 
@@ -184,6 +184,14 @@ for f = 1:length(File),
 
   fclose(fid);
 
+
+  clear IText HText 
+
+end
+
+
+return
+
 % ----------------------------------------------- Create circular diagram
 
 %  figure(1)
@@ -191,7 +199,7 @@ for f = 1:length(File),
   E = fix(abs(File(f).Edge));
   B = E .* (E > 0) .* (E < 24);                 % pairs and stacks
   S = File(f).Range;
-  zNussinovPlot(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),1);
+  zCircularDiagram(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),1);
 
   saveas(gcf,[mypath FN '_circular_diagram.png'],'png');
   [X,map] = imread([mypath FN '_circular_diagram.png']);
@@ -199,14 +207,9 @@ for f = 1:length(File),
   imwrite(Y,[mypath FN '_circular_diagram.png']);
 
   clf
-  zNussinovPlot(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.1);
+  zCircularDiagram(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.1);
   saveas(gcf,[mypath FN '_circular_diagram.pdf'],'pdf');
 
 % ----------------------------------------------- Write PDB file
 
   zWritePDB(File(f),[mypath FN '_RNA.pdb']);
-
-  clear IText HText 
-
-end
-

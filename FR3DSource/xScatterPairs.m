@@ -73,7 +73,7 @@ if Reclassify > 0,
     Nj = File(f).NT(i2);
 
     [p,s] = zClassifyPair(Ni,Nj,CL,Exemplar,1);
-
+p
     p.NT1 = Ni;
     p.NT2 = Nj;
     p.Filename = File(f).Filename;

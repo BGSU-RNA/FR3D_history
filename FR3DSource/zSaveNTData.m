@@ -20,20 +20,10 @@ for f=1:length(Files),
   File.Filename = upper(File.Filename);
 
   if File.NumNT >= 0,
-
-   if File.SizeCode == 1,
-     save([pwd filesep 'PrecomputedData' filesep File.Filename '.mat'],'File');
-
-     if Verbose > 0,
-       fprintf('Saved %s.  ', [File.Filename '.mat']);
-     end
-
-     File = zSmallVersion(File);
-   end
-
-   save([pwd filesep 'PrecomputedData' filesep File.Filename '_small.mat'],'File');
+   File = zSmallVersion(File);
+   save([pwd filesep 'PrecomputedData' filesep File.Filename '.mat'],'File');
    if Verbose > 0,
-     fprintf('Saved %s\n', [File.Filename '_small.mat']);
+     fprintf('Saved %s\n', [File.Filename '.mat']);
    end
   end
 

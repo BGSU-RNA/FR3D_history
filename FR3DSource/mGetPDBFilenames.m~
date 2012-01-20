@@ -26,10 +26,10 @@ if ~isempty(a)
       end
     end
 
-    temp = ['AllFiles_list' temp];
-    
     temp = sort(temp);                              % sort list of PDB names
 
+    temp = ['AllFiles' 'BetterThan3Angstroms' 'BetterThan4Angstroms' 'BetterThan5Angstroms' temp];
+    
     for i=1:length(temp),
       temp{i} =regexprep(temp{i},' ','');           % strip spaces from lists
     end

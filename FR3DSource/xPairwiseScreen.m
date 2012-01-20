@@ -1,4 +1,6 @@
 % xPairwiseScreen returns a sparse matrix with non-zero entries corresponding to pairs of bases which satisfy all given constraints
+% Codes are the base codes from File
+% 
 
 function [Screen] = xPairwiseScreen(File,Codes,Query,p,q,PC);
 
