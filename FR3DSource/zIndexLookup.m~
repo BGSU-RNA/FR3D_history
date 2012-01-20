@@ -190,9 +190,7 @@ end
 %-------------------------------------------------------------------------
 function [ind] = LookUpOne(File,Numbers,N,Chain)
 
-    if any(N(1) == 'ACGU'),
-      N = N(2:end);
-    end
+    N = regexprep(N,'A|C|G|U','','ignorecase');
 
     % later, add the ability to infer the chain from the base specified
 
@@ -206,7 +204,7 @@ function [ind] = LookUpOne(File,Numbers,N,Chain)
       ind = [ind p];
       fprintf('Multiple matches found for %s in %s, consider specifying a chain\n', N, File.Filename);
       for a = 1:length(ind),
-        fprintf('Nucleotide %s%s Chain %5s Index %5d\n', File.NT(ind(a)).Base, File.NT(ind(a)).Number, File.NT(ind(a)).Chain, ind(a));
+        fprintf('Nucleotide %5s Chain %5s Index %5d\n', File.NT(ind(a)).Number, File.NT(ind(a)).Chain, ind(a));
       end
     elseif length(Chain) > 0,                    % chain specified
       c = 0;

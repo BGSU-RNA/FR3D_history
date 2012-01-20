@@ -82,7 +82,7 @@ M{4,1,13}='I0';   M{4,2,13}='I0';   M{4,3,13}='I0';   M{4,4,13}='I0';
 
 Text = M{c1,c2,categ};
 
-while length(Text) < 5,
+while length(Text) < 4,
   Text = [Text ' '];
 end
 

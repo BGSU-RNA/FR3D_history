@@ -20,8 +20,8 @@ for f = 1:length(File),
 end
 HFile = File(find((Res > 0) .* (Res < 3)));
 
-StudyNumbers = -8;
-Verbose = 2;
+StudyNumbers = [-4 1 5];
+Verbose = 0;
 Decimal = 1;              % do not include subcategories
 
 N = 200;                   % number of instances of each pair to keep
@@ -51,8 +51,8 @@ case -5,
   Param = [1 14];              % cWW CU versus cWW UU
   Param = [Param; [1 16]];
 case -4,
-  Param = [1 7];               % cWW GC versus cWW AU
-  Param = [Param; [1 13]];
+  Param = [1 7];               % cWW GC versus cWW UA
+  Param = [Param; [-1 4]];
 case -3,
   Param = [2 13];
   Param = [Param; [-2 4]];
@@ -95,7 +95,7 @@ for i = 3:length(Param(:,1)),
 end
 fprintf('%s\n', Text);
 
-NText = ['Isodiscrepancies between ' Pairs{Param(1,2)} ' ' zEdgeText(Param(1,1)) ' and ' Pairs{Param(2,2)} ' ' zEdgeText(Param(2,1))];
+NText = ['IsoDiscrepancy between ' Pairs{Param(1,2)} ' ' zEdgeText(Param(1,1)) ' and ' Pairs{Param(2,2)} ' ' zEdgeText(Param(2,1))];
 
 for i = 1:length(Param(:,1)),
   Lis  = zFindPairs(HFile,Param(i,:),1);
@@ -104,7 +104,7 @@ for i = 1:length(Param(:,1)),
   Lis = Lis(j,:);                     % order randomly
 
   Start(i+1) = Start(i)+min(s,N);
-  fprintf('Found %4d\n', s);
+  fprintf('Found %5d instances of %2s %4s class %5.1f\n', s, Pairs{Param(i,2)}, zEdgeText(Param(i,1),Decimal,Param(i,2)), Param(i,1));
   List = [List; Lis(1:min(s,N),:)];
   Study = [Study ' ' Pairs{Param(i,2)} zEdgeText(Param(i,1),Decimal,Param(i,2))];
 end
@@ -243,16 +243,6 @@ end
       title('Discrepancy within group 2');
       axis(ax);
 
-      figure(6)
-      clf
-      hist(nonzeros(ND(1:Start(2)-1,Start(2):Start(3)-1)),50);
-      title(NText);
-      ax = axis;
-      ax(1) = 0;
-      ax(2) = 5;
-      axis(ax);
-      saveas(gcf,[strrep(NText,' ','_') '.png'],'png');
-
       figure(4)
       clf
 
@@ -341,8 +331,18 @@ end
 
     end
 
+      figure(6)
+subplot(2,2,sn+1);
+      NBin = hist(nonzeros(ND(1:Start(2)-1,Start(2):Start(3)-1)),50);
+      hist(nonzeros(ND(1:Start(2)-1,Start(2):Start(3)-1)),50);
+      title(NText);
+      axis([0 6 0 1.1*max(NBin)]);
+      saveas(gcf,[strrep(NText,' ','_') '.png'],'png');
+
 if sn < length(StudyNumbers),
-  pause
+  disp('Press any key');
+%  pause
 end
 
 end
+ 

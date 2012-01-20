@@ -190,6 +190,8 @@ for f = 1:length(File),
 end
 
 
+return
+
 % ----------------------------------------------- Create circular diagram
 
 %  figure(1)
@@ -211,6 +213,3 @@ end
 % ----------------------------------------------- Write PDB file
 
   zWritePDB(File(f),[mypath FN '_RNA.pdb']);
-
-return
-

@@ -69,9 +69,9 @@ Discreps = [];
 
 for i = 1:length(Param(:,1)),
   List  = zFindPairs(HFile,Param(i,:),1);
+  [s,t] = size(List);
   fprintf('Found %5d instances of %2s %4s class %5.1f\n', s, Pairs{Param(i,2)}, zEdgeText(Param(i,1),Decimal,Param(i,2)), Param(i,1));
 
-  [s,t] = size(List);
   [y,j] = sort(rand(s,1));
   List = List(j,:);                     % order randomly
   List = List(1:min(s,N),:);            % take the first N instances
@@ -120,19 +120,19 @@ for i = 1:length(Param(:,1)),
   end
 end
 
-figure(2)
-clf
+figure(6)
+subplot(2,2,1)
 colormap('default')
 hist(Discreps,75);                          % all pairs
 ax = axis;
 ax(1) = 0;
-ax(2) = 5;
+ax(2) = 6;
 axis(ax);
 title('IsoDiscrepancy within basepairs');
 saveas(gcf,[strrep('IsoDiscrepancy within basepairs',' ','_') '.png'],'png');
 
 
-q = [0.9 0.95 0.98 0.99 0.999 0.9999];
+q = [0.9 0.95 0.96 0.97 0.98 0.99 0.999 0.9999];
 for i = 1:length(q),
   fprintf('%7.2f%% quantile is at %7.2f\n', 100*q(i), quantile(Discreps,q(i)));
 end
