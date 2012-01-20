@@ -1,9 +1,0 @@
-
-function [Sub] = zSubFile(File,i)
-
-Sub = File;
-
-Sub.NT = File.NT(i);
-Sub.Edge = File.NT(i,i);
-Sub.BasePhosphate = File.BasePhosphate(i,i);
-

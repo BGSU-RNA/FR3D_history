@@ -1,14 +1,6 @@
 % zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It re-orders the instances to group them into clusters, and puts nearby clusters next to one another.  Then it displays the distances graphically.  W(1) is the number of characters of Lab to use on the vertical axis, W(2) on the horizontal.  pp is an optional user-supplied ordering vector.
 
-function [void] = zClusterGraph(D,Lab,W,pp,Table)
-
-if nargin < 4,
-  pp = [];
-end
-
-if nargin < 5,
-  Table = 1;
-end
+function [void] = zClusterGraph(D,Lab,W,pp)
 
 % ----------------------------------------- Cluster analysis
 
@@ -26,7 +18,7 @@ Z = linkage(Y,'average');                      % compute cluster tree
 DD = full(D);
 p = zOrderGroups(Y,Z,DD);               % put instances in order
 
-if ~isempty(pp),
+if nargin == 4,
   p = pp;                               % use user-supplied ordering
 end
 
@@ -39,32 +31,28 @@ end
 
 [s,t] = size(DDD);
 
-if Table == 1,
-  fprintf('                      ');
-  for j=1:t,
-    w = min(length(Lab{p(j)}), W);
-    fprintf('%6s', Lab{p(j)}(1:w));
-  end
-  fprintf('\n');
-  for i=1:s,
-    fprintf('%24s ', Lab{p(i)});
-    for j= 1:t,
-      fprintf('%5.2f ', DDD(i,j));
-    end
-    fprintf('\n');
+fprintf('                      ');
+for j=1:t,
+  w = min(length(Lab{p(j)}), W);
+  fprintf('%6s', Lab{p(j)}(1:w));
+end
+fprintf('\n');
+for i=1:s,
+  fprintf('%24s ', Lab{p(i)});
+  for j= 1:t,
+    fprintf('%5.2f ', DDD(i,j));
   end
   fprintf('\n');
 end
+fprintf('\n');
 
 % ------------------------------------------ Display graph of isodiscrepancies
 
-DDDD = zeros(s+1,t+1);           % pad with zeros
+DDDD = zeros(s+1,t+1);
 DDDD(1:s,1:t) = DDD;
-
+figure
 pcolor(DDDD)
-
 %pcolor(2*floor(DDDD/2))
-
 shading flat
 axis ij
 view(2)
@@ -81,16 +69,13 @@ for i = 1:t,
   SSLab{i} = Lab{i}(1:W(2));
 end
 
-if length(Lab) < 20,
-  FS = 12;
-elseif length(Lab) < 50,
+FS = 12;
+if length(Lab) > 20,
   FS = 8;
-elseif length(Lab) < 80,
+elseif length(Lab) > 50,
   FS = 4;
-elseif length(Lab) < 100,
+elseif length(Lab) > 100,
   FS = 3;
-else
-  FS = 2;
 end
 
 set(gca,'XTick',(1:s)+0.5)

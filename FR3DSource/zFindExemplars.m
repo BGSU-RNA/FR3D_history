@@ -3,9 +3,9 @@
 % Pair codes:  1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
 
 pcodes = [6 7 13 14 15];
-pcodes = [1 5 6 7 9 11 13 14 15 16];    % pair codes to work on
-
 pcodes = [6 14 15 16];
+pcodes = 13;
+pcodes = [1 5 6 7 9 11 13 14 15 16];    % pair codes to work on
 
 LMax = 500;                % maximum number of pairs to consider in each class
 
@@ -26,11 +26,12 @@ Pairs{16} = 'UU';
 
 if ~exist('File'),                           % if no molecule data is loaded,
   [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0);   % load PDB data
+  File = File(SIndex);
 else
   [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,File); % add PDB data if needed
+  File = File(SIndex);
 end                       
                           % must load full .mat files!
-File = File(SIndex);
 
 if ~exist('ExtraFile'),                           % if no molecule data is loaded,
   [ExtraFile,SIndex] = zAddNTData('ExtraInstance_list',0);   % load PDB data
@@ -47,6 +48,14 @@ else
 end                       
 
 ModelFile = ModelFile(SIndex);
+
+if ~exist('CuratedFile'),                           % if no molecule data is loaded,
+  [CuratedFile,SIndex] = zAddNTData('Curated_list',0);   % load PDB data
+else
+  [CuratedFile,SIndex] = zAddNTData('Curated_list',0,CuratedFile); % add PDB data if needed
+end                       
+
+CuratedFile = CuratedFile(SIndex);
 
 % specify parameters for viewing -------------------------------------------
 
@@ -100,6 +109,8 @@ for j = 1:length(pcodes),            % run through all pair codes specified
 
   if length(SP) > 0,               % instances of this category are found
 
+    fprintf('Found %4d instances of %2s %4s class %5.1f', length(SP), Pairs{pc}, zEdgeText(CLE(row),1,pc), CLE(row));
+
     L = min(LMax,length(SP));      % Limit the number of pairs to consider
     PD = zeros(L,L);
     for k = 1:L,                   % Very slow nested loop
@@ -117,8 +128,6 @@ for j = 1:length(pcodes),            % run through all pair codes specified
 
     PD = sqrt(PD)/2;            % finish discrepancy calculation
 
-    fprintf('Found %4d instances of %2s %4s class %5.1f', length(SP), Pairs{pc}, zEdgeText(CLE(row),1,pc), CLE(row));
-
     bigm = max(max(PD));
     if bigm > 1,
       fprintf('%6.2f maximum pair discrepancy\n',bigm);
@@ -127,6 +136,9 @@ for j = 1:length(pcodes),            % run through all pair codes specified
     end
 
     PD = PD + PD';
+
+SPIN_comparison(PD);
+
     rs = sum(PD);
     [y,i] = sort(rs);
 
@@ -198,8 +210,8 @@ for j = 1:length(pcodes),            % run through all pair codes specified
     Exemplar(row,pc).LDiscCutoff  = Inf;
   end 
 
-  save(['FR3DSource' filesep 'PairExemplars'],'Exemplar'); % Matlab version 7 only
-  save PairExemplars_Version_6.mat Exemplar -V6 % for compatibility with older versions
+%  save(['FR3DSource' filesep 'PairExemplars'],'Exemplar'); % Matlab version 7 only
+%  save PairExemplars_Version_6.mat Exemplar -V6 % for compatibility with older versions
 
  end
 end

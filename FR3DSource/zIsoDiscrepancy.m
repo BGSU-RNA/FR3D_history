@@ -1,6 +1,6 @@
 % zIsoDiscrepancy(M1,M2,N1,N2) calculates the isodiscrepancy between the pairs represented by nucleotides M1,M2 and N1,N2
 
-function [d] = zIsoDiscrepancy(M1,M2,N1,N2)
+function [d,ang,t1,t2,cp] = zIsoDiscrepancy(M1,M2,N1,N2)
 
     R1 = M2.Rot' * M1.Rot;
     R2 = N1.Rot' * N2.Rot;
@@ -15,4 +15,5 @@ function [d] = zIsoDiscrepancy(M1,M2,N1,N2)
 
     % calculate isodiscrepancy
 
+%    d = sqrt((4*ang)^2 + (t1*t1' + t2*t2')/2 + (2*cp)^2);
     d = sqrt((4*ang)^2 + (t1*t1' + t2*t2')/2 + (3*cp)^2);

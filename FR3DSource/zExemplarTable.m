@@ -52,7 +52,7 @@ for c1 = 1:4,
     if ~isempty(E.NT1),                    % non-empty entry of Exemplar
     if  any(abs(E.Class) == Category) || ...
        (any(fix(abs(E.Class)) == Category) && (Subcat == 1)),
-    if (E.Count >= 1),
+    if (E.Count >= 0),
     
       [B,Lab,Cat] = AddExemplar(E,B,Lab,Cat,Subcat);
 
@@ -235,7 +235,7 @@ end
 % ------------------------------------------ Print table of isodiscrepancies
 % ------------------------------------------ Display graph of isodiscrepancies
 
-zClusterGraph(D, Lab, [5 2]);
+zClusterGraph(D, Lab, [12 2], [], 0);
 
 Title = [];
 for i = 1:length(Category),
@@ -456,7 +456,7 @@ zExemplarTable(10,3.5,0,0);
 zExemplarTable(11,3.5,0,0);
 zExemplarTable(12,3.5,0,0);
 zExemplarTable(13,3.5,0,0);
-zExemplarTable([1:12],3.5,0);
+zExemplarTable([1:12],3.5,0,0);
 zExemplarTable([1 5],3.5,0);
 zExemplarTable(1:6,3.5,0);
 zExemplarTable(7:12,3.5,0);
@@ -494,7 +494,9 @@ if ~isfield(E,'original'),
   E.original = 1;
 end
 
+ic = zIsostericSubgroups(E.NT1.Code,E.NT2.Code,abs(E.Class));
+
 B(m) = E;                    % store this exemplar for isodisc calc
-Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
+Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' ic sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
 Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
 
