@@ -43,6 +43,6 @@ end
 kk = Node(1).JunctionDeletion;
 kk = [kk abs(kk)];
 [y,i] = sortrows(kk,2);
-for i = 1:length(kk),
+for i = 1:length(kk(:,1)),
   fprintf('Removed a %4s basepair across a junction.\n', zEdgeText(kk(i,1)));
 end

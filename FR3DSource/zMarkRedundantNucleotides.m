@@ -57,8 +57,15 @@ for f = 1:length(File),
 
           c = find(abs(A) <= 0.8);              % reasonably similar bases
 
+          if Verbose > 2,
+            fprintf('\n%s\n%s\n\n', bases{u}(a), bases{v}(b));
+
+            fprintf('%s\n%s\n', bases{u}(a(c)), bases{v}(b(c)));
+          end
+
           if length(c) > 2 && length(c) > length(a)/2, 
             [Disc,R,MM,CM,A] = xDiscrepancy(File(f),indic{u}(a(c)),File(f),indic{v}(b(c)));
+
 
             E = eye(length(c),length(c));
 
@@ -69,6 +76,7 @@ for f = 1:length(File),
               if Verbose > 0,
                 fprintf('%c%c ', U(u), U(v));
               end
+
             end
           end
         end
@@ -87,7 +95,6 @@ for f = 1:length(File),
       clf
       spy(File(f).Redundant)
       drawnow
-      pause
     end
 
   else

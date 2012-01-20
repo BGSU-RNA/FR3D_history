@@ -140,8 +140,6 @@ axis off
 text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 
 
-if View(7) > 0,
-
 % Color = (B==1).*(C==0) + 2*(B>1).*(B<13).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 13) .*(C>0) + 5*(B > 20) .* (B < 25);
 
 
@@ -157,6 +155,8 @@ if View(7) > 0,
   Tally(1,5) = stack;
   bph = length(find(c == 6));
   Tally(1,6) = bph;
+
+if View(7) > 0,
 
   if View(1) > 0,
     text(-1.3,-1.4,['Dark blue chords indicate the ' num2str(cww) ' nested Watson-Crick basepairs']);

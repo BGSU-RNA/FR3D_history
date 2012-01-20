@@ -33,7 +33,7 @@ SugarReorder = [10 11 12 9 8 6 7 4 5 2 3 1];
 
   for k = 1:min(12,length(NT.Sugar(:,1))),         % loop through sugar atoms
     j = SugarReorder(k);
-    fprintf(fid, 'ATOM  %5d', a);
+    fprintf(fid, 'ATOM %6d', a);
     fprintf(fid,' %3s', S{j});
     fprintf(fid, '   %1s', NT.Base);
     fprintf(fid, ' %1s', NT.Chain);
@@ -47,7 +47,7 @@ SugarReorder = [10 11 12 9 8 6 7 4 5 2 3 1];
   end
   for j = 1:Lim(2,NT.Code),                    % loop through base atoms and H
     if j ~= Lim(3,NT.Code),
-      fprintf(fid, 'ATOM  %5d', a);
+      fprintf(fid, 'ATOM %6d', a);
       switch NT.Code,
         case 1, fprintf(fid,' %3s', A{j});
         case 2, fprintf(fid,' %3s', C{j});

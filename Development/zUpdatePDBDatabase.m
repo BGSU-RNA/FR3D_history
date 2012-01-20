@@ -89,10 +89,28 @@ for i = 1:length(t(:,1)),
     E  = abs(triu(File.Edge));
     n(i,3) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
 
-    [F,LC] = zMarkRedundantChains(File,Verbose);  % find redundant chains
+    if length(File.NT) > 0,
+     Chain = cat(2,File.NT.Chain);              % all chain identifiers
+     U = unique(Chain);                            % unique chain identifiers
 
-    j = find(cat(2,File.NT.Chain) == LC{1});    % indices of longest chain
-    t{i,11} = cat(2,File.NT(j).Base);        % bases in largest chain
+     if length(U) > 1,                             % more than one chain
+
+       maxleng = 0;                                % current max chain length
+
+       for u = 1:length(U),                        % loop through chains
+        j = find(Chain == U(u));                  % indices of this chain
+        if length(j) > maxleng,
+          jj = j;
+          maxleng = length(j);
+        end
+       end
+
+     else
+        jj = 1:length(File.NT);
+     end
+    end
+
+    t{i,11} = cat(2,File.NT(jj).Base);           % bases in largest chain
 
     if Verbose > 0,
       fprintf('All      %s\n',cat(2,File.NT.Base));

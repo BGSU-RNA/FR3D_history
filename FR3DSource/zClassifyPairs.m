@@ -8,6 +8,12 @@ if isfield(File,'Pair'),
   File = rmfield(File,'Pair');                  % remove previous pair info
 end
 
+if isempty(File.Distance),
+  c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+  File.Distance = zMutualDistance(c,16); % compute distances < 16 Angstroms
+end
+
+
 if nargin < 2,
   Verbose = 1;
 end

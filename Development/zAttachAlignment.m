@@ -2,7 +2,7 @@
 
 function [File] = zAttachAlignment(File,Verbose)
 
-[n,t,r] = xlsread('Alignments\StructureToAlignmentMap.xls');
+[n,t,r] = xlsread(['Alignments' filesep 'StructureToAlignmentMap.xls']);
 
 for f = 1:length(File),
   p = find(ismember(upper(t(:,1)),upper(File(f).Filename)));  % find line(s)

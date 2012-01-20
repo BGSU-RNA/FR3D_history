@@ -12,7 +12,7 @@ end
 
 method          = 4;             % method for assigning pair subst probs
 Extension       = 1;             % whether to extend stems with no LR inter
-AdjustSubsForLR = 1;             % adjust basepair subs probs for LR inter
+AdjustSubsForLR = 1;             % adjust ins, basepair subs probs for LR inter
 cdepth          = 10;            % how far to look ahead for a cluster
 jcdepth         = 4;             % how far to look for a junction cluster
 
@@ -92,6 +92,14 @@ elseif strcmp(class(LastNTNumber),'cell'),
 elseif strcmp(class(LastNTNumber),'char'),
   LastNTNumber = zIndexLookup(File,{LastNTNumber});
 end
+
+
+
+%NTNumber
+%LastNTNumber
+%full(File.Edge(NTNumber:(NTNumber+10),(LastNTNumber-10):LastNTNumber))
+
+
 
 % ------------------------------------------ Store indices of interacting bases
 

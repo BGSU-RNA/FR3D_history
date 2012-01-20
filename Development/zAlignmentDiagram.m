@@ -8,6 +8,9 @@ end
 
 % ----------- Make functions from File indices to rows of the alignment
 % R1 is a function from the indices of File(1) to the row of the alignment
+% Needed to represent the circular diagrams for the two structures in
+% the same way, putting aligned nucleotides in the same places around the
+% circle
 
 clear R1 R2
 
@@ -135,7 +138,9 @@ if Verbose > 0,
 
   Comp.BasePhosphate  = Comp.BasePhosphate .* (BP1 == BP2);
 
-  Tally = zCircularDiagram(Comp,thickness,ViewList);
+  Tally = zTallyInteractions(Comp);
+
+  zCircularDiagram(Comp,thickness,ViewList);
   saveas(gcf,[NewFile(2).Filename '-' NewFile(1).Filename '_alignment_conserved.pdf'],'pdf');
 
   % ------------------------------------ Show interactions in File(1) also in 2
@@ -163,13 +168,14 @@ if Verbose > 0,
 
 else
 
-  ViewList = [0 0 0 0 0 0 1 0 0];
+%  Tally = zTallyInteractions(File,Aligned1,Aligned2,Verbose);
 
   Comp = NewFile(2);
   Comp.Filename = [Comp.Filename ' inferred from ' NewFile(1).Filename];
   Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) == fix(abs(NewFile(2).Edge)));
   Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) == fix(abs(NewFile(2).BasePhosphate/100)));
-  Tally = zCircularDiagram(Comp,thickness,ViewList);
+
+  Tally = zTallyInteractions(Comp);
 
 end
 

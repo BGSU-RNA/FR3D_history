@@ -1,13 +1,19 @@
-% probe for insertions on left and right strands
+% probe for insertions on left and right strands, set insertion probabilities
 
-aa = a;                                 % initial values of these
+
+
+  Node(n).newfield = 'hello';
+
+
+
+
+aa = a;                                  % initial values of these
 BB = B;
-
-% ['Top ' File.NT(a).Number ' ' File.NT(B).Number]
 
 LeftIns  = 0;                            % number of insertions on the left
 RightIns = 0;                            % number of insertions on the right
 
+% ---------------------------------------- Carefully written probing algorithm!
 % ---------------------------------------- Easy insertions on the left
 
 while sum(sum(G(a,a:B))) == 0,          % a makes no interactions w/in loop
@@ -33,10 +39,10 @@ end
 % ---------------------------------------- a interacts, but skip anyway?
 
 aaa = min([length(File.NT) a+cdepth floor((a+B)/2)]);
-LS  = (a+1):aaa;                        % left strand not including a
+LS  = (a+1):aaa;                           % left strand not including a
 BBB = max([1 B-cdepth floor((a+B)/2)+1]);  % how far down right strand to look
-RS  = BBB:B;                            % right strand including B
-aB  = a:B;                              % indices from a to B
+RS  = BBB:B;                               % right strand including B
+aB  = a:B;                                 % indices from a to B
 na  = find(H(a,aB));                       % nested interaction(s) a makes
 nB  = find(H(B,aB));                       % nested interaction(s) B makes
 
@@ -51,8 +57,10 @@ elseif sum(sum(H((a+1):aB(max(na)),(a+1):(aB(max(na)))))) > 0, %
 %  disp('Found that the interaction a makes contains a stem');
 elseif ~isempty(nB),                        % B makes a nested interaction
   if min(abs(nonzeros(G(a,aB(na))))) < min(abs(nonzeros(G(B,aB(nB))))),
-    movea = 0;
+    movea = 0;                              % a makes a more important one
 %    disp('Both a and B make nested interactions, but a makes a more important one');
+  else
+    movea = 1;                              % B makes a more important one
   end
 elseif any(abs(G(a,aB(na)))==1),
   movea = 0;
@@ -182,43 +190,109 @@ end
 
 %['Moved B ' File.NT(a).Number ' ' File.NT(B).Number]
 
+% ---------------------------------------------- Set insertion parameters
+
+uniform = [1 1 1 1]'/4;
  
 if strcmp(Node(n).type,'Basepair'),   % add insertions to basepair
-  Node(n).lpar = (0.01+LeftIns)  * [ones(16,1); 0];
-  Node(n).rpar = (0.01+RightIns) * [ones(16,1); 0];
-  Node(n).leftLengthDist  = subPoisson(0.01+LeftIns);
-  Node(n).leftLetterDist  = [0.25 0.25 0.25 0.25];
-  Node(n).rightLengthDist = subPoisson(0.01+RightIns); 
-  Node(n).rightLetterDist = [0.25 0.25 0.25 0.25];
+  i1 = Node(n).LeftIndex+1;           % index of first inserted base on left
+  LeftCodes = cat(2,File.NT(i1:(a-1)).Code);
+  ID = pMakeNodesInsertionDist(LeftCodes,'Basepair');
+  if length(LeftCodes) == 1 && AdjustSubsForLR == 1,  % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method); % adjust for LR basepairs
+    ID.LetterDist = R;
+  end
+
+  Node(n).leftLengthDist  = ID.LengthDist;
+  Node(n).leftLetterDist  = ID.LetterDist;
+
+if length(LeftCodes) > 0,
+fprintf('pMakeNodesProbeForInsertions:  LeftIns %d  length(LeftCodes) %d\n', LeftIns, length(LeftCodes));
+ID.LengthDist
+ID.LetterDist
+end
+
+  i1 = Node(n).RightIndex-1;           % index of first inserted base on right
+  RightCodes = cat(2,File.NT((B+1):(Node(n).RightIndex-1)).Code);
+  ID = pMakeNodesInsertionDist(RightCodes,'Basepair');
+  if length(RightCodes) == 1 && AdjustSubsForLR == 1, % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method); % adjust for LR basepairs
+    ID.LetterDist = R;
+disp('Adjusted for LR interactions');
+  end
+  Node(n).rightLengthDist = ID.LengthDist; 
+  Node(n).rightLetterDist = ID.LetterDist;
+
+
+if length(RightCodes) > 0,
+fprintf('pMakeNodesProbeForInsertions:  RightIns %d  length(RightCodes) %d\n', RightIns, length(RightCodes));
+ID.LengthDist
+ID.LetterDist
+end
+
   Node(n).LeftLetter  = [Node(n).LeftLetter cat(2,File.NT((Node(n).LeftIndex+1):(a-1)).Base)];
   Node(n).RightLetter = [cat(2,File.NT((B+1):(Node(n).RightIndex-1)).Base) Node(n).RightLetter];
 
+% ----------------------------------------------- Insertions for Initial node
+
 elseif strcmp(Node(n).type,'Initial'),
-  Node(n).lpar            = 0.01+LeftIns;       % left insertion parameter
-  Node(n).rpar            = 0.01+RightIns;      % right insertion parameter
-  Node(n).leftLengthDist  = subPoisson(Node(n).lpar);
-  Node(n).leftLetterDist  = [0.25 0.25 0.25 0.25];
-  Node(n).rightLengthDist = subPoisson(Node(n).rpar); 
-  Node(n).rightLetterDist = [0.25 0.25 0.25 0.25];
+  i1 = Node(n).LeftIndex;               % index of first inserted base on left
+  LeftCodes = cat(2,File.NT(i1:(a-1)).Code);
+  ID = pMakeNodesInsertionDist(LeftCodes,'Initial');
+  if length(LeftCodes) == 1 && AdjustSubsForLR == 1,  % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method);% adjust for LR basepairs
+    ID.LetterDist = R;
+  end
+  Node(n).leftLengthDist  = ID.LengthDist;
+  Node(n).leftLetterDist  = ID.LetterDist;
+
+  i1 = Node(n).RightIndex;           % index of first inserted base on right
+  RightCodes = cat(2,File.NT((B+1):i1).Code);
+  ID = pMakeNodesInsertionDist(RightCodes,'Initial');
+  if length(RightCodes) == 1 && AdjustSubsForLR == 1, % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method); % adjust for LR basepairs
+    ID.LetterDist = R;
+  end
+  Node(n).rightLengthDist = ID.LengthDist; 
+  Node(n).rightLetterDist = ID.LetterDist;
 
   Node(n).LeftLetter  = cat(2,File.NT(Node(n).LeftIndex:(a-1)).Base);
   Node(n).RightLetter = cat(2,File.NT((B+1):Node(n).RightIndex).Base);
+
+% ----------------------------------------------- Insertion node after cluster
 
 elseif strcmp(Node(n).type,'Cluster') && (LeftIns > 0 || RightIns > 0),
   n = n + 1;                          % initial node after cluster
   Node(n).type = 'Initial';
   Node(n).nextnode  = n+1;            % index of next node in tree
-  Node(n).lpar = LeftIns;
-  Node(n).rpar = RightIns;
   Node(n).LeftIndex  = aa;
   Node(n).RightIndex = BB;
   Node(n).LeftLetter  = cat(2,File.NT(aa:(aa+LeftIns-1)).Base);
   Node(n).RightLetter = cat(2,File.NT((BB-RightIns+1):BB).Base);
-  Node(n).leftLengthDist  = subPoisson(Node(n).lpar);
-  Node(n).leftLetterDist  = [0.25 0.25 0.25 0.25];
-  Node(n).rightLengthDist = subPoisson(Node(n).rpar); 
-  Node(n).rightLetterDist = [0.25 0.25 0.25 0.25];
+
+  i1 = Node(n).LeftIndex;               % index of first inserted base on left
+  LeftCodes = cat(2,File.NT(i1:(i1+LeftIns-1)).Code);
+  ID = pMakeNodesInsertionDist(LeftCodes,'Initial');
+  if length(LeftCodes) == 1 && AdjustSubsForLR == 1,  % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method);% adjust for LR basepairs
+    ID.LetterDist = R;
+  end
+  Node(n).leftLengthDist  = ID.LengthDist;
+  Node(n).leftLetterDist  = ID.LetterDist;
+
+  i1 = Node(n).RightIndex;           % index of first inserted base on right
+  RightCodes = cat(2,File.NT((BB-RightIns+1):i1).Code);
+  ID = pMakeNodesInsertionDist(RightCodes,'Initial');
+  if length(RightCodes) == 1 && AdjustSubsForLR == 1, % exactly one insertion
+    R = pAdjustSubsProb(File,i1,[],uniform,method); % adjust for LR basepairs
+    ID.LetterDist = R;
+  end
+  Node(n).rightLengthDist = ID.LengthDist; 
+  Node(n).rightLetterDist = ID.LetterDist;
+
 end
+
+% ---------------------------------------------- Add comments for initial node
 
 if strcmp(Node(n).type,'Initial'),
   Node(n).Comment = [' // Initial node ' File.NT(aa).Base File.NT(aa).Number ' - ' File.NT(BB).Base File.NT(BB).Number ' from junction ' Node(n).id];

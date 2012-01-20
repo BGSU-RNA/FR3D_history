@@ -1,11 +1,13 @@
-% This function write rudimentary colors at the end of a PDB file
+% This function writes rudimentary colors at the end of a PDB file
 
 % Numbers is an nx1 vector telling how many nucleotides get each color
-% Colors is a nx3 matrix of color specifiers
+% Colors is an nx3 matrix of color specifiers
 
-function [void] = nWriteColorInformation(fid,Numbers,Colors)
+function [void] = zWriteColorInformation(fid,Numbers,Colors)
 
 C = [];
+
+% distribute colors across different numbers
 
 for a = 1:length(Numbers),
   C = [C; ones(Numbers(a),1)*Colors(a,:)];

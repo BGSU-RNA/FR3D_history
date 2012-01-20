@@ -1,8 +1,8 @@
 
 WhatToWrite = [0 1 0 0 0];           % which pieces to write right now
-WhatToWrite = [1 1 1 1 1];           % which pieces to write right now
 WhatToWrite = [1 0 0 0 0];           % which pieces to write right now
 WhatToWrite = [0 2 0 0 0];           % which pieces to write right now
+WhatToWrite = [1 1 1 1 0];           % which pieces to write right now
 
 % WhatToWrite(1)  - html pages
 % WhatToWrite(2)  - circular diagram

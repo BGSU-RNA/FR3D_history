@@ -1,8 +1,6 @@
 
 Node(n).type      = '';             % node type
 Node(n).nextnode  = 0;                   % index of next node in tree
-Node(n).lpar      = 0;                  % left insertion parameter
-Node(n).rpar      = 0;                  % right insertion parameter
 Node(n).LeftIndex = 1;
 Node(n).RightIndex= 1;
 Node(n).Insertion = [];                    % make sure this field exists

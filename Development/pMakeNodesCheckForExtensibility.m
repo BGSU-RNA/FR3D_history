@@ -4,7 +4,9 @@ Outside = [1:(a-1) (B+1):length(File.NT)];
 
 if sum(sum(J(a:B,Outside))) == 0 && ... % no tertiary inter outside this stem
    sum(sum(File.BasePhosphate(a:B,Outside)>0)) == 0 && ... % no BPh either
-   sum(HasGUPacking(a:B)) == 0,
+   sum(HasGUPacking(a:B)) == 0 && ...
+   (~strcmp(File.Filename,'2J01') || (a > 2842)) && ...
+   (~strcmp(File.Filename,'2AW4') || (a > 69)),
 
   if TertiaryFreeNode == 0,              % only mark the first one
     TertiaryFreeNode = n;                

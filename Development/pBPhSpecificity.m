@@ -1,3 +1,4 @@
+% pBPhSpecificity(bph,bp) returns a 4x1 probability distribution over ACGU telling how likely each of these is, given that the nucleotide makes BPh interaction with FR3D code bph.  If the nucleotide is part of a basepair, set bp = 1; some day we can calculate Q differently in this case
 
 function [Q] = pBPhSpecificity(bph,bp)
 

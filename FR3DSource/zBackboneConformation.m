@@ -11,7 +11,7 @@ if exist('chiropraxis.jar') == 2 ...       % if chiropraxis is here
    && File.NumNT > 1 ...                   % and there is more than one NT
    && exist(File.PDBFilename) == 2,        % and the PDB file is available
 
-  d = which([File.Filename '.pdb1']);
+  d = which(File.PDBFilename);
   e = which('chiropraxis.jar');
   g = which('suitename.0.3.070628.win.exe');
 

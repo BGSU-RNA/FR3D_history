@@ -283,6 +283,8 @@ for f = 1:length(File),
 
   fclose(fid);
 
+datapath
+
   fid = fopen([datapath FN '_interactions_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
   fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');

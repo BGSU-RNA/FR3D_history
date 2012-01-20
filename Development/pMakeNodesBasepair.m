@@ -23,7 +23,9 @@ Node(1).Edge(a,B) = File.Edge(a,B);      % store this interaction
 
 L = Node(n).lpar(1,1);
 R = Node(n).rpar(1,1);
-X = 0:10;     
+
+X = 0:10;                                % 0 to 10 insertions after a basepair
+
 Node(n).Z = sum(L.^X*exp(-L)./factorial(X)) ...
           * sum(R.^X*exp(-R)./factorial(X));
 

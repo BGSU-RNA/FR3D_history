@@ -11,8 +11,6 @@
 
 function [File] = zAlignToFASTA(File,Chain,FASTA,Entry,Verbose)
 
-File.Filename
-
 if nargin < 5,
   Verbose = 0;
 end
@@ -85,7 +83,7 @@ end
   d = 2;
 %  [matches,align1,align2,s1,s2] = dNeedlemanWunsch(StructureSequence,FASTA(Entry).Sequence,p,d);
 
-  [matches,align1,align2,s1,s2] = zNeedlemanWunsch(StructureSequence,FASTA(Entry).Sequence);
+  [matches,align1,align2,s1,s2] = zNeedlemanWunsch(StructureSequence,FASTA(Entry).Sequence,8,4);
 
   k = double(FASTA(Entry).Aligned ~= '-');            % 1 if not a gap
   m = cumsum(k);
@@ -137,18 +135,21 @@ end
     fprintf('\n');
     fprintf('Structure: %s\n', c);
     fprintf('Alignment: %s\n', d);
+
+    % show all columns of Entry from alignment, with nucleotides from 3D struct
+
+    for i = 1:length(FASTA(Entry).Aligned),
+      StructAligned(i) = '-';
+    end
+
+    for i = 1:length(FastaCol),
+      StructAligned(FastaCol(i)) = StructureSequence(i);
+    end
+
+    i = find( (StructAligned ~= '-') + (FASTA(Entry).Aligned ~= '-'));
+
+    fprintf('\n');
+    fprintf('Structure: %s\n', StructAligned(i));
+    fprintf('Alignment: %s\n', FASTA(Entry).Aligned(i));
   end
 
-return
-
-
-
-% check:
-
-F = File(2);
-
-
-
-for i = 1:length(FASTA),
-  fprintf('%d %s\n', i, FASTA(i).Header);
-end

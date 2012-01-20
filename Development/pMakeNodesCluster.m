@@ -141,18 +141,28 @@ Node(n).Right(1,:) = ztyt;                  % which bases interact
 Node(n).PIns = [0.00001 0.99999];           % when no previous state
 Node(n).P    = ones(17,1) * Node(n).PIns;
 
-% create a list of insertions according to what is observed here
+% ------------- create a list of insertions according to what is observed here
 
 e = [Node(n).Left(1,:) Node(n).Left(1,end)+Node(n).Right(1,:)];
-                                            % bases used, left to right
+                                        % indices of bases used, left to right
 
 d = diff(e);                                % diffs in positions used
 h = find(d>1);                              % where insertions occur
-cc = 1;
-for aaa = 1:length(h),
+cc = 1;                                     % counter for insertions
+for aaa = 1:length(h),                      % loop through insertions
   Node(n).Insertion(cc).Position = h(aaa);
-  Node(n).Insertion(cc).LengthDist = subPoisson(d(h(aaa))-1);
-  Node(n).Insertion(cc).LetterDist = [1 1 1 1]/4;  % WRONG!!
+
+  ID = pMakeNodesInsertionDist(cat(2,File.NT(AllIndices(h(aaa)+1):AllIndices(h(aaa)+d(h(aaa))-1)).Code));
+
+  if d(aaa) == 2,                           % exactly one insertion
+disp('Checking for interactions made by single inserted base');
+    R = pAdjustSubsProb(File,AllIndices(h(aaa)+1),[],ID.LetterDist,[]);
+  end
+
+  Node(n).Insertion(cc).LengthDist = ID.LengthDist;
+  Node(n).Insertion(cc).LetterDist = ID.LetterDist;
+
+  
 
   Node(n).InsertionComment{aaa} = [' // Insertion between ' File.NT(AllIndices(h(aaa))).Base File.NT(AllIndices(h(aaa))).Number ' and ' File.NT(AllIndices(h(aaa)+d(h(aaa)))).Base File.NT(AllIndices(h(aaa)+d(h(aaa)))).Number];
 

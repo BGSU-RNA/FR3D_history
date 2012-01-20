@@ -9,7 +9,7 @@
 
 % File = zAttachAlignment(File,1);
 
-% incorporate Jesse's list of bases near a protein (for some files)
+% ---------- incorporate Jesse's list of bases near a protein (for some files)
 
 for f = 1:length(File),
   for i = 1:length(File(f).NT),
@@ -37,7 +37,21 @@ for f = 1:length(File),
   end
 end
 
+% ----------------------------------------------- Determine center of PDB file
+
+% E coli: (2avy, 2aw4)
+moleculecenter = [24.1858  157.7919 -120.8290];
+
+% T.th: (2j01, 2j00, not 1j5e)
+
+% moleculecenter = [-27.9808  118.6233  138.5073];
+
 for f = 1:length(File),
+
+% centers = cat(1,File(f).NT.Center);
+% moleculecenter = mean(centers);
+
+
  chain = cat(1,File(f).NT.Chain);
  ch = unique(chain);
  for u = 1:length(ch),
@@ -82,7 +96,7 @@ for f = 1:length(File),
 
 %      Data(7) = sum(fasta == File(f).NT(i).Base) / total; % conservation %
 
-
+      Data(8) = norm(moleculecenter - File(f).NT(i).Center);
 
       fprintf(fid,'%5d %1s %8s %5d %2d %2d %2d %2d %2d %2c\n', c, File(f).NT(i).Base, File(f).NT(i).Number, i, Data(1), Data(2), Data(3), Data(4), Data(5), File(f).NT(i).BaseProtein);
 
