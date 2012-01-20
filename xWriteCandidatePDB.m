@@ -2,7 +2,9 @@
 % Search, in which each candidate is present, translated from the previous
 % one by 20 Angstroms
 
-function [void] = xWriteCandidatePDB(File,Search)
+function [void] = xWriteCandidatePDB(Search)
+
+File = Search.File;
 
 N = Search.Query.NumNT;                        % number of nucleotides in each
 
@@ -37,7 +39,7 @@ for c = 1:M,                                   % loop through candidates
 
  for i = 1:N,                                  % loop through nucleotides
   NT = Cand(i);                                % current nucleotide
-  a = zWriteNucleotidePDB(fid,NT,a,R,Sh,c)
+  a = zWriteNucleotidePDB(fid,NT,a,R,Sh,c);
  end
 end
 

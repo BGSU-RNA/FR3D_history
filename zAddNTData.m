@@ -9,6 +9,16 @@ if nargin < 2,
   SizeCode = 1;                           % default is to read full files
 end
 
+LoadedFiles = [];
+F = 0;
+
+if nargin == 3,
+  F = length(File);
+  for j = 1:length(File),
+    LoadedFiles{j} = lower(File(j).Filename);
+  end
+end
+
 if SizeCode == 0,
   SizeCode = 1;
 end
@@ -29,39 +39,31 @@ end
 
 if length(FullList) > 0,
 
-for f = 1:length(FullList),
-  FL{f} = lower(FullList{f});
-  FirstOccurence(f) = isempty(strmatch(FL{f},FL(1:(f-1)),'exact'));
+for f = 1:length(FullList),                       % loop through PDB list
+  if ~isempty(FullList{f}),
+    i = strmatch(lower(FullList{f}), LoadedFiles, 'exact');
+    if isempty(i),                                  % if PDB not loaded,
+      File(F+1) = zGetNTData(FullList{f},0,SizeCode); %   load it
+      F = length(File);
+      k = length(LoadedFiles);
+      LoadedFiles{k+1} = FullList{f};
+      Index(f) = F;                           %   point to it
+    else                                      % but if PDB has been loaded
+      Index(f) = i(1);                        %   point to first instance
+      if length(File(i(1)).NT) == 0,
+        File(Index(f)) = zGetNTData(File(Index(f)).Filename,0,SizeCode);
+      end
+    end
+  end
 end
 
-FullList = FullList(find(FirstOccurence)); % remove multiple instances
-
-JustRead = 0;
-
-if nargin < 3,                            % no data already loaded
-  File = zGetNTData(FullList{1},0,SizeCode);
-  JustRead = 1;
-  Index(1) = 1;
-end
-
-for j = 1:length(File),
-  LoadedFiles{j} = lower(File(j).Filename);
-end
-
+% -----------------------------------  allow for File(Index)
 F = length(File);
 
-for f = 1:length(FullList),                       % loop through PDB list
-  i = strmatch(lower(FullList{f}), LoadedFiles, 'exact');
-  if isempty(i),                                  % if PDB not loaded,
-    File(F+1) = zGetNTData(FullList{f},0,SizeCode); %   load it
-    F = length(File);
-    LoadedFiles = [LoadedFiles FullList{f}];
-    Index(f) = F;                                 %   point to it
-  else                                            % but if PDB has been loaded
-    Index(f) = i(1);                              %   point to first instance
-    if length(File(i(1)).NT) == 0,
-      File(Index(f)) = zGetNTData(File(Index(f)).Filename,0,SizeCode);
-    end
+for i = 1:length(Index),             
+  if Index(i) == 0,
+    File(F+1).NumNT = 0;               % create a fictitious file
+    Index(i) = F+1;                    % point to the fictitious file
   end
 end
 

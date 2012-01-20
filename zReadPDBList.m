@@ -2,13 +2,13 @@
 
 function [NewNames] = zReadPDBList(Filename)
 
+NewNames = '';
+
 if isempty(strfind(Filename,'_list')),
   NewNames = {Filename};
 elseif strcmp(Filename,'AllFiles_list'),
   [s,NewNames] = mGetPDBFilenames;
-else
-  NewNames = [];
-
+elseif ~isempty(Filename),
   fid = fopen(['PDBFiles' filesep Filename '.pdb'],'r');
 
   if fid > 0

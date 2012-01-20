@@ -6,22 +6,20 @@
 % and after this,
 %    [Search,File] = xDisplayCandidates(File,Search);
 
-function [Search, File] = xDisplayCandidates(File,Search,Level)
-
-if isempty(File),
-  [File,SIndex] = zAddNTData(Search.Filenames,2);   % load PDB data
-  File = File(SIndex);                   % re-order file numbers
-else
-  [File,SIndex] = zAddNTData(Search.Filenames,2,File); % add PDB data if needed
-  File = File(SIndex);                   % re-order file numbers
-end
-
-fontsize = 10;                               % for nucleotide numbers
+function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull)
 
 if isempty(Search.Candidates)
   fprintf('There are no candidates to display\n');
+  File = FullFile;
   return
 end
+
+UsingFull = 0;
+File = Search.File;
+FIndex = 1:length(Search.File);
+
+fontsize = 10;                               % for nucleotide numbers
+dn = [4 4 4 4 6 6 8 8 0];                 % neighborhood setting list
 
 if nargin < 3,
   MenuTitle = 'Display options';
@@ -87,8 +85,18 @@ drawnow
 
 while stop == 0,                            
 
+  if (Level == 0),
+    if (Display(1).neighborhood == max(dn)),
+      Neighborhood = 'No Neighborhood';
+    else
+      Neighborhood = 'Larger Neighborhood';
+    end
+  else
+    Neighborhood = '';
+  end
+
   k=menu(MenuTitle,'Next candidate','Previous Candidate', ... % 1,2
-         'Add plot','Larger Neighborhood', ...                % 3,4
+         'Add plot',Neighborhood, ...                % 3,4
          'Toggle sugar','Toggle display', ...                 % 5,6
          'Mark/Unmark current','Reverse all marks', ...       % 7,8
          'Display marked only', ...                           % 9
@@ -112,10 +120,16 @@ while stop == 0,
 
   switch k                               % k is the menu choice
     case 1                                      % next plot
-      Display(i).n = min(L,Display(i).n+1);     % move to next candidate
+      Display(i).n = Display(i).n+1;            % move to next candidate
+      if Display(i).n > L,
+        Display(i).n = 1;
+      end
 
     case 2                                      % Previous Plot
-      Display(i).n = max(1,Display(i).n-1);
+      Display(i).n = Display(i).n-1;
+      if Display(i).n < 1,
+        Display(i).n = L;
+      end
 
     case 3                                      % Add plot
       Numplots = Numplots + 1;                  % increase number of windows
@@ -124,8 +138,9 @@ while stop == 0,
       figure(i);
 
     case 4                                      % toggle Neighborhood
-      dn = [4 4 4 4 6 6 8 8 0];                 % neighborhood setting list
-      Display(1).neighborhood = dn(1+Display(1).neighborhood);
+      if (Level == 0) || (UsingFull == 1),
+        Display(1).neighborhood = dn(1+Display(1).neighborhood);
+      end
 
     case 5                                      % toggle sugar
       if Display(1).superimpose == 0,
@@ -167,25 +182,25 @@ while stop == 0,
         Search2.Marked      = Search.Marked(j);
         Search2.Disc        = Search.Disc(j,j);
         Search2.DiscComputed= Search.DiscComputed(1,j);
-        xDisplayCandidates(File,Search2,Level+1);
+        xDisplayCandidates(File(FIndex),Search2,Level+1);
         Search.Disc(j,j)    = Search2.Disc;
         Search.DiscComputed(1,j) = Search2.DiscComputed;
       end
 
     case 10                                      % list on screen
-      xListCandidates(File,Search,Inf);
+      xListCandidates(Search,Inf);
 
     case 11                                     % write PDB of all
-      xWriteCandidatePDB(File,Search);
+      xWriteCandidatePDB(Search);
 
     case 12                                     % sort by centrality
-      Search = xSortByCentrality(File,Search,Level);
+      Search = xSortByCentrality(File(FIndex),Search,Level,UsingFull);
 
     case 13
-      Search = xGroupCandidates(File,Search,Level);
+      Search = xGroupCandidates(File(FIndex),Search,Level,UsingFull);
 
     case 14                                     % align
-      xAlignCandidates(File,Search,1)
+      xAlignCandidates(File(FIndex),Search,1)
 
     case 15                                     % quit Display
       if exist('fidOUT','var')
@@ -196,17 +211,23 @@ while stop == 0,
     end  % switch statement for menu
 
   if Display(i).n ~= nn,
-    DisplayTable(File,Search,Model,Display,i)
+    DisplayTable(File(FIndex),Search,Model,Display,i)
     nn = Display(i).n;
   end
 
   if any([1 2 3 7] == k),
-      PlotMotif(File,Search,Model,Display,i);
+      PlotMotif(File(FIndex),Search,Model,Display,i);
+  end
+
+  if (k == 4) && (UsingFull == 0) && (Level == 0),
+    [File,FIndex] = zAddNTData(Search.CandidateFilenames,2,FullFile);
+    FullFile = [];
+    UsingFull = 1;
   end
 
   if any([4 5 6 8] == k),
     for j=1:Numplots
-      PlotMotif(File,Search,Model,Display,j);
+      PlotMotif(File(FIndex),Search,Model,Display,j);
     end
   end
 
@@ -229,6 +250,11 @@ while stop == 0,
   drawnow
 
 end  % end while
+
+if UsingFull == 0,
+  File = FullFile;
+  FullFile = [];
+end
 
 %-------------------------------------------------------------------------
 %-------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 % xDiscrepancy(Model,Cand) calculates the discrepancy between Model and 
 % Cand, which is an array of NT's.
+% One must take the square root and divide by the number of nucleotides after.
 % As soon as the discrepancy exceeds Model.RelCutoff, the calculation stops.
 % The current sum is returned as a negative discrepancy, shifted to
 % record when the calculation stopped.

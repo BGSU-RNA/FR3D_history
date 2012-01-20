@@ -1,6 +1,6 @@
 % xGroupCandidates clusters sequences and displays groups together
 
-function [Search] = xGroupCandidates(File,Search,Level)
+function [Search] = xGroupCandidates(File,Search,Level,UsingFull)
 
 N      = Search.Query.NumNT;
 Search = xMutualDiscrepancy(File,Search);      % compute discrepancy matrix
@@ -49,19 +49,22 @@ S.Candidates   = Search.Candidates(r,:);            % re-order candidates
 S.Discrepancy  = Search.Discrepancy(r);
 S.Disc         = Search.Disc(r,r);
 S.DiscComputed = Search.Disc(1,r);
+S.File         = Search.File;
+S.CandidateFilenames = Search.CandidateFilenames;
 if isfield(Search,'AvgDisc'),
   S.AvgDisc = Search.AvgDisc(r);
 end
 
-xListCandidates(File,S,Inf);                 % show on screen
+xListCandidates(S,Inf);                 % show on screen
 
 S.Query        = Search.Query;                      % set up new "Search" data
 S.Candidates   = Search.Candidates(q,:);            % re-order candidates
 S.Discrepancy  = Search.Discrepancy(q);
 S.Disc         = Search.Disc(q,q);
 S.DiscComputed = Search.Disc(1,q);
+S.File         = Search.File;
 if isfield(Search,'AvgDisc'),
   S.AvgDisc = Search.AvgDisc(q);
 end
 
-xDisplayCandidates(File,S,Level+1);          % display, level 1
+xDisplayCandidates(File,S,Level+1,UsingFull);          % display, level 1

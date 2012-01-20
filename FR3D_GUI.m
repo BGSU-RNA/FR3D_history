@@ -101,7 +101,7 @@ varargout{1} = handles.output;
 
 function LOAD_Callback(hObject, eventdata, handles)
 
-savedf=dir(['SearchSaveFiles' filesep '*.mat']);
+savedf = dir(['SearchSaveFiles' filesep '*.mat']);
 if length(savedf) == 0,
   savedff=' ';
 else
@@ -110,12 +110,28 @@ else
   end
 end
 
-set(handles.LOAD,'String',savedff);  % Update without having to reopen GUI
+set(handles.LOAD,'String',savedff);  % Update list without having to reopen GUI
 
 v=get(handles.LOAD,'Value');
 f=savedff{v,1};
-l=strcat('SearchSaveFiles/',f);
-load(l)
+l= ['SearchSaveFiles' filesep f];      % prepend directory name
+load(l)                              % Load search data
+
+if (~isfield(Search,'File')) && (length(Search.Candidates(:,1)) > 0),
+  Search = xAddFiletoSearch([],Search);  % add candidate filenames
+
+  if isfield(handles,'File')
+    File = handles.File;
+    [File,FIndex] = zAddNTData(Search.CandidateFilenames,2,File);
+  else
+    [File,FIndex] = zAddNTData(Search.CandidateFilenames,2);
+  end
+  Search = xAddFiletoSearch(File(FIndex),Search);
+  save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
+  fprintf('Saved updated version of this search\n');
+
+  handles.File = File;
+end
 
 mSetLoadedParameters
 
@@ -153,6 +169,8 @@ function ReadQuery_Callback(hObject, eventdata, handles)
 
   if isfield(handles,'File')
     File = handles.File;
+File
+File(1)
     [File,QIndex]=zAddNTData(Query.Filename,2,File);
   else
     [File,QIndex]=zAddNTData(Query.Filename,2);
@@ -189,14 +207,21 @@ function ReadQuery_Callback(hObject, eventdata, handles)
                              % this is the text just to the left of the popups
 
     %Pass some variables created here to be used by other functions
-    handles.Indices = Indices;
-    handles.NT=Query.NTList;
     handles.Filename = Query.Filename;
     handles.File = File;
     handles.QIndex=QIndex;               % index of File for query file
-    handles.NTList=Query.NTList;
+
+    if length(Indices) > 0,
+      handles.Indices = Indices;
+      handles.NT=Query.NTList;
+      handles.NTList=Query.NTList;
+    else
+      fprintf('No query nucleotides found in the query file\n');
+    end
+
     guidata(hObject, handles);
 
+  if length(Indices) > 0 
     if get(handles.ViewQuery,'Value')==1
         figure(3)
         clf
@@ -208,12 +233,12 @@ function ReadQuery_Callback(hObject, eventdata, handles)
     set(handles.Status,'String','Choose "Query Chains" and click "Generate Interaction Matrix"');
     set(handles.GenerateMatrix,'Visible','on');
 
-set(handles.RunSearch,'Visible','off');
-set(handles.ListCandidates,'Visible','off');
-set(handles.DisplayCandidates,'Visible','off');
+    set(handles.RunSearch,'Visible','off');
+    set(handles.ListCandidates,'Visible','off');
+    set(handles.DisplayCandidates,'Visible','off');
+  end
 
-% ------------------------------------------------ Generate interaction matrix
-
+% ------------------------------------------- Generate interaction matrix
 function GenerateMatrix_Callback(hObject, eventdata, handles)
 
 if get(handles.Geometric,'Value') == 1
@@ -315,6 +340,20 @@ else
     set(handles.ListCandidates,'Visible','off');
     set(handles.DisplayCandidates,'Visible','off');
 end
+
+% --------------
+savedf = dir(['SearchSaveFiles' filesep '*.mat']);
+if length(savedf) == 0,
+  savedff=' ';
+else
+  for i = 1:length(savedf),
+    savedff{i,1} = savedf(i).name;
+  end
+end
+
+set(handles.LOAD,'String',savedff);  % Update without having to reopen GUI
+% ---------------
+
 guidata(hObject, handles);
 
 
@@ -411,37 +450,24 @@ end
 function DisplayCandidates_Callback(hObject, eventdata, handles)
 
 Search=handles.Search;
+
 if isfield(handles,'File')
-    File=handles.File;
-    [File,SIndex]=zAddNTData(Search.Filenames,2,File);
+  File = handles.File;
+  [Search,File] = xDisplayCandidates(File,Search);
 else
-    [File,SIndex]=zAddNTData(Search.Filenames,2);
-Search.Filenames
+  [Search,File] = xDisplayCandidates([],Search);
 end
 
 handles.File=File;
-handles.SIndex=SIndex;
 guidata(hObject, handles);
-
-xDisplayCandidates(File(SIndex),Search);
 
 
 % --------------- Executes on button press in List Candidates
 function ListCandidates_Callback(hObject, eventdata, handles)
+
 Search=handles.Search;
 
-if isfield(handles,'SIndex')
-  File=handles.File;
-  SIndex=handles.SIndex;
-else %If data is loaded from saved search results
-  [File,SIndex]=zAddNTData(Search.Filenames,2);
-  handles.File=File;
-  handles.SIndex=SIndex;
-  guidata(hObject, handles);
-end
-
-xListCandidates(File(SIndex),Search,Inf);
-
+xListCandidates(Search,Inf);
 
 % --- Executes on selection change in Overlap.
 function Overlap_Callback(hObject, eventdata, handles)

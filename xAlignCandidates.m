@@ -49,7 +49,7 @@ for n = 1:(Model.NumNT-1),
     fprintf('    ');
   end
 end
-fprintf('%d\n', Model.NumNT);
+fprintf('%d\n', mod(Model.NumNT,10));
 
 % ----------------------------- Print alignment
 

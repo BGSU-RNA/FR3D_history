@@ -19,7 +19,7 @@ if ~exist('File'),                           % if no molecule data is loaded,
   [File,SIndex] = zAddNTData(Filenames,2);   % load PDB data
 else
   [File,SIndex] = zAddNTData(Filenames,2,File); % add PDB data if needed
-end                           % SIndex tells which elements of File to search
+end                       % SIndex tells which elements of File to search
 
 % ------------------------------------------- Store actual filenames
 %                                             rather than list name(s)
@@ -123,6 +123,8 @@ if ~isempty(Candidates),                         % some candidate(s) found
  Search.SaveName    = strrep(Search.SaveName,':','_');
  Search.Candidates  = Candidates;
  Search.Discrepancy = Discrepancy;
+
+ Search = xAddFiletoSearch(File(SIndex),Search);
 
  if ~(exist('SearchSaveFiles') == 7),        % if directory doesn't yet exist
    mkdir('SearchSaveFiles');

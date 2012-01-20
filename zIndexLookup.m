@@ -30,7 +30,8 @@ end
 
 t = 1;
 for k = 1:length(Num),
-  N = regexprep(Num{k},';| ',',');    % replace other delimeters with commas
+  N = regexprep(Num{k},'([ACGU])\s*([123456789])','$1$2'); % join base & number
+  N = regexprep(N,';| ',',');         % replace other delimeters with commas
   while strfind(N,',,'),              % replace double commas with single
     N = regexprep(N,',,',',');
   end
