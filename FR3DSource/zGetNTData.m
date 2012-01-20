@@ -46,7 +46,7 @@ for f=1:length(Filenames),
   SaveCode     = 0;
   ReadPDB      = 0;
 
-  if (ReadCode > 0),
+  if (ReadCode > 3),
     ReadFull = 1;
   else
     ReadFull = 0;
@@ -127,6 +127,7 @@ for f=1:length(Filenames),
       (ClassifyCode == 1) | (File.ClassVersion < CurrentVersion),
 
       File.Edge = sparse(File.NumNT,File.NumNT);
+      File.Coplanar = sparse(File.NumNT,File.NumNT);
 
       c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
 

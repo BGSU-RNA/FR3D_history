@@ -14,23 +14,42 @@ end
 t = cputime;
 
 % ------------------------------  Meanings of the classification codes:
-    %  1  A C2-H2  interacts with oxygen of phosphate, called 2BP
-    %  2  A N6-1H6 interacts with oxygen of phosphate, called 6BP
-    %  3  A N6-2H6 interacts with oxygen of phosphate, called 7BP
-    %  4  A C8-H8  interacts with oxygen of phosphate, called 0BP
-    %  5  C N4-2H4 interacts with oxygen of phosphate, called 6BP
-    %  6  C N4-1H4 interacts with oxygen of phosphate, called 7BP
-    %  7  C N4-1H4 and C5-H5 interact with oxygen(s) of phosphate, called 8BP
-    %  8  C C5-H5  interacts with oxygen of phosphate, called 9BP
-    %  9  C C6-H6  interacts with oxygen of phosphate, called 0BP
-    % 10  G N2-1H2 interacts with oxygen of phosphate, called 1BP
-    % 11  G N2-2H2 interacts with oxygen of phosphate, called 3BP
-    % 12  G N2-2H2 and N1-H1 interacts with oxygen(s) of phosphate, called 4BP
-    % 13  G N1-H1  interacts with oxygen of phosphate, called 5BP
-    % 14  G C8-H8  interacts with oxygen of phosphate, called 0BP
-    % 15  U N3-H3  interacts with oxygen of phosphate, called 5BP
-    % 16  U C5-H5  interacts with oxygen of phosphate, called 9BP
-    % 17  U C6-H6  interacts with oxygen of phosphate, called 0BP
+    %  1  A C2-H2  interacts with oxygen of phosphate, called 2BPh
+    %  2  A N6-1H6 interacts with oxygen of phosphate, called 6BPh
+    %  3  A N6-2H6 interacts with oxygen of phosphate, called 7BPh
+    %  4  A C8-H8  interacts with oxygen of phosphate, called 0BPh
+    %  5  C N4-2H4 interacts with oxygen of phosphate, called 6BPh
+    %  6  C N4-1H4 interacts with oxygen of phosphate, called 7BPh
+    %  7  C N4-1H4 and C5-H5 interact with 2 oxygens of phosphate, called 8BPh
+    % 18  C N4-1H4 and C5-H5 interact with just one oxygen, called 8bBP
+    %  8  C C5-H5  interacts with oxygen of phosphate, called 9BPh
+    %  9  C C6-H6  interacts with oxygen of phosphate, called 0BPh
+    % 10  G N2-1H2 interacts with oxygen of phosphate, called 1BPh
+    % 11  G N2-2H2 interacts with oxygen of phosphate, called 3BPh
+    % 12  G N2-2H2 and N1-H1 interacts with 2 oxygens of phosphate, called 4BPh
+    % 19  G N2-2H2 and N1-H2 interact with just one oxygen, called 4bBP
+    % 13  G N1-H1  interacts with oxygen of phosphate, called 5BPh
+    % 14  G C8-H8  interacts with oxygen of phosphate, called 0BPh
+    % 15  U N3-H3  interacts with oxygen of phosphate, called 5BPh
+    % 16  U C5-H5  interacts with oxygen of phosphate, called 9BPh
+    % 17  U C6-H6  interacts with oxygen of phosphate, called 0BPh
+
+% ------------------------------ temporary cutoffs! 
+
+CarbonDist    = 4.0;                           % max massive - oxygen distance
+nCarbonDist   = 5;                           % near category
+
+NitrogenDist  = 3.5;                           % max massive - oxygen distance
+nNitrogenDist = 5.0;                           % near category
+
+AL = 130;                                      % angle limit for BPh
+nAL = 90;                                     % angle limit for nBPh
+
+DL([4 6 11]) = NitrogenDist;
+DL([7 8 9])  = CarbonDist;
+
+nDL([4 6 11]) = nNitrogenDist;
+nDL([7 8 9])  = nCarbonDist;
 
 % ------------------------------ specify cutoffs for classification
 
@@ -40,8 +59,8 @@ nCarbonDist   = 4.5;                           % near category
 NitrogenDist  = 3.5;                           % max massive - oxygen distance
 nNitrogenDist = 4.0;                           % near category
 
-AL = 130;                                      % angle limit for BP
-nAL = 110;                                     % angle limit for nBP
+AL = 130;                                      % angle limit for BPh
+nAL = 110;                                     % angle limit for nBPh
 
 DL([4 6 11]) = NitrogenDist;
 DL([7 8 9])  = CarbonDist;
@@ -90,6 +109,8 @@ for f = 1:length(File),
    N1 = File(f).NT(i(k));                       % nucleotide i information
    N2 = File(f).NT(j(k));                       % nucleotide j information
 
+   DT = [];                                     % accumulate data here
+
    ph = (N2.Sugar(10,:)-N1.Fit(1,:)) * N1.Rot;  % phosphorus displacement
    if abs(ph(3)) < 4.5,                         % phosphorus close to plane
 
@@ -121,6 +142,7 @@ for f = 1:length(File),
     dis = dis .* (dis < nearDL);      % massive-oxygen pairs close enough
 
     g = [];                           % internal classification number
+    w = [];                           % which oxygen interacts
     Angle = [];
     Dist  = [];
 
@@ -141,11 +163,13 @@ for f = 1:length(File),
      for n = 1:length(pp),            % loop through potential oxygens
       if Angle(n) > nAL,              % good enough to be "near" base-phosph
 
-        if ((Angle(n) > AL) && (Dist(n) < DL(m(mm)))) % true BP pair
+        if ((Angle(n) > AL) && (Dist(n) < DL(m(mm)))) % true BPh pair
           g = [g e(mm)];              % assign a non-near class.
+          w = [w pp(n)];              % record which oxygen it is 
           T = [T; [f i(k) j(k) e(mm) pp(n)]];
         else
           g = [g e(mm) + 100];        % > 100 means "near"
+          w = [w pp(n)];              % record which oxygen it is
         end
 
         if Verbose > 1,
@@ -175,9 +199,10 @@ for f = 1:length(File),
           %20  distance from massive to phosphorus
           %21  nucleotide number of base
           %22  nucleotide number of phosphate donor
+          %23  (to be added below) classification of this interaction
 
           if length(a(1,:)) == 22,
-            D = [D; a];                  % append data to data matrix
+            DT = [DT; a];                  % append data to data matrix
           end
 
 %          zOtherPhosphateInteractions
@@ -201,14 +226,19 @@ for f = 1:length(File),
 
      if length(g) > 0,
        if (min(g) < 100) && (max(g) > 100),
+         w = w(find(g < 100));
          g = g(find(g < 100));               % remove near classifications
        end
        if length(g) > 1,                     % multiple bonds
          g = sort(g);
-         if (g(1) == 6) && (g(end) == 8),
-           g = 7;                            % two bonds formed
-         elseif (g(1) == 11) && (g(end) == 13),
+         if (g(1) == 6) && (g(end) == 8) && (min(w) < max(w)),
+           g = 7;                            % two different oxygens
+         elseif (g(1) == 6) && (g(end) == 8) && (min(w) == max(w)),
+           g = 18;
+         elseif (g(1) == 11) && (g(end) == 13) && (min(w) < max(w)),
            g = 12;                           % two bonds formed
+         elseif (g(1) == 11) && (g(end) == 13) && (min(w) == max(w)),
+           g = 19;                           % two bonds formed
          elseif (min(g) == max(g)),
            g = g(1);
          elseif (g(end) < 100) && (Verbose > 0),
@@ -222,6 +252,13 @@ for f = 1:length(File),
        end
 
        File(f).BasePhosphate(i(k),j(k)) =   g(1);  % record classification
+
+       if Verbose > 1,
+         if ~isempty(DT),
+           D = [D; [DT g(1)*ones(length(DT(:,1)),1)]];
+         end 
+       end
+
      end
 
    end    % if vertical displacement of phosphate is less than 6 Angstroms

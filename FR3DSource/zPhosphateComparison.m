@@ -9,6 +9,8 @@ load PhosphateComparisonD
 i = find(D(:,17) == 1);                        % use best oxygen only
 D = D(i,:);
 
+% Note that column 23 is now used to record the eventual classification!
+
 D(:,23) = mod(D(:,5),100);                      % don't distinguish near BPh
 
 D = sortrows(D,5);                              % sort by classification

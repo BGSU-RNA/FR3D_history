@@ -2,8 +2,7 @@
 
 function [void] = zPhosDisplay(D)
 
-conv = [1 2 3 3];
-%D(:,7) = conv(D(:,7));                 % O1P and O2P are equivalent
+zStandardBases
 
 L = {'A','C','G','U'};
 
@@ -48,10 +47,14 @@ for v = 1:4,
 %  s = 10*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
 %  s = 10*(DD(:,17) == 1) + 1*(DD(:,17) == 0);% best oxygen is large
 
-  scatter3(DD(:,13),DD(:,14),DD(:,15), 0.3*s, 0*DD(:,9), 'filled'); % phosphorus
+  scatter3(DD(:,13),DD(:,14),DD(:,15), 0.2*s, 'k', 'filled'); % phosphorus
   hold on
 
   scatter3(DD(:,10),DD(:,11),DD(:,12), s,   DD(:,9), 'filled'); % color by dist
+
+%  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   double((DD(:,5)<100)), 'filled'); % color by true/near
+
+
 %  scatter3(DD(:,10),DD(:,11),DD(:,12)-0.0001*DD(:,5), s,   DD(:,8), 'filled'); % color by angle
 %  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   DD(:,7), 'filled'); % color by oxygen atom
 %  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   abs(DD(:,12)), 'filled'); % color oxygen by vertical displacement
@@ -62,11 +65,8 @@ for v = 1:4,
     end
   end
 
-  map = colormap;
-  map(1,:) = [0 0 0];
-  colormap(map);
-
-  caxis([2 4.5]);
+  caxis([2.3 4.5]);
+%  caxis([0 1.5]);
 %  caxis([80 180]);
 
   zPlotStandardBase(v,1,0);                % plot base at the origin
@@ -74,6 +74,45 @@ for v = 1:4,
   rotate3d on
   grid off
   axis equal
+
+    switch v
+      case 1,                         % Base A
+              h   = [11 12 14 15];    % rows of the base hydrogens
+              m   = [ 9  7  6  6];    % rows of the corresponding massive atoms
+      case 2,                         % Base C
+              h   = [10 11 12 13];
+              m   = [ 7  8  6  6];
+      case 3,                         % Base G
+              h   = [12 13 15 16];
+              m   = [ 4  7 11 11];
+      case 4,                         % Base U
+              h   = [ 9 11 12];
+              m   = [ 8  4  7];
+    end
+
+  for hh = 1:length(h),
+    vv = StandardLoc(h(hh),:,v) - StandardLoc(m(hh),:,v);
+    vang = atan2(vv(2),vv(1));               % angle v makes with x axis
+    xo = StandardLoc(h(hh),1,v);
+    yo = StandardLoc(h(hh),2,v);
+
+    a1 = 180-AL;
+    th = (vang - a1*pi/180):0.1:(vang + a1*pi/180);
+    x = xo + DL(m(hh))*cos(th);
+    y = yo + DL(m(hh))*sin(th);
+    x = [xo x xo];
+    y = [yo y yo];
+    plot(x,y,'k');
+
+    a1 = 180-nAL;
+    th = (vang - a1*pi/180):0.1:(vang + a1*pi/180);
+    x = xo + nDL(m(hh))*cos(th);
+    y = yo + nDL(m(hh))*sin(th);
+    x = [xo x xo];
+    y = [yo y yo];
+    plot(x,y,'g');
+  end
+
 
   switch v,
     case 1,     text(8,0,'2BPh');
@@ -107,6 +146,10 @@ for v = 1:4,
 
 end
 
+  colormap('default')
+  map = colormap;
+%  map(1,:) = [0 0 0];
+  colormap(flipud(map));
 
 
 %set(gcf,'Renderer','OpenGL');     % fast rotation
@@ -121,6 +164,118 @@ saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.pdf'],'pdf');
 
 %  saveas(gcf,['Phosphate interactions' filesep 'Phosphate with ' L{v} '.png'],'png');
 
+% ----------------- Display bond length and angle by type of massive base
+figure(7)
+clf
+
+
+% temporary redefinition!
+
+MT = {'Self interactions with C6/C8','Carbon with no overlap','G 3BPh/5BPh C 7BPh/9BPh (overlap)','Nitrogen with no overlap'};
+
+ICode{1} = [4 9 14 17];             % carbon C6/C8 
+ICode{2} = [1 16];                % ring carbons, but not C6/C8
+ICode{3} = [6 8 11 13];                 % ring (imino) nitrogen
+ICode{4} = [2 3 5 10 15];         % amino nitrogen
+
+% correct definition:
+
+MT = {'Self interactions with C6/C8','Carbon (excluding all self interactions)','Imino Nitrogen G(N1) U(N3)','Amino Nitrogen A(N6) C(N4) G(N2)'};
+
+ICode{1} = [4 9 14 17];             % carbon C6/C8 
+ICode{2} = [1 8 16];                % ring carbons, but not C6/C8
+ICode{3} = [13 15];                 % ring (imino) nitrogen
+ICode{4} = [2 3 5 6 10 11];         % amino nitrogen
+
+
+for v = 1:4,
+  subplot(2,2,v)
+
+  r = [];
+  for k = 1:length(ICode{v}),
+    if v == 2,                         % exclude self interactions
+      r = [r (find((mod(D(:,5),100) == ICode{v}(k)) .* (D(:,2) ~= D(:,3))))'];
+    elseif v == 1,                     % keep only self interactions
+      r = [r (find((mod(D(:,5),100) == ICode{v}(k)) .* (D(:,2) == D(:,3))))']; 
+    else
+      r = [r (find((mod(D(:,5),100) == ICode{v}(k))))'];  
+    end
+                                       % append matches to this massive atom
+  end
+
+  if v == 2,                           % add in non-self 0BP pairs
+    for k = 1:length(ICode{2}),
+      r = [r (find((mod(D(:,5),100) == ICode{2}(k)) .* (D(:,2) ~= D(:,3))))'];
+    end
+  end
+
+%  if v == 1,                           % add in self C5-H5 pairs
+  if v == 10,                           % add in self C5-H5 pairs
+    for k = 1:length(ICode{1}),
+      r = [r (find((mod(D(:,5),100) == ICode{1}(k)) .* (D(:,2) == D(:,3))))'];
+    end
+  end
+
+  if (v == 1) && (length(r) > 4000),   % reduce number of self interactions
+    y = rand(1,length(r));
+    [w,i] = sort(y);
+    r = r(i(1:4000));
+  end
+
+  DD = D(r,:);                         % use only these lines of data
+
+%  s = 4*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
+%  scatter3(DD(:,9),DD(:,8), DD(:,12), s,   DD(:,4), 'filled');
+
+  s = 4*(DD(:,17) == 1) + 0*(DD(:,17) == 0);% best oxygen is large
+
+%  scatter(DD(:,9),DD(:,8), s, abs(DD(:,12)), 'filled'); % color by vert displ
+%  scatter(DD(:,9),DD(:,8), s,   DD(:,4), 'filled'); % color by base
+
+  i = find((DD(:,7) == 1) .* (DD(:,17) == 1));
+  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'g', 'filled'); % color by oxygen atom
+hold on
+  i = find((DD(:,7) == 2) .* (DD(:,17) == 1));
+  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'b', 'filled'); % color by oxygen atom
+  i = find((DD(:,7) >  2) .* (DD(:,17) == 1));
+  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'r', 'filled'); % color by oxygen atom
+
+  view(2)
+  grid off
+
+CarbonDist    = 4.0;                           % max massive - oxygen distance
+nCarbonDist   = 4.5;                           % near category
+
+NitrogenDist  = 3.5;                           % max massive - oxygen distance
+nNitrogenDist = 4.0;                           % near category
+
+  hold on
+  if v <=2,
+    plot3([1 CarbonDist CarbonDist], [AL AL 180], [1 1 1], 'k', 'LineWidth', 1.5);
+    plot3([1 nCarbonDist nCarbonDist], [nAL nAL 180], [1 1 1], 'k', 'LineWidth', 1.0);
+  else
+    plot3([1 NitrogenDist NitrogenDist], [AL AL 180], [1 1 1], 'k', 'LineWidth', 1.5);
+    plot3([1 nNitrogenDist nNitrogenDist], [nAL nAL 180], [1 1 1], 'k', 'LineWidth', 1.0);
+  end
+
+  title([MT{v}]);
+  if any(v==[1 3]),
+    ylabel('Hydrogen bond angle');
+  end
+  if any(v==[3 4]),
+    xlabel('Distance from hydrogen donor');
+  end
+  axis([2 5 90 180]);
+  caxis([1 4]);
+end
+
+set(gcf,'Renderer','painters');    % makes nice PDF files
+
+saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.fig'],'fig');
+saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.png'],'png');
+saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.pdf'],'pdf');
+
+return
 
 % ----------------- Distance between centers of bases
 figure(5)
@@ -149,103 +304,6 @@ for v = 1:4,
   caxis([0 5]);
 end
 
-
-% ----------------- Display bond length and angle by type of massive base
-figure(7)
-clf
-
-MT = {'Carbon (excluding all self interactions)','Self interactions with C5/C6/C8','Ring Nitrogen','Amino Nitrogen'};
-
-ICode{1} = [1 8 16];                % ring carbons, but not C6/C8
-ICode{2} = [4 9 14 17];             % carbon C6/C8 
-ICode{3} = [13 15];                 % ring nitrogen
-ICode{4} = [2 3 5 6 10 11];         % amino nitrogen
-
-for v = 1:4,
-  subplot(2,2,v)
-
-  r = [];
-  for k = 1:length(ICode{v}),
-    if v == 1,                         % exclude self interactions
-      r = [r (find((mod(D(:,5),100) == ICode{v}(k)) .* (D(:,2) ~= D(:,3))))'];
-    elseif v == 2,                     % keep only self interactions
-      r = [r (find((mod(D(:,5),100) == ICode{v}(k)) .* (D(:,2) == D(:,3))))']; 
-    else
-      r = [r (find((mod(D(:,5),100) == ICode{v}(k))))'];  
-    end
-                                       % append matches to this massive atom
-  end
-
-  if v == 1,                           % add in non-self 0BP pairs
-    for k = 1:length(ICode{2}),
-      r = [r (find((mod(D(:,5),100) == ICode{2}(k)) .* (D(:,2) ~= D(:,3))))'];
-    end
-  end
-
-  if v == 2,                           % add in self C5-H5 pairs
-    for k = 1:length(ICode{1}),
-      r = [r (find((mod(D(:,5),100) == ICode{1}(k)) .* (D(:,2) == D(:,3))))'];
-    end
-  end
-
-  if (v == 2) && (length(r) > 5000),
-    y = rand(1,length(r));
-    [w,i] = sort(y);
-    r = r(i(1:5000));
-  end
-
-  DD = D(r,:);                         % use only these lines of data
-
-%  s = 4*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
-%  scatter3(DD(:,9),DD(:,8), DD(:,12), s,   DD(:,4), 'filled');
-
-  s = 4*(DD(:,17) == 1) + 0*(DD(:,17) == 0);% best oxygen is large
-
-%  scatter(DD(:,9),DD(:,8), s, abs(DD(:,12)), 'filled'); % color by vert displ
-%  scatter(DD(:,9),DD(:,8), s,   DD(:,4), 'filled'); % color by base
-
-  i = find((DD(:,7) == 1) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'r', 'filled'); % color by oxygen atom
-hold on
-  i = find((DD(:,7) == 2) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'b', 'filled'); % color by oxygen atom
-  i = find((DD(:,7) >  2) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'g', 'filled'); % color by oxygen atom
-
-  view(2)
-  grid off
-
-CarbonDist    = 4.0;                           % max massive - oxygen distance
-nCarbonDist   = 4.5;                           % near category
-
-NitrogenDist  = 3.5;                           % max massive - oxygen distance
-nNitrogenDist = 4.0;                           % near category
-
-  hold on
-  if v <=2,
-    plot3([1 CarbonDist CarbonDist], [AL AL 180], [1 1 1], 'k');
-    plot3([1 nCarbonDist nCarbonDist], [nAL nAL 180], [1 1 1], 'k');
-  else
-    plot3([1 NitrogenDist NitrogenDist], [AL AL 180], [1 1 1], 'k');
-    plot3([1 nNitrogenDist nNitrogenDist], [nAL nAL 180], [1 1 1], 'k');
-  end
-
-  title([MT{v}]);
-  if any(v==[1 3]),
-    ylabel('Angle');
-  end
-  if any(v==[3 4]),
-    xlabel('Distance from massive atom');
-  end
-  axis([2 4.6 105 180]);
-  caxis([1 4]);
-end
-
-set(gcf,'Renderer','painters');    % makes nice PDF files
-
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.fig'],'fig');
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.png'],'png');
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.pdf'],'pdf');
 
 
 % -------------- Histogram of vertical displacement of phosphorus
