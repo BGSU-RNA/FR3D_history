@@ -16,7 +16,7 @@
 
 function [Files] = zGetNTData(Filenames,ReadCode,SizeCode)
 
-CurrentVersion = 3.8;                       % version number of class limits
+CurrentVersion = 3.9;                       % version number of class limits
 
 if nargin < 2,
   ReadCode = 0;
@@ -99,17 +99,21 @@ for f=1:length(Filenames),
     File.ClassVersion = 0;
   end
 
-  if isfield(File,'Inter'),
-    File = rmfield(File,'Inter');
+  if ~isfield(File,'BasePhosphate'),
+    File.BasePhosphate = 0;
   end
 
-  if length(File.NT(1).Sugar(:,1)) < 13,
-    File = zStoreO3(File);
+  if isfield(File,'Inter'),
+    File = rmfield(File,'Inter');
   end
 
   Overlap = 0;
 
   if length(File.NT) > 0,                    % if it has nucleotides,
+    if length(File.NT(1).Sugar(:,1)) < 13,
+      File = zStoreO3(File);
+    end
+
     c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
     File.Distance = zMutualDistance(c,35);   % compute distances < 35 Angstroms
 

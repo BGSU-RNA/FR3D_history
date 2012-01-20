@@ -283,6 +283,7 @@ File.CI        = sparse(NumNT,NumNT);
 File.Edge      = sparse(NumNT,NumNT);
 File.Modified  = 1;
 File.Header    = Header;
+File.BasePhosphate = [];
 
 % Calculate configuration (syn or anti) -------------------------------------
 
@@ -317,6 +318,9 @@ else
   File.Info.RNA        = '';
   File.Info.Species    = '';
   File.Info.LigandsAndComments = '';
+  File.BasePhosphate = [];
 
-  File = orderfields(File);
 end
+
+File = orderfields(File);
+

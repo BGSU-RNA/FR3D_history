@@ -4,7 +4,7 @@
 % Change the list of PDB files to be searched by editing zFileNameList
 % Change the query by editing xSpecifyQuery
 
-if ~exist('GUIactive'),                      % if the GUI is not being used
+if ~exist('GUIactive') && ~exist('UsingLibrary'),  % FR3D should just search
   Query     = xSpecifyQuery;                 % get search parameters
   if isfield(Query,'SearchFiles'),           % if query specifies files
     Filenames = Query.SearchFiles;
@@ -32,12 +32,15 @@ end
 
 % ------------------------------------------- Construct details of search ---
 
-if isfield(Query,'Filename'),                % if query motif is from a file
+if ~exist('UsingLibrary'),
+ if isfield(Query,'Filename'),                % if query motif is from a file
   [File,QIndex] = zAddNTData(Query.Filename,0,File);  
                                              % load data for Query, if needed
   Query = xConstructQuery(Query,File(QIndex)); % preliminary calculations
-else
+ else
   Query = xConstructQuery(Query);              % preliminary calculations
+ end
+
 end
 
 clear Search
@@ -113,30 +116,31 @@ if ~isempty(Candidates),                         % some candidate(s) found
  end
 
 % -------------------------------------------------- Save results of search
+  Search.Query       = Query;
+  Search.Filenames   = Filenames;
+  Search.TotalTime   = cputime - starttime;
+  Search.Date        = Search.SaveName(1:10);
+  Search.Time        = Search.SaveName(12:18);
+  Search.SaveName    = strrep(Search.SaveName,' ','_');
+  Search.SaveName    = strrep(Search.SaveName,':','_');
+  Search.Candidates  = Candidates;
+  Search.Discrepancy = Discrepancy;
 
- Search.Query       = Query;
- Search.Filenames   = Filenames;
- Search.TotalTime   = cputime - starttime;
- Search.Date        = Search.SaveName(1:10);
- Search.Time        = Search.SaveName(12:18);
- Search.SaveName    = strrep(Search.SaveName,' ','_');
- Search.SaveName    = strrep(Search.SaveName,':','_');
- Search.Candidates  = Candidates;
- Search.Discrepancy = Discrepancy;
+  Search = xAddFiletoSearch(File(SIndex),Search);
 
- Search = xAddFiletoSearch(File(SIndex),Search);
+  if ~exist('UsingLibrary'),
 
- if ~(exist('SearchSaveFiles') == 7),        % if directory doesn't yet exist
-   mkdir('SearchSaveFiles');
+    if ~(exist('SearchSaveFiles') == 7),     % if directory doesn't yet exist
+      mkdir('SearchSaveFiles');
+    end
+
+    save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
  end
-
- save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
-
 % ------------------------------------------------ Display results
 
  fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
 
- if (~exist('GUIactive')) && (~isempty(Candidates)),
+ if (~exist('GUIactive')) && (~isempty(Candidates)) && ~exist('UsingLibrary'),
    xListCandidates(Search,Inf,1);
    Search = xDisplayCandidates(File(SIndex),Search);
    save(['SearchSaveFiles' filesep Search.SaveName], 'Search');

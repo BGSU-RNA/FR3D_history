@@ -472,6 +472,8 @@ else
 end
 
 handles.File=File;
+handles.Search = Search;
+save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
 guidata(hObject, handles);
 
 % --------------- Executes on button press in List Candidates

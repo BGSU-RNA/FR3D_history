@@ -177,21 +177,36 @@ while stop == 0,
       Search.Marked = 1-Search.Marked;
 
     case 9                                      % display marked only
-      Search2 = Search;
+%      Search2 = Search;
       j = find(Search.Marked);
       if length(j) > 0,
-        Search2.Candidates  = Search.Candidates(j,:);
-        Search2.Discrepancy = Search.Discrepancy(j);
-        Search2.Marked      = Search.Marked(j);
-        Search2.Disc        = Search.Disc(j,j);
-        Search2.DiscComputed= Search.DiscComputed(1,j);
+        Search2 = SearchSubset(Search,j);
+
+%        Search2.Candidates  = Search.Candidates(j,:);
+%        Search2.Discrepancy = Search.Discrepancy(j);
+%        Search2.Marked      = Search.Marked(j);
+%        Search2.Disc        = Search.Disc(j,j);
+%        Search2.DiscComputed= Search.DiscComputed(1,j);
+
         xDisplayCandidates(File(FIndex),Search2,Level+1);
         Search.Disc(j,j)    = Search2.Disc;
         Search.DiscComputed(1,j) = Search2.DiscComputed;
       end
 
     case 10                                      % list on screen
-      xListCandidates(Search,Inf);
+      j  = find(Search.Marked);
+      jj = find(Search.Marked == 0);
+      if (length(j) > 0) && (length(jj) > 0),
+        Search2 = SearchSubset(Search,j);
+        fprintf('Marked candidates\n');
+        xListCandidates(Search2,Inf);
+
+        Search2 = SearchSubset(Search,jj);
+        fprintf('Unmarked candidates\n');
+        xListCandidates(Search2,Inf);
+      else
+        xListCandidates(Search,Inf);
+      end
 
     case 11                                     % write PDB of all
       xWriteCandidatePDB(Search);
@@ -203,7 +218,7 @@ while stop == 0,
       Search = xGroupCandidates(File(FIndex),Search,Level,UsingFull);
 
     case 14                                     % align
-      xAlignCandidates(File(FIndex),Search,1)
+      xAlignCandidates(File(FIndex),Search,1);
 
     case 15
       ViewParam.Color  = 6;
@@ -382,3 +397,14 @@ function  DisplayTable(File,Search,Model,Display,i)
       zBasePhosphateTable(File(f),double(Indices));
     end
     drawnow
+
+% -------------------------------------------------- Select subset of search
+
+function [Search2] = SearchSubset(Search,j)
+
+  Search2             = Search;
+  Search2.Candidates  = Search.Candidates(j,:);
+  Search2.Discrepancy = Search.Discrepancy(j);
+  Search2.Marked      = Search.Marked(j);
+  Search2.Disc        = Search.Disc(j,j);
+  Search2.DiscComputed= Search.DiscComputed(1,j);

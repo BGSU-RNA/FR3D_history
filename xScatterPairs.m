@@ -183,18 +183,18 @@ clf
 %set(gcf,'Renderer','zbuffer')
 
 for k = 1:length(Pair),                              % Loop through pairs
-  p = Pair(k);
-  c = Color(k);
-  e = p.Displ;
-
-  scatter3(e(1),e(2),e(3),4,c,'filled')
-  hold on
+  p      = Pair(k);
+  c(k)   = Color(k);
+  e(k,:) = p.Displ;
 
   if ViewParam.Normal == 1,
     v = p.Normal/3;                                      % add normal vector
     plot3([e(1) e(1)+v(1)], [e(2) e(2)+v(2)], [e(3) e(3)+v(3)], 'b');
+    hold on
   end
 end
+
+scatter3(e(:,1),e(:,2),e(:,3),18*ones(size(c)),c,'filled')
 
 if max(modcode) == min(modcode),             % all have same first base
   zPlotStandardBase(modcode);                % plot base at the origin
@@ -214,8 +214,9 @@ if isfield(ViewParam,'ClassLimits'),
      hold on
      if (abs(B(row,1)) < 14) & (abs(B(row,1)) > 0),
        zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
-%       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-       text(B(row,2)+0.2,B(row,4)+0.35,0,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+       tex = zEdgeText(fix(B(row,1)));
+       tex = tex(1:3);
+       text(B(row,2)+0.1,B(row,4)+0.2,0,tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
      end
    end
  elseif ViewParam.ClassLimits == 2,              % just show one box
@@ -226,8 +227,9 @@ if isfield(ViewParam,'ClassLimits'),
      hold on
      if any(fix(B(row,1)) == fix(Param.Category)),
        zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
-%       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
-       text(B(row,2)+0.2,B(row,4)+0.35,0,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+       tex = zEdgeText(fix(B(row,1)));
+       tex = tex(1:3);
+       text(B(row,2)+0.1,B(row,4)+0.2,0,tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
      end
    end
  end
@@ -237,7 +239,7 @@ zoom on
 
 caxis(ColorAxis);
 view(2)
-axis square
+axis equal
 
 if ViewParam.Normal == 1,
  Title = [Title ', lines are the normal vector of second base'];
@@ -264,7 +266,7 @@ for k = 1:length(Pair),                               % Loop through pairs
 
   c = Color(k);
 
-  scatter3(mod(p.Ang+cut,360)-cut,p.Normal(3),p.Gap,4,c,'filled')
+  scatter3(mod(p.Ang+cut,360)-cut,p.Normal(3),p.Gap,18,c,'filled')
   hold on
 end
 
@@ -287,14 +289,16 @@ if isfield(ViewParam,'ClassLimits'),
     for row = 1:length(B(:,1)),
       hold on
       if (abs(B(row,1)) < 14) & (abs(B(row,1)) > 0),
+        tex = zEdgeText(fix(B(row,1)));
+        tex = tex(1:3);
         if (B(row,10) < B(row,11)),
           zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
-          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
         else
           zSquare([B(row,[10 8]) 0],[270 B(row,9) 0],'k');
-          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
           zSquare([-90 B(row,8) 0],[B(row,[11 9]) 0],'k');
-          text(-86,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(-86,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
         end
       end
     end
@@ -306,14 +310,16 @@ if isfield(ViewParam,'ClassLimits'),
     for row = 1:length(B(:,1)),
       hold on
       if any(fix(B(row,1)) == fix(Param.Category)),
+        tex = zEdgeText(fix(B(row,1)));
+        tex = tex(1:3);
         if (B(row,10) < B(row,11)),
           zSquare([B(row,[10 8]) 0],[B(row,[11 9]) 0],'k');
-          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
         else
           zSquare([B(row,[10 8]) 0],[270 B(row,9) 0],'k');
-          text(B(row,10)+4,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(B(row,10)+4,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
           zSquare([-90 B(row,8) 0],[B(row,[11 9]) 0],'k');
-          text(-86,B(row,8)+0.08,B(row,11),num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+          text(-86,B(row,8)+0.08,B(row,11),tex,'horizontalalignment','left','fontweight','bold','FontSize',8);
         end
       end
     end

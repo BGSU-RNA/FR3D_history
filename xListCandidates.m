@@ -4,12 +4,15 @@
 %   Value 1 : prints a wide listing to the Matlab command window
 %   Value 2 : prints a wide listing to an Editbox
 %   Value 3 : prints a narrow listing to an Editbox
+%   Value 5 : returns a wide listing
+%   Value 6 : returns the text of the narrow listing
+
 % The PC compiled version does both 2 and 3.
 
 % It may be run directly from Matlab using the command:
 %   xListCandidates(Search);
 
-function [void] = xListCandidates(Search,NumToOutput,WheretoOutput)
+function [Text] = xListCandidates(Search,NumToOutput,WheretoOutput,Param)
 
 File        = Search.File;
 
@@ -67,16 +70,14 @@ Text{t} = '';
 
 if isfield(Search,'AvgDisc'),
   Text{t} = [Text{t} sprintf('  Filename Avg Discrep ')];
-  for i=1:N,
-    Text{t} = [Text{t} sprintf('%7d ', i)];
-  end
 elseif Query.Geometric > 0,
   Text{t} = [Text{t} sprintf('  Filename Discrepancy ')];
-  for i=1:N,
-    Text{t} = [Text{t} sprintf('%7d ', i)];
-  end
 else
-  Text{t} = [Text{t} sprintf('  Filename Number Nucleotides')];
+  Text{t} = [Text{t} sprintf('  Filename Number Nucl ')];
+end
+
+for i=1:N,
+  Text{t} = [Text{t} sprintf('%7d ', i)];
 end
 
 c = 'Chains                                             ';
@@ -112,16 +113,20 @@ for i=1:min(s,NumToOutput),
   Text{i+t} = '';
 
   f = double(Candidates(i,N+1));               % file number for this candidate
-  Text{i+t} = [Text{i+t} sprintf('%10s', File(f).Filename)];
+  if WheretoOutput < 4,
+    Text{i+t} = [Text{i+t} sprintf('%10s', File(f).Filename)];
+  else
+    Text{i+t} = [Text{i+t} sprintf('      <a href="../../MotifList/%s/index.html#%s">%s</a>', File(f).Filename, Param{1}, File(f).Filename)];
+  end
 
   Indices = Candidates(i,1:N);                 % indices of nucleotides
 
-  if isfield(Search,'AvgDisc'),
-    Text{i+t} = [Text{i+t} sprintf('%12.4f',Search.AvgDisc(i))];
+  if isfield(Search,'DisttoCenter'),
+    Text{i+t} = [Text{i+t} sprintf('%12.4f',Search.DisttoCenter(i))];
   elseif Query.Geometric > 0,
     Text{i+t} = [Text{i+t} sprintf('%12.4f',Search.Discrepancy(i))];
   else
-    Text{i+t} = [Text{i+t} sprintf('%6d',Search.Discrepancy(i))];      % original candidate number
+    Text{i+t} = [Text{i+t} sprintf('%12d',Search.Discrepancy(i))];      % original candidate number
   end
 
   for j=1:N,
@@ -156,13 +161,15 @@ for i=1:min(s,NumToOutput),
   end
     
   if N == 2,                        % special treatment for basepairs
+
     CP(i) = norm(File(f).NT(Candidates(i,1)).Sugar(1,:) - ...
                           File(f).NT(Candidates(i,2)).Sugar(1,:));
     Text{i+t} = [Text{i+t} sprintf('   C1*-C1*: %8.4f', CP(i))];
     NT1 = File(f).NT(Candidates(i,1));
     NT2 = File(f).NT(Candidates(i,2));
-    Edge  = full(File(f).Edge(Candidates(i,1),Candidates(i,2)));
-    Text{i+t} = [Text{i+t} sprintf(' %s ', zEdgeText(Edge))];
+    BP  = full(File(f).BasePhosphate(Candidates(i,1),Candidates(i,2)));
+    Edge= full(File(f).Edge(Candidates(i,1),Candidates(i,2)));
+    Text{i+t} = [Text{i+t} sprintf(' %4s ', zBasePhosphateText(BP))];
     Text{i+t} = [Text{i+t} sprintf('%7.1f ', Edge)];
     SA = {'A', 'S'};
     Text{i+t} = [Text{i+t} sprintf('%c', SA{1+File(f).NT(Candidates(i,1)).Syn})];
@@ -174,15 +181,17 @@ end
 % -------------------------------------- Additional notifications and info
 if (Query.Geometric > 0),
   if (Query.RelCutoff > Query.DiscCutoff) && ~isfield(Search,'AvgDisc'),
-    fprintf(fidOUT,'Some motifs with discrepancy between %7.4f and %7.4f might not appear above\n\n', Query.DiscCutoff, Query.RelCutoff);
+    L = length(Text);
+    Text{L+1} = sprintf('Some motifs with discrepancy between %7.4f and %7.4f might not appear above\n\n', Query.DiscCutoff, Query.RelCutoff);
   end
 end
 
 if s > NumToOutput,
-  fprintf('Only the first %d candidates were listed.\n', NumToOutput);
+  L = length(Text);
+  Text{L+1} = sprintf('Only the first %d candidates were listed.\n', NumToOutput);
 end
 
-if N == 2,
+if (N == 2) && (WheretoOutput < 4),
   figure
   clf
   hist(CP,30)
@@ -195,7 +204,7 @@ if WheretoOutput == 3,
   mEditbox(Text,'List of Candidates',10);
 elseif WheretoOutput == 2,
   mEditbox(Text,'Wide list of Candidates',7);
-else
+elseif WheretoOutput == 1,
   for i=1:length(Text),
     fprintf('%s\n',Text{i});
   end

@@ -66,7 +66,7 @@ c = 2;                                     % category of interaction
 A  = a;
 B  = LastIndex;
 AA = a;
-BB = a;
+BB = B;
 
 while (a < B) & (a <= N), % while not the end of the loop,
 
@@ -74,17 +74,42 @@ while (a < B) & (a <= N), % while not the end of the loop,
     b = Interact{a}.Index(1);              % get index 
     c = Interact{a}.Categ(1);              % and category of interaction
     t = zEdgeText(File.Edge(a,b));         % edge notation
+
+%fprintf('a %d A %d AA %d - b %d B %d BB %d\n',a,A,AA,b,B,BB);
+
+
     if (a < b),                            % if b comes after a
 
       % ---------------------------------- Check for junction
 
-      if (sum(sum(E((b+1):(BB-1),(b+1):(BB-1)) == 1)) > 0) & ...
-         (sum(sum(E((a+1):(b-1),(a+1):(b-1))   == 1)) > 0),
-        fprintf('\nJunction\n\n');
-        fprintf('Loop 1 - Nucleotides %s to %s, length %3d\n',File.NT(a).Number,File.NT(b).Number,b+1-a);
-        zSecondaryStructure(File,a,b,Interact);
-        fprintf('Loop 2 - Nucleotides %s to %s, length %3d\n',File.NT(b+1).Number,File.NT(BB-1).Number,BB-b);
-        zSecondaryStructure(File,b+1,BB-1,Interact);
+      if (sum(sum(E((a+1):(b-1), (a+1):(b-1))  == 1)) > 0) && ...
+         (sum(sum(E((b+1):(BB-1),(b+1):(BB-1)) == 1)) > 0),
+
+        junc = [];
+
+        while (sum(sum(E((a+1):(b-1), (a+1):(b-1))  == 1)) > 0) && ...
+              (sum(sum(E((b+1):(BB-1),(b+1):(BB-1)) == 1)) > 0),
+
+          while (sum(E(b,(b+1):BB-1)) == 0) && (b < BB),
+            b = b + 1;                     % extend this loop to the next
+          end
+          junc = [junc; [a b-1]];
+
+          a = b;                           % move to next loop
+          b = Interact{a}.Index(1);        
+        end
+
+        junc = [junc; [a BB-1]];             % add last loop
+
+        NL = length(junc(:,1));              % number of loops
+
+        id = fix(1000*rand);
+        fprintf('\nJunction with %d loops, call it %d\n\n', NL,id);
+
+        for loopnum = 1:NL,
+          fprintf('Loop %d of junction %d - Nucleotides %s to %s, length %3d\n',loopnum,id,File.NT(junc(loopnum,1)).Number,File.NT(junc(loopnum,2)).Number,junc(loopnum,2)+1-junc(loopnum,1));
+          zSecondaryStructure(File,junc(loopnum,1),junc(loopnum,2),Interact);
+        end
 
         return
       end

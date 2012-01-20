@@ -7,7 +7,7 @@ function [void] = zListInteractions(File)
 for f = 1:length(File),
   clear Text
   Text{1} = ['<html><title>' File(f).Filename ' basepairing and base stacking</title>'];
-  Text{2} = ['<h1>' File(f).Filename ' basepairing and base stacking</h1>'];
+  Text{2} = ['<h1>' File(f).Filename ' basepairing and base stacking</h1><a href = "index.html">List of motifs found in ' File(f).Filename '</a><br><a href="../">Return to list of PDB files</a><br><a href="../../MotifLibrary/index.html">Return to motif library</a><br>'];
   Text{3} = ['FR3D classification version ' num2str(File(f).ClassVersion) ' ' date];
   Text{4} = '<p>Basepairing follows the paper Leontis, Stombaugh, Westhof Nucleic Acids Research <b>30</b> No. 16, August 15, 2002.  Basepairs are either <i>cis</i> or <i>trans</i>, denoted c and t below.  Each base can use one of three edges, the Waston-Crick edge (W), the Hoogsteen edge (H) or the Sugar edge (S).  Basepairs listed below indicate which base is using which edge.  For example, a line reading A108 G130 tSH would mean that A108 is using its Sugar Edge and G130 is using its Hoogsteen edge.  In the case that both bases use the same edge, a capital letter indicates which base uses the edge in the dominant way.  For perfectly symmetric basepairs such as AU cWW, the capital and lowercase letters are irrelevant.  Bifurcated basepairs are indicated by the text bif.  It does not indicate which base uses which edge.';
 
@@ -39,7 +39,8 @@ for f = 1:length(File),
   t = length(Text);
   Text{t+1} = '</pre></html>';
 
-  fid = fopen(['Interactions' filesep File(f).Filename '_Interaction_List.html'],'w'); % open for writing
+  fid = fopen(['MotifList' filesep File(f).Filename filesep 'interactions.html'],'w'); % open for writing
+
   for i = 1:length(Text),
     fprintf(fid,'%s\n',Text{i});
   end

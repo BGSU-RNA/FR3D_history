@@ -66,11 +66,11 @@ if ~isempty(File),
 
     for n = 1:(N-1),                      
       if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
-      if Indices(n+1) - Indices(n) > 1,             % increasing order
+      if double(Indices(n+1)) - double(Indices(n)) > 1,      % increasing order
         for i = (Indices(n)+1):(Indices(n+1)-1),
           Search.File(f).NT(i) = File(f).NT(i);
         end
-      elseif Indices(n+1) - Indices(n) < -1,        % decreasing order
+      elseif double(Indices(n+1)) - double(Indices(n)) < -1, % decreasing order
         for i = (Indices(n)-1):-1:(Indices(n+1)+1),
           Search.File(f).NT(i) = File(f).NT(i);
         end
