@@ -12,7 +12,7 @@
 % One can also use ranges of nucleotide numbers, as in
 % zDisplayNT('rr0033_23S',{'2548:2555','2557','2559:2566'},VP);
 
-function [void] = zSuperimposeNucleotides(File1,NTList1,File2,NTList2,ViewParam)
+function [disc] = zSuperimposeNucleotides(File1,NTList1,File2,NTList2,ViewParam)
 
 % set default values for the display
 
@@ -170,9 +170,8 @@ end
 
 [disc,SuperR] = xDiscrepancy(File1,Indices1,File2,Indices2);
 
-fprintf('Geometric discrepancy is %8.4f between the two sets of nucleotides\n', disc);
+fprintf('Geometric discrepancy %8.4f between %s and %s\n', disc, File1.Filename, File2.Filename);
 
-% ---------------- Plot the nucleotides ------------------------------------
 
 L        = length(Indices1);
 
@@ -185,19 +184,24 @@ CC2      = ones(1,L) * Centers2 / L;
 R = File1.NT(Indices1(1)).Rot;             % Rotation matrix for first base
 R = eye(3);
 
+% ---------------- Plot the nucleotides ------------------------------------
+
+if ViewParam.Plot > 0
+
 clf
 
 zPlotNTsRotated(File1,Indices1,VP,R,CC1);
 
 zPlotNTsRotated(File2,Indices2,VP,R*SuperR',CC2);
 
-Title = strcat(File1.NT(Indices1(1)).Base,File1.NT(Indices1(1)).Number);
-for j=2:length(Indices1),
-  nt = File1.NT(Indices1(j));
-  Title = strcat(Title,'-',nt.Base,nt.Number);
-end;
+%Title = strcat(File1.NT(Indices1(1)).Base,File1.NT(Indices1(1)).Number);
+%for j=2:length(Indices1),
+%  nt = File1.NT(Indices1(j));
+%  Title = strcat(Title,'-',nt.Base,nt.Number);
+%end;
+%Title = strcat(Title,[' ' strrep(File1.Filename,'_','\_')]);
 
-Title = strcat(Title,[' ' strrep(File1.Filename,'_','\_')]);
+Title = [File1.Filename ' versus ' File2.Filename];
 
 title(Title);
 axis equal
@@ -211,7 +215,11 @@ end
 
 rotate3d on
 
+end
+
 % ---------------- Write PDB file for first set of nucleotides
+
+if ViewParam.Write > 0,
 
 Filename = File1.Filename;
 Filename = [Filename '_' File1.NT(min(Indices1)).Number '_' File1.NT(max(Indices1)).Number];
@@ -245,3 +253,4 @@ end
 fclose(fid);
 fprintf('Wrote %s\n', Filename);
 
+end
