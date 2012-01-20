@@ -27,6 +27,10 @@ switch paircode                           % reverse certain pairs
     sw  = -1;                                  % bases in reversed order
 end
 
+if paircode == 7,
+  Class = -Class;                              % this is crazy but works
+end
+
 if any(Class == [-1 -2 -7 -8]),
   Class = -Class;
 end
@@ -63,3 +67,29 @@ for r = 1:s,
   end
 end
 
+%if paircode == 7,
+%  T = NT1;
+%  NT1 = NT2;
+%  NT2 = T;
+%end
+
+
+return
+
+Lett = 'ACGU';
+for e = 1:12,
+%for i = 2:4,
+%  for j = 2:4,
+    [Lett(i) Lett(j)]
+    [N1,N2,E] = zGetExemplar(e,3,2);
+    if ~isempty(N1.Code) && ~isempty(N2.Code),
+      clf
+      VP.Sugar = 1;
+      zPlotOneNT(N1,VP)
+      zPlotOneNT(N2,VP)
+      axis square
+      pause
+%    end
+%  end
+ end
+end

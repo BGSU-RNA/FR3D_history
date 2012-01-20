@@ -667,7 +667,7 @@ function  PlotMotif(File,Search,Query,Display,i)
     Indices = xNeighborhood(File(f),Indices,v,Display(1));
   end
 
-  if exist('amal.txt','file') > 0,
+  if exist('amal.txt','file') > 0 && N == 3,
      VP.AtOrigin = 1;
   end
 
@@ -698,7 +698,7 @@ function  PlotMotif(File,Search,Query,Display,i)
 
   % Commands for Amal's study of base triples:
 
-  if exist('amal.txt','file') > 0,
+  if exist('amal.txt','file') > 0 && N == 3,
 
     N1 = File(f).NT(Indices(1));
     N2 = File(f).NT(Indices(2));
@@ -720,6 +720,45 @@ function  PlotMotif(File,Search,Query,Display,i)
     else
       ylabel(['Plot ',int2str(n),' of ',int2str(s)]);
     end
+
+    BP1 = File(f).Edge(Indices(1),Indices(2));
+    BP2 = File(f).Edge(Indices(2),Indices(3));
+    BP3 = File(f).Edge(Indices(3),Indices(1));
+
+    BP1 = BP1 - 100*fix(BP1/100);
+    BP2 = BP2 - 100*fix(BP2/100);
+    BP3 = BP3 - 100*fix(BP3/100);
+
+    if BP2 ~= 0,
+      FFF = zMakeTriple(BP1,BP2,N1.Code,N2.Code,N3.Code);
+      if ~isempty(FFF),
+        hold on
+        VPP.AtOrigin = 1;
+        VPP.Sugar = 0;
+        VPP.LineStyle = '-.';
+        zDisplayNT(FFF,1:3,VPP)
+        view(2)
+
+        fprintf('Discrepancy from model: %7.4f\n',xDiscrepancy(File(f),Indices(1:3),FFF,1:3));
+
+      end
+    elseif BP3 ~= 0,
+      FFF = zMakeTriple(BP3,BP1,N3.Code,N1.Code,N2.Code);
+      if ~isempty(FFF),
+        hold on
+        FFF.NT = FFF.NT([2 3 1]);
+        VPP.AtOrigin = 1;
+        VPP.Sugar = 0;
+        VPP.LineStyle = '-.';
+        zDisplayNT(FFF,1:3,VPP)
+        view(2)
+
+        fprintf('Discrepancy from model: %7.4f\n',xDiscrepancy(File(f),Indices(1:3),FFF,1:3));
+
+      end
+    end
+
+
   end
   % end of commands for Amal
 

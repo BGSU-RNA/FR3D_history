@@ -17,6 +17,7 @@ Node(n).Comment = '';
 Node(n).NumLoops = [];
 if n == 1,
   Node(n).Edge = sparse(zeros(length(File.NT)));
+  Node(n).Extensibility = zeros(1,length(File.NT));
 end
 Node(n).Delete = [];
 Node(n).SubsProb = [];

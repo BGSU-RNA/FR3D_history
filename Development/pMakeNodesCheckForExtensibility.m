@@ -12,6 +12,8 @@ if sum(sum(J(a:B,Outside))) == 0 && ... % no tertiary inter outside this stem
      fprintf('After node %3d, this stem is free of tertiary interactions\n',n);
     end
 
+    Node(1).Extensibility(a:B) = ones(1,length(a:B));
+
     if Extension > 1,                    % replace rest of stem with cWW BPs
       G(a:B,a:B) = G(a:B,a:B) .* (abs(fix(G(a:B,a:B))) == 1);
       H(a:B,a:B) = H(a:B,a:B) .* (abs(fix(G(a:B,a:B))) == 1);

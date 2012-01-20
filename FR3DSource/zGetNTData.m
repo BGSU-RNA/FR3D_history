@@ -70,6 +70,16 @@ for f=1:length(Filenames),
       if Verbose > 0,
         fprintf('Loaded  %s\n', [FILENAME '.MAT']);
       end
+    elseif (exist(strcat(FILENAME,'.mat'),'file') > 0),  % helps on a Mac
+      load(strcat(FILENAME,'.mat'),'File','-mat');
+      if Verbose > 0,
+        fprintf('Loaded  %s\n', [FILENAME '.mat']);
+      end
+    elseif (exist(strcat(filename,'.MAT'),'file') > 0),  % helps on a Mac
+      load(strcat(filename,'.MAT'),'File','-mat');
+      if Verbose > 0,
+        fprintf('Loaded  %s\n', [FILENAME '.mat']);
+      end
     elseif (exist(strcat(filename,'.mat'),'file') > 0),  % helps on a Mac
       load(strcat(filename,'.mat'),'File','-mat');
       if Verbose > 0,
