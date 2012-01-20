@@ -3,16 +3,6 @@
 
 function [D] = zMutualDistance(A,L)
 
-a = sum((A.*A)');                  % sum of squares of each row
+D = squareform(pdist(A));
 
-N = length(a);
-
-B = A * A';                        % inner products of rows of A
-
-C = repmat(a,N,1);
-
-D = C + C' - 2*B;
-
-D = sparse(D .* (D < L^2));
-
-D = sqrt(D);
+D = sparse(D .* (D < L));

@@ -2,12 +2,7 @@
 %File = zGetNTData('5S_Hm_Ec',0);
 %Ch=mGetChainsOfNTnumber(File,'1')
 %Ch=mGetChainsOfNTnumber(File,'3')
-
-% This should eventually be replaced by zIndexLookup
-
-function Ch = mGetChainsOfNTnumber(File,NTnum) %File here is the Query PDB  
-
-%%NTnum must be a character not number
+function Ch = mGetChainsOfNTnumber(File,NTnum) %File here is the Query PDB  %%num must be a character not number
 
 ct=1;
 for i=1:length(File.NT)

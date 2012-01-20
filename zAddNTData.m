@@ -1,30 +1,52 @@
 % zAddNTData(Filenames,ReadCode,File) reads RNA structure data files, if
-% necessary, so that all molecules listed in Filenames are present in File
+% necessary, so that all molecules listed in Filenames are present in File.
+% The parameter Index is a non-redundant list of indices of File
+% corresponding to names in Filenames.
 
 function [File,Index] = zAddNTData(Filenames,ReadCode,File)
 
 if strcmp(class(Filenames),'char'),
-  Filenames = {Filenames};
+  Filenames = {Filenames};                % make into a cell array
+end
+
+% ----------------------------------------- Read PDB lists, if any
+
+FullList = [];
+
+for j=1:length(Filenames),
+  FullList = [FullList; zReadPDBList(Filenames{j})];
+end
+
+for f = 1:length(FullList),
+  FL{f} = lower(FullList{f});
+  FirstOccurence(f) = isempty(strmatch(FL{f},FL(1:(f-1)),'exact'));
+end
+
+FullList = FullList(find(FirstOccurence));
+
+if nargin < 2,
+  ReadCode = 0;
 end
 
 if nargin < 3,                            % no data already loaded
-  File = zGetNTData(Filenames,ReadCode);
-  Index = 1:length(Filenames);
-else
-  for j = 1:length(File),
-    LoadedFiles{j} = lower(File(j).Filename);
-  end
+  File = zGetNTData(FullList{1},ReadCode);
+end
 
-  F = length(File);
+for j = 1:length(File),
+  LoadedFiles{j} = lower(File(j).Filename);
+end
 
-  for f = 1:length(Filenames),
-    i = strmatch(lower(Filenames{f}), LoadedFiles);
-    if isempty(i),
-      File(F+1) = zGetNTData(Filenames{f},ReadCode);
-      F = length(File);
-      Index(f) = F;
-    else
-      Index(f) = i(1);
-    end
+F = length(File);
+
+for f = 1:length(FullList),                       % loop through PDB list
+  i = strmatch(lower(FullList{f}), LoadedFiles);
+  if isempty(i),                                  % if PDB not loaded,
+    File(F+1) = zGetNTData(FullList{f},ReadCode); %   load it
+    F = length(File);
+    LoadedFiles = [LoadedFiles FullList{f}];
+    Index(f) = F;                                 %   point to it
+  else                                            % but if PDB has been loaded
+    Index(f) = i(1);                              %   point to first instance
   end
 end
+

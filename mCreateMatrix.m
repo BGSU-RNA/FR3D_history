@@ -1,5 +1,7 @@
 %mCreateMatrix
 
+% modify the nucleotide index lookup to be aware of the given chain
+
 %%%%%%Create the basepair matrix (and delete extra ones) for determining
 %%%%%%Query.Diff, Query.ReqInter, Query.Diagonal
 %%%%%%Query.Config added
@@ -22,12 +24,15 @@ for i=1:12
 end
 for i=1:length(NT)
     if get(handles.Geometric,'Value') == 1
-        Bas=mGetBaseFromNTnumberAndChain(File(SIndex),NT{i},ChainList(i));
+        ind = zIndexLookup(File(QIndex),NT(i),ChainList(i));
+        Bas = File(QIndex).NT(ind).Base;
+%        Bas=mGetBaseFromNTnumberAndChain(File(QIndex),NT{i},ChainList(i));
+
     else
         Bas='NT';
     end
     %%%Horizontal title line:
-%     handles.BPtexth(i) = uicontrol('Tag',strcat('BPtexth',num2str(i)),'Style','text','Units','normalized','Position',[(0.25+0.057*i) (0.73) .054 .04],'String',strcat(File(SIndex).NT(str2num(NT{i})).Base,NT(i)));
+%     handles.BPtexth(i) = uicontrol('Tag',strcat('BPtexth',num2str(i)),'Style','text','Units','normalized','Position',[(0.25+0.057*i) (0.73) .054 .04],'String',strcat(File(QIndex).NT(str2num(NT{i})).Base,NT(i)));
     handles.BPtexth(i) = uicontrol('Tag',strcat('BPtexth',num2str(i)),'Style','text','Units','normalized','Position',[(0.25+0.057*i) (0.71) .054 .04],'String',strcat(Bas,NT(i)));
     %%%Vertical title line:
     handles.BPtextv(i) = uicontrol('Tag',strcat('BPtextv',num2str(i)),'Style','text','Units','normalized','Position',[(0.26) (0.715-0.0445*i) .054 .04],'String',strcat(Bas,NT(i)));

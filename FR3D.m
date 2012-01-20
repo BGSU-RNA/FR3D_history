@@ -64,8 +64,8 @@ if Query.Geometric > 0,                       % if a geometric search
       File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
              % sparse matrix of center-center distances, up to Query.DistCutoff
       if length(File(i).NT) > 10,
-        zSaveNTData(File(i));
-        drawnow;
+%        zSaveNTData(File(i));                % don't bother, avoid mistakes
+%        drawnow;
       end
       CalcFlag = 1;
     end

@@ -1,4 +1,5 @@
-% zPairViewer loads one or more pdb files, allows the user to specify
+% PairViewer(File,Param,ViewParam)
+% loads one or more pdb files, allows the user to specify
 % selection criteria, then displays pair information in various formats
 
 function [File] = PairViewer(File,Param,ViewParam)

@@ -40,26 +40,23 @@ for f=1:length(Filenames),
   filename = lower(Filename);
   if (ReadCode < 4) & (exist(strcat(Filename,'.mat'),'file') > 0),
       load(strcat(Filename,'.mat'),'File','-mat');
-      File.Distance = tril(File.Distance) + tril(File.Distance)';  
-                                          % only saved lower triangular part
       fprintf('Loaded %s\n', [Filename '.mat']);
       ClassifyCode = 0;
   elseif (ReadCode < 4) & (exist(strcat(FILENAME,'.MAT'),'file') > 0),  % helps on a Mac
       load(strcat(FILENAME,'.MAT'),'File','-mat');
-      File.Distance = tril(File.Distance) + tril(File.Distance)';  
-                                          % only saved lower triangular part
       fprintf('Loaded %s\n', [FILENAME '.MAT']);
       ClassifyCode = 0;
   elseif (ReadCode < 4) & (exist(strcat(filename,'.mat'),'file') > 0),  % helps on a Mac
       load(strcat(filename,'.mat'),'File','-mat');
-      File.Distance = tril(File.Distance) + tril(File.Distance)';  
-                                          % only saved lower triangular part
       fprintf('Loaded %s\n', [FILENAME '.MAT']);
       ClassifyCode = 0;
   else
       File = zReadandAnalyze(Filename);
       ClassifyCode = 1;
   end
+
+  c = cat(1,File.NT(1:File.NumNT).Center);
+  File.Distance = zMutualDistance(c,35); 
 
   if isfield(File,'BI'),
     File = rmfield(File,'BI');
@@ -75,18 +72,23 @@ for f=1:length(Filenames),
 
   Overlap = 0;
 
+  if ~isfield(File,'ClassVersion'),
+    File.ClassVersion = 0;
+  end
+
   if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
     (ClassifyCode == 1) | (length(fieldnames(File)) < 11) | ...
-    (max(max(File.Inter)) < 100),
+    (max(max(File.Inter)) < 100) | File.ClassVersion < 1,
     File.Edge = sparse(File.NumNT,File.NumNT);
 
     d = sort(nonzeros(File.Distance));
     if d(min(10,length(d))) < 1,
-      fprintf('%s has overlapping nucleotides and should be re-read\n',File.Filename);
+      fprintf('%s has overlapping nucleotides and should be avoided as such\n',File.Filename);
       Overlap = 1;
     else
       File = zClassifyPairs(File);
       File = zUpdateDistanceToExemplars(File);
+      File.ClassVersion = 1;
       ClassifyCode = 1;
     end
   end
@@ -98,6 +100,8 @@ for f=1:length(Filenames),
     end
     ClassifyCode = 1;
   end
+
+File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
 
   if ~isfield(File,'Header'),
     File.Header.ModelStart = [];

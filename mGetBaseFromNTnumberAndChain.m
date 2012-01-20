@@ -2,8 +2,6 @@
 %File = zGetNTData('5S_Hm_Ec',0);
 %Bas=mGetBaseFromNTnumberAndChain(File,'2','A')
 
-% should be replaced by zIndexLookup
-
 function Bas = mGetBaseFromNTnumberAndChain(File,NTnum,cha)
 
 N=[];

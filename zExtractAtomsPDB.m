@@ -50,7 +50,7 @@ if fid > 0
   fclose(fid);
   fclose(out);
 
-  fprintf('Read  %s.pdb\n', Filename)
+  fprintf('Read %s.pdb for header information\n', Filename)
 
 else
 

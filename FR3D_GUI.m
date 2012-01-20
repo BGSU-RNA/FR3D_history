@@ -25,6 +25,21 @@ function varargout = FR3D_GUI(varargin)   %By Ali Mokdad - March 2006
 
 % Last Modified by GUIDE v2.5 17-Jul-2006 19:31:53
 
+if ~(exist('PDBFiles') == 7),        % if directory doesn't yet exist
+  mkdir('PDBFiles');
+end
+path(path,[pwd filesep 'PDBFiles']);
+
+if ~(exist('PrecomputedData') == 7),        % if directory doesn't yet exist
+  mkdir('PrecomputedData');
+end
+path(path,[pwd filesep 'PrecomputedData']);
+
+if ~(exist('SearchSaveFiles') == 7),        % if directory doesn't yet exist
+  mkdir('SearchSaveFiles');
+end
+path(path,[pwd filesep 'SearchSaveFiles']);
+
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -57,11 +72,11 @@ else
 end
 set(handles.LOAD,'String',savedff);
 
-mGetPDBfilenames %defines s
+mGetPDBfilenames                                   % defines s
 set(handles.SearchPDBs,'String',s);
 set(handles.SearchPDBs,'Min',1);
 set(handles.SearchPDBs,'Max',length(s)+1);
-set(handles.QueryPDB,'String',s);
+set(handles.QueryPDB,'String',snolist);
 
 handles.output = hObject;
 guidata(hObject, handles);
@@ -71,9 +86,7 @@ function varargout = FR3D_GUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-
-
-
+% ----------------------------------------- Loads saved search
 
 function LOAD_Callback(hObject, eventdata, handles)
 
@@ -86,19 +99,19 @@ else
   end
 end
 
-set(handles.LOAD,'String',savedff); %Update without having to reopen GUI
+set(handles.LOAD,'String',savedff);  % Update without having to reopen GUI
 
 v=get(handles.LOAD,'Value');
 f=savedff{v,1};
 l=strcat('SearchSaveFiles/',f);
 load(l)
 
-
-
 mSetLoadedParameters
 
 handles.Search=Search;
 guidata(hObject, handles);
+
+% ----------------------------------------- Change query PDB
 
 function QueryPDBedit_Callback(hObject, eventdata, handles)
 function QueryPDBedit_CreateFcn(hObject, eventdata, handles)
@@ -106,6 +119,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+% ----------------------------------------- Change query nucleotides
 
 function QueryNTs_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -114,14 +128,16 @@ end
 function QueryNTs_Callback(hObject, eventdata, handles)
 
 
-% --- Executes on button press in ReadQuery.
+% ------------------------------- Executes on button press in ReadQuery
+
 function ReadQuery_Callback(hObject, eventdata, handles)
 %%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
-NTs = [',' get(handles.QueryNTs,'String') ','];
-NTs    = regexprep(NTs,'A|C|G|U','');      % strip out base letters is present
-NTs    = regexprep(NTs,';| ',',');
+
+NTs = [',' get(handles.QueryNTs,'String') ',']; % pad with commas; useful below
+NTs = regexprep(NTs,'A|C|G|U','');      % strip out base letters if present
+NTs = regexprep(NTs,';| ',',');
 while strfind(NTs,',,'),
-    NTs = regexprep(NTs,',,',',');
+  NTs = regexprep(NTs,',,',',');
 end
 ind=findstr(',',NTs);
 for i=1:length(ind)-1
@@ -138,53 +154,60 @@ if length(NT)<=12 %this is a limitation by the size of the GUI
     set(handles.Status,'String','Reading query PDB, please wait ...');
     drawnow
     %%handles.File.Filename 
+
     %%%%%%%%%%%%%%%ALERT: CRAIG'S HELP NEEDED: I need to use File(SIndex), but how to set SIndex???????
+
+% response: use Qindex here, Sindex for the list of search files
     
     if isfield(handles,'File')
         File = handles.File;
-        [File,SIndex]=zAddNTData(Query.Filename,0,File);
+        [File,QIndex]=zAddNTData(Query.Filename,0,File);
     else
-        [File,SIndex]=zAddNTData(Query.Filename,0);
+        [File,QIndex]=zAddNTData(Query.Filename,0);
     end
     %%%
 
-    %     mCreateDynamicGUI %Creates all dynamic popum menus and edit boxes and hides extra ones from previous searches
-    mCreateChains
+    %     mCreateDynamicGUI 
+    % Creates all dynamic popum menus and edit boxes and hides extra ones 
+    % from previous searches
 
+    mCreateChains                        % find chains for these nucleotides
 
     %Pass some variables created here to be used by other functions
     handles.NT=NT;
     handles.Filename = Query.Filename;
     handles.File = File;
-    handles.SIndex=SIndex;
+    handles.QIndex=QIndex;               % index of File for query file
     handles.NTList=Query.NTList;
     guidata(hObject, handles);
 
     if get(handles.ViewQuery,'Value')==1
         figure(3)
         zDisplayNT(File(SIndex),NT);
+        grid off
+        rotate3d on
     end
     set(handles.Status,'String','Choose "Query Chains" and click "Generate Interaction Matrix"');
     set(handles.GenerateMatrix,'Visible','on');
 
 else
-    set(handles.Status,'String','Error: It is not possible to use this GUI for a motif longer than 12 NTs');
+    set(handles.Status,'String','Error: It is not possible to use this GUI for a motif longer than 12 NTs.  Use FR3D.');
     set(handles.GenerateMatrix,'Visible','off');
 end
 set(handles.RunSearch,'Visible','off');
 set(handles.ListCandidates,'Visible','off');
 set(handles.DisplayCandidates,'Visible','off');
 
+% ------------------------------------------------ Generate interaction matrix
 
 function GenerateMatrix_Callback(hObject, eventdata, handles)
 
 if get(handles.Geometric,'Value') == 1
     NT=handles.NT;
     File=handles.File;
-    SIndex=handles.SIndex;
+    QIndex=handles.QIndex;
 
     %%%Read Query.ChainList from GUI
-    % Query.ChainList      = {'9' '9' '9'};
     for i=1:length(NT)
         h=findobj('Tag',strcat('ChainPopup',num2str(i)));
         s=get(h,'String');
@@ -195,11 +218,11 @@ if get(handles.Geometric,'Value') == 1
     ChainList=Query.ChainList;
     handles.ChainList=ChainList;
     handles.NTlen=length(NT);
-    set(handles.Status,'String','Ready to "Search"');
+    set(handles.Status,'String','Ready to Search');
 else
     NTlen=str2num(get(handles.NumberOfNTs,'String'));
     if NTlen>12
-        set(handles.Status,'String','12 is the maximum length of motifs that can be addressed in this GUI. Ready to "Search"');
+        set(handles.Status,'String','12 is the maximum number of nucleotides that can be addressed in this GUI. Ready to "Search"');
     else
         set(handles.Status,'String','Ready to "Search"');
     end
@@ -210,7 +233,7 @@ else
     handles.NTlen=NTlen;
 end
 
-mCreateMatrix
+mCreateMatrix                                  % generate interaction matrix
 set(handles.GuarCutoffText,'visible','on');
 set(handles.GuarCutoff,'visible','on');
 set(handles.RelCutoffText,'visible','on');
@@ -233,7 +256,6 @@ if ~isdeployed,clc,end
 % if get(handles.Geometric,'Value') == 1
 if isfield(handles,'File')
     File=handles.File;
-    SIndex=handles.SIndex;
 end
 if get(handles.Geometric,'Value') == 1
     Query.Filename=handles.Filename;
@@ -257,7 +279,6 @@ set(handles.Status,'String','Searching... Please wait (press Ctrl+C to interrupt
 drawnow
 
 FR3D
-% Search.Query.Inter
 
 handles.File=File;
 handles.SIndex=SIndex;

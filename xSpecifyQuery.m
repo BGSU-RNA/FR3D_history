@@ -46,7 +46,7 @@ case 'Sarcin5Geo'
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.5;
-  Query.SearchFiles    = {'1s72'};
+  Query.SearchFiles    = {'1s72' 'HighResolution_list'};
 
 case 'Sarcin5Symb'
   Query.Description    = 'Sarcin five nucleotide symbolic';

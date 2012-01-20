@@ -264,19 +264,12 @@ for n=1:NumNT,                                   % analyze all nucleotides
   NT(n).Syn         = 0;
 end
 
-% Compute center-center distances -------------------------------------------
-
-c = cat(1,NT(1:NumNT).Center);   % locations of base centers
-
-Distance = zMutualDistance(c,35);
-                               % sparse matrix of center-center distances < 35
-
 % Fill in fields of File ----------------------------------------------------
 
 File.Filename  = Filename;
 File.NT        = NT(1:NumNT);
 File.NumNT     = NumNT;
-File.Distance  = Distance;
+File.Distance  = [];
 File.HandClass = [];
 File.Comment   = [];
 File.CI        = sparse(NumNT,NumNT);
