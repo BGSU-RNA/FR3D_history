@@ -130,10 +130,10 @@ case 'GNRA5'
 % -------------------------------------------- Additional searches
 
 case 'Basepair'
-  Query.Edges{1,2}     = 'pair ~cWW';
+  Query.Edges{1,2}     = 'cWW AU';
 %  Query.Diff{1,2}      = '> <1000';
-  Query.Config{1}      = 'syn';
-  Query.SearchFiles    = {'1s72', '1j5e'};
+ % Query.Config{1}      = 'syn';
+ % Query.SearchFiles    = {'1s72', '1j5e'};
 
 case 'GNRA4NonSeq'
   Query.Description    = 'GRNA hairpin without sequential constraint';

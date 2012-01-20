@@ -1,6 +1,6 @@
 % xGroupCandidates clusters sequences and displays groups together
 
-function [Search] = xGroupCandidates(File,Search)
+function [Search] = xGroupCandidates(File,Search,Level)
 
 N      = Search.Query.NumNT;
 Search = xMutualDiscrepancy(File,Search);      % compute discrepancy matrix
@@ -27,4 +27,35 @@ D = Search.Disc(Done,Done);                    % mutual distances to consider
 Y = squareform(full(D));                       % convert to a vector
 Z = linkage(Y,'average');                      % compute cluster tree
 figure(25)
-H = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',Lab);
+[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',Lab);
+
+n = length(p):-1:1;
+r = Done(p(n));
+q = Done(p);                                      % reverse order
+
+% ----------------------------------- List and display results
+
+fprintf('Candidates sorted by centrality within these candidates:\n');
+fprintf('\n');
+
+S.Query        = Search.Query;                      % set up new "Search" data
+S.Candidates   = Search.Candidates(r,:);            % re-order candidates
+S.Discrepancy  = Search.Discrepancy(r);
+S.Disc         = Search.Disc(r,r);
+S.DiscComputed = Search.Disc(1,r);
+if isfield(Search,'AvgDisc'),
+  S.AvgDisc = Search.AvgDisc(r);
+end
+
+xListCandidates(File,S,Inf);                 % show on screen
+
+S.Query        = Search.Query;                      % set up new "Search" data
+S.Candidates   = Search.Candidates(q,:);            % re-order candidates
+S.Discrepancy  = Search.Discrepancy(q);
+S.Disc         = Search.Disc(q,q);
+S.DiscComputed = Search.Disc(1,q);
+if isfield(Search,'AvgDisc'),
+  S.AvgDisc = Search.AvgDisc(q);
+end
+
+xDisplayCandidates(File,S,Level+1);          % display, level 1

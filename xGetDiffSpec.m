@@ -33,8 +33,6 @@ if length(str) > 0,
    end
   end
 
-str
-
   lt = strfind(str,'<');
   for i=length(lt):-1:1,
    if lt(i)+1 <= length(str),
@@ -43,8 +41,6 @@ str
     end
    end
   end
-
-str
 
   commas = strfind(str,',');                % find locations of commas
   lim    = [0 commas length(str)+1];        % locations of tokens

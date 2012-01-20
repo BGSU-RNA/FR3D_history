@@ -7,7 +7,6 @@ Candidates = Search.Candidates;
 
 N     = Query.NumNT;
 [s,t] = size(Candidates);
-s     = min(s,200);                          % only order the first 200
 
 if ~isfield(Query,'LocWeight'),              % should not be necessary
   Query.LocWeight = ones(1,N);

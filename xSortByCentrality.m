@@ -1,6 +1,6 @@
 % xSortByCentrality re-orders the candidates according to their centrality
 
-function [Search] = xSortByCentrality(File,Search)
+function [Search] = xSortByCentrality(File,Search,Level)
 
 Search = xMutualDiscrepancy(File,Search);
 
@@ -24,5 +24,5 @@ S.DiscComputed = Search.Disc(1,j);
 S.AvgDisc      = z;
 
 xListCandidates(File,S,Inf);                 % show on screen
-xDisplayCandidates(File,S,1);                % display, level 1
+xDisplayCandidates(File,S,Level+1);          % display, level 1
 

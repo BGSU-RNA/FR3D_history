@@ -154,10 +154,10 @@ while stop == 0,
       xWriteCandidatePDB(File,Search);
 
     case 12                                     % sort by centrality
-      Search = xSortByCentrality(File,Search);
+      Search = xSortByCentrality(File,Search,Level);
 
     case 13
-      Search = xGroupCandidates(File,Search);
+      Search = xGroupCandidates(File,Search,Level);
 
     case 14                                     % align
       xAlignCandidates(File,Search,1)
@@ -272,13 +272,15 @@ function  PlotMotif(File,Search,Model,Display,i)
 
   zDisplayNT(File(f),Indices,VP);
 
-  if isfield(Search,'Discrepancy'),   
+  if isfield(Search,'AvgDisc'),   
+    xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Average discrepancy from others ', num2str(Search.AvgDisc(n))]);
+  elseif Model.Geometric > 0,
     xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Discrepancy ',...
           num2str(Search.Discrepancy(n))]);
   else
-    xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Average discrepancy from others ', num2str(Search.AvgDisc(n))]);
-    
+    xlabel(['Plot ',int2str(n),' of ',int2str(s)]);
   end
+
   if Search.Marked(n) == 1;
     yl = 'Marked';
   else
@@ -302,14 +304,13 @@ function  DisplayTable(File,Search,Model,Display,i)
     n       = Display(i).n;
     f       = Search.Candidates(n,N+1);
     Indices = double(Search.Candidates(n,1:N));
-    if isfield(Search,'Discrepancy'),
-      if Model.Geometric > 0,
-        fprintf('Discrepancy %6.4f', Search.Discrepancy(n));
-      else
-        fprintf('Candidate #%d', Search.Discrepancy(n));  % integer is cand num
-      end
-    else
+    
+    if isfield(Search,'AvgDisc'),
       fprintf('Average discrepancy from others %6.4f', Search.AvgDisc(n));
+    elseif Model.Geometric > 0,
+      fprintf('Discrepancy %6.4f', Search.Discrepancy(n));
+    else
+      fprintf('Candidate #%d', Search.Discrepancy(n));  % integer is cand num
     end
 
     zShowInteractionTable(File(f),double(Indices));
