@@ -29,7 +29,9 @@ k = find(i<j);                                  % look at each pair only once
 i = i(k);                                       % reduce list of indices
 j = j(k);                                       % reduce list of indices
 
-fprintf('Classifying %5d pairs of bases for interactions ...', length(i));
+if Verbose > 0,
+  fprintf('Classifying %5d pairs of bases for interactions ...', length(i));
+end
 
 % -------- Screen and analyze base pairs ------------------------------------ 
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 

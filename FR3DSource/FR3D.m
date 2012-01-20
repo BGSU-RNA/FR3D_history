@@ -1,12 +1,8 @@
-% xFR3DSearch conducts the search given in xSpecifyQuery in the PDB files 
-% listed in zFileNameList
+% FR3D conducts the search given in xSpecifyQuery in the PDB files listed
+% in zFileNameList
 
 % Change the list of PDB files to be searched by editing zFileNameList
 % Change the query by editing xSpecifyQuery
-
-if ~exist('Verbose'),
-  Verbose = 1;                               % default is to print output
-end
 
 if ~exist('GUIactive') && ~exist('UsingLibrary'),  % FR3D should just search
   Query     = xSpecifyQuery;                 % get search parameters
@@ -58,30 +54,34 @@ if isfield(Query,'NumNT'),                    % if query is specified OK
 
 % ------------------------------------------- Display query information------
 
-if Verbose > 0,
-  fprintf('Query %s:', Query.Name);             % display query name
+fprintf('Query %s:', Query.Name);             % display query name
 
-  if isfield(Query,'Description'),
-    fprintf(' %s\n', Query.Description);
-  else
-    fprintf('\n');
-  end
+if isfield(Query,'Description'),
+  fprintf(' %s\n', Query.Description);
+else
+  fprintf('\n');
 end
 
 % ------------------------------------------- Calc more distances if needed -
 
-for f=1:length(SIndex),
-  i = SIndex(f);
-  if isempty(File(i).Distance),
-    dmin = 0;
-  else
-    dmin = ceil(max(max(File(i).Distance)));
-  end
-
-  if (ceil(Query.DistCutoff) > dmin) && (File(i).NumNT > 0),
-    c = cat(1,File(i).NT(1:File(i).NumNT).Center);
-    File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
+if Query.Geometric > 0,                       % if a geometric search
+  tic                                         % keep track of time
+  CalcFlag = 0;                               % if more distances were needed
+  for f=1:length(SIndex),
+    i = SIndex(f);
+    if ceil(Query.DistCutoff) > ceil(max(max(File(i).Distance))),
+      c = cat(1,File(i).NT(1:File(i).NumNT).Center);
+      File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
              % sparse matrix of center-center distances, up to Query.DistCutoff
+      if length(File(i).NT) > 10,
+%        zSaveNTData(File(i));                % don't bother, avoid mistakes
+%        drawnow;
+      end
+      CalcFlag = 1;
+    end
+  end
+  if CalcFlag > 0,
+    fprintf('Calculated more distances in %5.3f seconds\n', toc);
   end
 end
 
@@ -91,14 +91,12 @@ drawnow
 
 starttime = cputime;
 
-Candidates = xFindCandidates(File(SIndex),Query,Verbose);  % screen for candidates
+Candidates = xFindCandidates(File(SIndex),Query);  % screen for candidates
 
 if ~isempty(Candidates),                         % some candidate(s) found
  if Query.Geometric > 0,
   [Discrepancy, Candidates] = xRankCandidates(File(SIndex),Query,Candidates);
-  if Verbose > 0,
-    fprintf('Found %d candidates in the desired discrepancy range\n',length(Discrepancy));
-  end
+  fprintf('Found %d candidates in the desired discrepancy range\n',length(Discrepancy));
 
    if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0) ...
      & (Query.NumNT > 2),
@@ -106,9 +104,7 @@ if ~isempty(Candidates),                         % some candidate(s) found
                                                  % quick reduction in number
      [Candidates, Discrepancy] = xExcludeOverlap(Candidates,Discrepancy,400); 
                                                 % find top 400 distinct ones
-     if Verbose > 0,
-       fprintf('Removed highly overlapping candidates, kept %d\n', length(Candidates(:,1)));
-     end
+     fprintf('Removed highly overlapping candidates, kept %d\n', length(Candidates(:,1)));
    end
 
  else
@@ -120,7 +116,6 @@ if ~isempty(Candidates),                         % some candidate(s) found
  end
 
 % -------------------------------------------------- Save results of search
-
   Search.Query       = Query;
   Search.Filenames   = Filenames;
   Search.TotalTime   = cputime - starttime;
@@ -128,11 +123,6 @@ if ~isempty(Candidates),                         % some candidate(s) found
   Search.Time        = Search.SaveName(12:18);
   Search.SaveName    = strrep(Search.SaveName,' ','_');
   Search.SaveName    = strrep(Search.SaveName,':','_');
-  Search.SaveName    = strrep(Search.SaveName,'<','_');
-  Search.SaveName    = strrep(Search.SaveName,'>','_');
-  Search.SaveName    = strrep(Search.SaveName,'?','_');
-  Search.SaveName    = strrep(Search.SaveName,'*','_');
-  Search.SaveName    = strrep(Search.SaveName,'&','_');
   Search.Candidates  = Candidates;
   Search.Discrepancy = Discrepancy;
 
@@ -148,9 +138,7 @@ if ~isempty(Candidates),                         % some candidate(s) found
  end
 % ------------------------------------------------ Display results
 
- if Verbose > 0,
-   fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
- end
+ fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
 
  if (~exist('GUIactive')) && (~isempty(Candidates)) && ~exist('UsingLibrary'),
    xListCandidates(Search,Inf,1);

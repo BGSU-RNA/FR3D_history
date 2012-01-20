@@ -1,14 +1,19 @@
 % zReadPDBList(Filename) reads Filename.pdb for a list of PDB file names
 
-function [NewNames] = zReadPDBList(Filename)
+function [NewNames] = zReadPDBList(Filename,Verbose)
+
+if nargin < 2,
+  Verbose = 1;
+end
 
 NewNames = '';
 
 if isempty(strfind(Filename,'_list')),
   NewNames = {Filename};
-elseif strcmp(Filename,'AllFiles_list'),
+elseif strcmpi(Filename,'AllFiles_list'),
   [s,NewNames] = mGetPDBFilenames;
 elseif ~isempty(Filename),
+  Filename = strrep(Filename,'.pdb','');
   fid = fopen(['PDBFiles' filesep Filename '.pdb'],'r');
 
   if fid > 0
@@ -28,7 +33,7 @@ elseif ~isempty(Filename),
 
     fclose(fid);
 
-    fprintf('Read %s.pdb\n', Filename)
+    fprintf('Read list %s.pdb\n', Filename)
 
   else
 

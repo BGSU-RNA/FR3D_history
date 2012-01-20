@@ -1,4 +1,4 @@
-% zGetNTData reads data files, depending on ReadCode
+% zGetNTData(Filenames,ReadCode,SizeCode,Verbose) reads data files, depending on ReadCode
 %
 % If ReadCode = 0, it looks for Filename.mat and reads it if it exists.
 %    If no hand classification data is present, it looks for Filename.class.
@@ -110,7 +110,7 @@ for f=1:length(Filenames),
   else
     File.SizeCode = 2;
 
-% if File.Info is empty, do this:
+    % if File.Info is empty, do this:
 
     File = zGetPDBInfo(File);          % temporary!
   end
@@ -125,6 +125,10 @@ for f=1:length(Filenames),
 
   if isfield(File,'Inter'),
     File = rmfield(File,'Inter');
+  end
+
+  if isfield(File,'Header'),
+    File = rmfield(File,'Header');
   end
 
   Overlap = 0;
@@ -152,22 +156,22 @@ for f=1:length(Filenames),
          Overlap = 1;
          File.Pair = [];
        else
-t = cputime;
+         t = cputime;
          File = zClassifyPairs(File);
 
-%fprintf(' Finding nearest exemplars ...');
-%        File = zUpdateDistanceToExemplars(File);
+         if Verbose > 0,
+           fprintf(' Base-phosphate interactions ... ');
+         end
 
-      if Verbose > 0,
-        fprintf(' Base-phosphate interactions ... ');
-      end
          File = zPhosphateInteractions(File);
          File.ClassVersion = CurrentVersion;
          ClassifyCode = 1;
-      if Verbose > 0,
-        fprintf('Classification took %4.2f minutes\n', (cputime-t)/60);
-      end
-         File = zInteractionRange(File,0);
+
+         File = zInteractionRange(File,Verbose);
+
+         if Verbose > 0,
+           fprintf('Classification took %4.2f minutes\n', (cputime-t)/60);
+         end
        end
       end
     end
@@ -183,17 +187,8 @@ t = cputime;
     File.Pair     = [];
   end
 
-  % File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
-
-  if ~isfield(File,'Header'),
-    File.Header.ModelStart = [];
-    File.Header.ExpData    = '';
-    File.Header.Resolution = '';
-    ClassifyCode = 1;
-  end
-
   if ~isfield(File,'Range'),
-    File = zInteractionRange(File,1);
+    File = zInteractionRange(File,Verbose);
     ClassifyCode = 1;
   end
 

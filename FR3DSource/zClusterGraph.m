@@ -1,6 +1,6 @@
-% zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It re-orders the instances to group them into clusters, and puts nearby clusters next to one another.  Then it displays the distances graphically.  W is the number of characters of Lab to use.
+% zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It re-orders the instances to group them into clusters, and puts nearby clusters next to one another.  Then it displays the distances graphically.  W(1) is the number of characters of Lab to use on the vertical axis, W(2) on the horizontal.  pp is an optional user-supplied ordering vector.
 
-function [void] = zClusterGraph(D,Lab,W)
+function [void] = zClusterGraph(D,Lab,W,pp)
 
 % ----------------------------------------- Cluster analysis
 
@@ -17,6 +17,10 @@ Z = linkage(Y,'average');                      % compute cluster tree
 
 DD = full(D);
 p = zOrderGroups(Y,Z,DD);               % put instances in order
+
+if nargin == 4,
+  p = pp;                               % use user-supplied ordering
+end
 
 DDD = DD(p,p);                          % re-order according to p
 d = d(p);                               % re-order diagonal too
@@ -60,8 +64,8 @@ caxis([0 16]);
 colorbar('location','eastoutside');
 
 for i = 1:t,
-  SLab{i} = Lab{i}(1:W);
-  SSLab{i} = Lab{i}(1:W);
+  SLab{i} = Lab{i}(1:W(1));
+  SSLab{i} = Lab{i}(1:W(2));
 end
 
 FS = 12;

@@ -44,7 +44,7 @@ end
 FullList = [];
 
 for j=1:length(Filenames),
-  FullList = [FullList; zReadPDBList(Filenames{j})];
+  FullList = [FullList; zReadPDBList(Filenames{j},1)];
 end
 
 % ----------------------------------------- Skip some files

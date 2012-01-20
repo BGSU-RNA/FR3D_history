@@ -1,9 +1,8 @@
-% zExemplarTable(Cateogry) displays the best known
-% representatives for interactions involving all pairs in
-% interaction category(ies) Category
+% zExemplarTable(Cateogry) displays the best known representatives for interactions involving all pairs in interaction category(ies) Category
 % Example:  zExemplarTable(1,3.5)
 % Example:  zExemplarTable(1:12,3.5)
 
+% threshold controls coloring of the dendrogram
 % Subcat = 1, include subcategories, Subcat = 0, don't
 
 function [Y,Z,DD] = zExemplarTable(Category,threshold,Subcat)
@@ -36,7 +35,7 @@ ViewParam.ConnectSugar = 0;
 ViewParam.AtOrigin  = 1;
 ViewParam.Hydrogen  = 1;
 ViewParam.Sort      = 0;
-ViewParam.LabelBases= 8;                  % font size
+ViewParam.LabelBases= 8;                    % font size
 
 % loop through computer classifications, accumulating exemplars ------------
 
@@ -45,7 +44,7 @@ m = 1;                                      % counter for stored exemplars
 for ca = 1:length(Category),
  figure(fix(Category(ca)))
  clf
- plotted = zeros(16,1);
+ plotted = zeros(16,1);                     % keep track of which are plotted
 
  for c1 = 1:4,
   for c2 = 1:4,
@@ -106,8 +105,8 @@ for ca = 1:length(Category),
        F.NT(1) = E.NT1;
        F.NT(2) = E.NT2;
        F.Filename = E.Filename;
-%       zDisplayNT(F,[1 2],ViewParam);
-%       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
+       zDisplayNT(F,[1 2],ViewParam);
+       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
 
        view(2)
        grid off
@@ -125,15 +124,14 @@ for ca = 1:length(Category),
 
 
       if (E.Count >= 1),
-       B(m) = E;                                % store this exemplar
+       B(m) = E;                    % store this exemplar for isodisc calc
        Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
        Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
        m = m + 1;
 
-       % ------- AA, CC, GG, UU pairs are not very symmetric, so store twice
+       % ------- in symmetric families, store AA, CC, GG, UU pairs twice
 
-       if (E.NT1.Code == E.NT2.Code) && (Category(ca) ~= 2),
-%       if any(Category(ca) == [1 7 8 11 12]) && (E.NT1.Code == E.NT2.Code),
+       if (E.NT1.Code == E.NT2.Code) && any(Category(ca) == [1 7 8 11 12]),
          B(m) = E;                              % store again
          B(m).NT1 = E.NT2;
          B(m).NT2 = E.NT1;
@@ -144,7 +142,7 @@ for ca = 1:length(Category),
        end
       end
 
-      end
+     end
     end
    end
   end
@@ -208,57 +206,9 @@ end
 %print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
 
 % ------------------------------------------ Print table of isodiscrepancies
-
-DD = full(D);
-p = zOrderGroups(Y,Z,DD);               % put instances in order
-
-DDD = DD(p,p);                          % re-order according to p
-[s,t] = size(DDD);
-
-if length(Category) == 1,
-  fprintf('Table %d\n',Category(ca));
-else
-  fprintf('Tables ');
-  for c = 1:length(Category),
-    fprintf('%d ', Category(c));
-  end
-  fprintf('\n');
-end
-fprintf('                      ');
-for j=1:t,
-  fprintf('%6s', Lab{p(j)}(1:6));
-end
-fprintf('\n');
-
-for i=1:s,
-  Text{i} = sprintf('%24s ', Lab{p(i)});
-  for j= 1:t,
-    Text{i} = [Text{i} sprintf('%5.2f ', DDD(i,j))];
-  end
-end
-
-for i = 1:s,
-  fprintf('%s\n', Text{i});
-end
-
-fprintf('\n');
-
 % ------------------------------------------ Display graph of isodiscrepancies
 
-DDDD = zeros(s+1,t+1);
-DDDD(1:s,1:t) = DDD;
-figure
-pcolor(DDDD)
-shading flat
-axis ij
-view(2)
-colormap('default');
-map = colormap;
-map = map((end-8):-1:8,:);
-%map = map((end-8):-1:end,:);
-colormap(map);
-caxis([0 16]);
-colorbar('location','eastoutside');
+zClusterGraph(D, Lab, [5 2]);
 
 Title = [];
 for i = 1:length(Category),
@@ -269,26 +219,6 @@ if Subcat > 0,
   Title = [Title ' with subcategories'];
 end
 title(Title);
-
-for i = 1:t,
-  SLab{i} = Lab{i}(1:6);
-  SSLab{i} = Lab{i}(1:2);
-end
-
-FS = 12;
-if length(Lab) > 20,
-  FS = 8;
-elseif length(Lab) > 50,
-  FS = 4;
-elseif length(Lab) > 100,
-  FS = 3;
-end
-
-set(gca,'XTick',(1:s)+0.5)
-set(gca,'XTickLabel',SSLab(p),'FontSize',FS)
-
-set(gca,'YTick',(1:s)+0.5)
-set(gca,'YTickLabel',SLab(p),'FontSize',FS)
 
 saveas(gcf,['Isostericity' filesep Title '.pdf'],'pdf');
 saveas(gcf,['Isostericity' filesep Title '.png'],'png');
@@ -327,7 +257,7 @@ for p = 1:12,
   end
 end
 
-zClusterGraph(MeanD,Fam,3);
+zClusterGraph(MeanD,Fam,[3 3]);
 
 return
 
