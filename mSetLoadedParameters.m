@@ -1,14 +1,13 @@
-% mSetLoadedParameters fills in entries in the GUI from a saved search file
+%mSetLoadedParameters.m fills in entries in the GUI from a saved search file
+
 Query=Search.Query;
 
-s  = get(handles.SearchPDBs,'String');
-ss = get(handles.QueryPDB,'String');
-v = [];
-
+s=get(handles.SearchPDBs,'String');
+ss=get(handles.QueryPDB,'String');
+v=[];
 for i=1:length(Search.Filenames)
     v=[v find(strcmp(s,Search.Filenames{i}))];
 end
-
 set(handles.SearchPDBs,'Value',v);
 
 if Search.Query.Geometric == 1
@@ -41,12 +40,23 @@ if Search.Query.Geometric == 1
 
     
     
-    for i=1:12
-        h=findobj('Tag',strcat('ChainPopup',num2str(i)));
-        delete(h);
+% % %     for i=1:25
+% % %         h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+% % %         delete(h);
+% % %     end
+h = findobj('-regexp','Tag','ChainPopup[0-9]');
+delete(h);
+    
+    if length(NT)<13
+        x=.054;
+        y=.04;
+    else
+        x=.684/length(NT);
+        y=.54/length(NT);
     end
+    
     for i=1:length(NT)
-        handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.79) .054 .04],'String',Search.Query.ChainList{i},'Background',[1 1 1]);
+        handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.305+x*(i-1)) (0.795) x-.003 .04],'String',Search.Query.ChainList{i},'Background',[1 1 1]);
     end
     set(handles.QueryChains,'Visible','on')%this the text just to the left of the popups
 %     mCreateChains
@@ -76,10 +86,12 @@ else
     for i=1:Search.Query.NumNT
         NT{i}=num2str(i);
     end
-    for i=1:12
-        h=findobj('Tag',strcat('ChainPopup',num2str(i)));
-        delete(h);
-    end
+    % % %     for i=1:25
+    % % %         h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+    % % %         delete(h);
+    % % %     end
+    h = findobj('-regexp','Tag','ChainPopup[0-9]');
+    delete(h);
 end
 
 set(handles.SearchNameText,'Visible','on');
@@ -117,5 +129,4 @@ set(handles.RunSearch,'Visible','off');
 set(handles.Status,'String','Loaded saved search results. You can examine these results using "Display Candidates" or "List Candidates", or you can repeat the analysis by starting from "Read Query" '); 
 
 %%The matrix
-
 mCreateMatrix_Loaded

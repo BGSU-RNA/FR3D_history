@@ -27,16 +27,16 @@ else
 end
 
 switch NT.Code
-case 1,
-  col = [1 0 0];   % A is red 
-case 2,
-  col = [1 0.8 0]; % C is yellow
-case 3,
-  col = [0 1 0];   % G is green
-case 4, 
-  col = [0 0 1];   % U is blue
-otherwise,
-  col = [0 0 0];
+  case 1,
+    col = [1 0 0];   % A is red 
+  case 2,
+    col = [1 0.8 0]; % C is yellow
+  case 3,
+    col = [0 1 0];   % G is green
+  case 4, 
+    col = [0 0 1];   % U is blue
+  otherwise,
+    col = [0 0 0];
 end
 
 gray = 0.5*[1 1 1];
@@ -133,6 +133,6 @@ end
 end
 
 if LB > 0,
-  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
-%  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
+  text(X(1,1)+0.5,X(1,2),X(1,3)+0.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
+%  text(X(1,1)+0.5,X(1,2),X(1,3)+0.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
 end

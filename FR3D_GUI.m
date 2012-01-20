@@ -169,8 +169,6 @@ function ReadQuery_Callback(hObject, eventdata, handles)
 
   if isfield(handles,'File')
     File = handles.File;
-File
-File(1)
     [File,QIndex]=zAddNTData(Query.Filename,2,File);
   else
     [File,QIndex]=zAddNTData(Query.Filename,2);
@@ -179,11 +177,10 @@ File(1)
   %%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
 
   [Indices,Ch] = zIndexLookup(File(QIndex),get(handles.QueryNTs,'String'));
-
-  if length(Indices) > 12,
-    set(handles.Status,'String','Error: It is not possible to use this GUI for a motif larger than 12 NTs.  Use FR3D.');
-    set(handles.GenerateMatrix,'Visible','off');
-  end
+%   if length(Indices) > 25,
+%     set(handles.Status,'String','Error: It is not possible to use this GUI for a motif larger than 25 NTs.');
+%     set(handles.GenerateMatrix,'Visible','off');
+%   end
 
   %%%
 
@@ -193,35 +190,39 @@ File(1)
 
   % Create popupmenus (and delete extra ones) for determining Query.ChainPopup
 
-  for i=1:12
-    h=findobj('Tag',strcat('ChainPopup',num2str(i)));
-    delete(h);
+% % %   for i=1:25
+% % %     h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+% % %     delete(h);
+% % %   end
+h = findobj('-regexp','Tag','ChainPopup[0-9]');
+delete(h);
+
+
+  if length(Indices)<13
+      x=.054;
+      y=.04;
+  else
+      x=.684/min(25,length(Indices));
+      y=.54 /min(25,length(Indices));
   end
 
-  for i=1:min(12,length(Indices)),               % truncate at 12 nucleotides
+  for i=1:min(25,length(Indices)),               % truncate at 25 nucleotides
     Query.NTList{i} = File(QIndex).NT(Indices(i)).Number;
-    handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.795) .054 .04],'String',Ch{i},'Background',[1 1 1]);
+    handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.305+x*(i-1)) (0.795) x-.003 .04],'String',Ch{i},'Background',[1 1 1]);
   end
 
   set(handles.QueryChains,'Visible','on')
                              % this is the text just to the left of the popups
 
     %Pass some variables created here to be used by other functions
+    handles.Indices = Indices;
+    handles.NT=Query.NTList;
     handles.Filename = Query.Filename;
     handles.File = File;
     handles.QIndex=QIndex;               % index of File for query file
-
-    if length(Indices) > 0,
-      handles.Indices = Indices;
-      handles.NT=Query.NTList;
-      handles.NTList=Query.NTList;
-    else
-      fprintf('No query nucleotides found in the query file\n');
-    end
-
+    handles.NTList=Query.NTList;
     guidata(hObject, handles);
 
-  if length(Indices) > 0 
     if get(handles.ViewQuery,'Value')==1
         figure(3)
         clf
@@ -233,12 +234,12 @@ File(1)
     set(handles.Status,'String','Choose "Query Chains" and click "Generate Interaction Matrix"');
     set(handles.GenerateMatrix,'Visible','on');
 
-    set(handles.RunSearch,'Visible','off');
-    set(handles.ListCandidates,'Visible','off');
-    set(handles.DisplayCandidates,'Visible','off');
-  end
+set(handles.RunSearch,'Visible','off');
+set(handles.ListCandidates,'Visible','off');
+set(handles.DisplayCandidates,'Visible','off');
 
-% ------------------------------------------- Generate interaction matrix
+% ------------------------------------------------ Generate interaction matrix
+
 function GenerateMatrix_Callback(hObject, eventdata, handles)
 
 if get(handles.Geometric,'Value') == 1
@@ -260,12 +261,12 @@ if get(handles.Geometric,'Value') == 1
     set(handles.Status,'String','Ready to Search');
 else
     NTlen=str2num(get(handles.NumberOfNTs,'String'));
-    if NTlen>12
-        set(handles.Status,'String','12 is the maximum number of nucleotides that can be addressed in this GUI. Ready to "Search"');
+    if NTlen>25
+        set(handles.Status,'String','25 is the maximum number of nucleotides that can be addressed in this GUI. Ready to "Search"');
     else
         set(handles.Status,'String','Ready to "Search"');
     end
-    NTlen=min(12,NTlen);
+    NTlen=min(25,NTlen);
     for i=1:NTlen
       NT{i}=num2str(i);
     end
@@ -340,20 +341,6 @@ else
     set(handles.ListCandidates,'Visible','off');
     set(handles.DisplayCandidates,'Visible','off');
 end
-
-% --------------
-savedf = dir(['SearchSaveFiles' filesep '*.mat']);
-if length(savedf) == 0,
-  savedff=' ';
-else
-  for i = 1:length(savedf),
-    savedff{i,1} = savedf(i).name;
-  end
-end
-
-set(handles.LOAD,'String',savedff);  % Update without having to reopen GUI
-% ---------------
-
 guidata(hObject, handles);
 
 
@@ -425,10 +412,13 @@ set(handles.QueryPDB,'Visible','off');
 set(handles.QueryNTs,'Visible','off');
 % h=findobj('Tag','QueryPDB');delete(h);
 % h=findobj('Tag','QueryNTs');delete(h);
-for i=1:12
-    h=findobj('Tag',strcat('ChainPopup',num2str(i)));
-    delete(h);
-end
+% % % for i=1:25
+% % %     h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+% % %     delete(h);
+% % % end
+h = findobj('-regexp','Tag','ChainPopup[0-9]');
+delete(h);
+
 set(handles.QueryChains,'Visible','off')
 
 set(handles.NumberOfNTsTitle,'Visible','on');
@@ -461,12 +451,10 @@ end
 handles.File=File;
 guidata(hObject, handles);
 
-
 % --------------- Executes on button press in List Candidates
 function ListCandidates_Callback(hObject, eventdata, handles)
 
 Search=handles.Search;
-
 xListCandidates(Search,Inf);
 
 % --- Executes on selection change in Overlap.

@@ -63,7 +63,13 @@ for ca = 1:length(Category),
     end
 
     if ~isempty(E.Filename),
-     if abs(fix(E.Class)) == Category(ca),
+
+
+% modify the following line to include or exclude subcategories
+
+     if abs(E.Class) == Category(ca),          % don't include subcategories
+ 
+%     if abs(fix(E.Class)) == Category(ca),     % include subcategories
 
 %       fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
 %       zListPairData(E.Pair,1);
@@ -136,7 +142,7 @@ for ca = 1:length(Category),
  end
  h = gcf;
  orient landscape
- print(h,'-depsc2',['Isostericity\Exemplars' zEdgeText(Category(ca))]);
+% print(h,'-depsc2',['Isostericity\Exemplars' zEdgeText(Category(ca))]);
 
 end
 
@@ -213,7 +219,7 @@ else
   set(hh,'FontSize',8);
 end
 orient landscape
-print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
+%print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
 
 % ----------------------------------------- Display nearby exemplars
 

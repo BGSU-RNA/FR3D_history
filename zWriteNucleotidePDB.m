@@ -1,21 +1,23 @@
-% zWriteNucleotidePDB(NT,R,Sh) writes the atoms of nucleotide NT, with
+% zWriteNucleotidePDB(fid,NT,a,c,R,Sh) writes the atoms of nucleotide NT, with
 % hydrogens, to the current file id.
 % If specified, it rotates by R, shifts by sh, puts each c set off from
 % the others by 20*c Angstroms
 
 function [a] = zWriteNucleotidePDB(fid,NT,a,c,R,Sh)
 
-x = mod(c,30);                       % shift along x axis
-y = mod(fix(c/30),30);               % shift along y axis
-z = mod(fix(c/900),900);             % shift along z axis
-
 if nargin < 4,
   c = 0;
-elseif nargin < 5
+end
+
+if nargin < 5
   c = 0;
   R = eye(3);
   Sh = [0 0 0];
 end
+
+x = mod(c,30);                       % shift along x axis
+y = mod(fix(c/30),30);               % shift along y axis
+z = mod(fix(c/900),900);             % shift along z axis
 
 Lim(1,:) = [10 8 11 8];       % number of base atoms, excluding hydrogen
 Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen

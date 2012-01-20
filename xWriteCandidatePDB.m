@@ -39,7 +39,7 @@ for c = 1:M,                                   % loop through candidates
 
  for i = 1:N,                                  % loop through nucleotides
   NT = Cand(i);                                % current nucleotide
-  a = zWriteNucleotidePDB(fid,NT,a,R,Sh,c);
+  a = zWriteNucleotidePDB(fid,NT,a,c,R,Sh);
  end
 end
 

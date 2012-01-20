@@ -22,6 +22,8 @@ else
   Indices = NTList;
 end
 
+%Indices = sort(Indices);
+
 fprintf('  File %s',File.Filename);         % display filename
 fprintf(' Chain ');
 for j=1:length(Indices),

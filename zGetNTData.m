@@ -29,19 +29,19 @@ end
 path(path,pwd);
 
 if ~(exist('PDBFiles') == 7),        % if directory doesn't yet exist
-  mkdir('PDBFiles');
+%  mkdir('PDBFiles');
 end
-path(path,[pwd filesep 'PDBFiles']);
+%path(path,[pwd filesep 'PDBFiles']);
 
 if ~(exist('PrecomputedData') == 7),        % if directory doesn't yet exist
-  mkdir('PrecomputedData');
+%  mkdir('PrecomputedData');
 end
-path(path,[pwd filesep 'PrecomputedData']);
+%path(path,[pwd filesep 'PrecomputedData']);
 
 if ~(exist('SearchSaveFiles') == 7),        % if directory doesn't yet exist
-  mkdir('SearchSaveFiles');
+%  mkdir('SearchSaveFiles');
 end
-path(path,[pwd filesep 'SearchSaveFiles']);
+%path(path,[pwd filesep 'SearchSaveFiles']);
 
 if strcmp(class(Filenames),'char'),
   Filenames = {Filenames};
