@@ -219,6 +219,7 @@ while stop == 0,
 
     case 14                                     % align
       xAlignCandidates(File(FIndex),Search,1);
+      xFASTACandidates(File(FIndex),Search,1);
 
     case 15
       ViewParam.Color  = 6;
@@ -337,15 +338,8 @@ function  PlotMotif(File,Search,Model,Display,i)
   VP.Grid     = 0;
 
   if Display(1).neighborhood > 0,
-    a = zeros(1,File(f).NumNT);
     v = Display(1).neighborhood;
-    for j=1:length(Indices),
-      a = a + (File(f).Distance(Indices(j),:) < v) .* ...
-              (File(f).Distance(Indices(j),:) > 0);
-    end
-    a(Indices) = zeros(1,length(Indices));  % take out ones in Indices
-    B = find(a);
-    Indices = [Indices B];
+    Indices = Neighbors(File(f),Indices,v);
   end
 
   zDisplayNT(File(f),Indices,VP);
@@ -391,6 +385,11 @@ function  DisplayTable(File,Search,Model,Display,i)
       fprintf('Candidate #%d', Search.Discrepancy(n));  % integer is cand num
     end
 
+    if Display(1).neighborhood > 0,
+      v = Display(1).neighborhood;
+      Indices = Neighbors(File(f),Indices,v);
+    end
+
     zShowInteractionTable(File(f),double(Indices));
 
     if isfield(File(f),'BasePhosphate'),
@@ -408,3 +407,16 @@ function [Search2] = SearchSubset(Search,j)
   Search2.Marked      = Search.Marked(j);
   Search2.Disc        = Search.Disc(j,j);
   Search2.DiscComputed= Search.DiscComputed(1,j);
+
+% -------------------------------------------------- Find neighborhood
+
+function [Indices] = Neighbors(File,Indices,v)
+  a = zeros(1,File.NumNT);
+  for j=1:length(Indices),
+    a = a + (File.Distance(Indices(j),:) < v) .* ...
+            (File.Distance(Indices(j),:) > 0);
+  end
+  a(Indices) = zeros(1,length(Indices));  % take out ones in Indices
+  B = find(a);
+  Indices = [Indices B];
+  Indices = sort(Indices);
