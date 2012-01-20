@@ -95,7 +95,15 @@ for f=1:length(Filenames),
   end
 
   if ~isfield(File,'BasePhosphate'),
-    File.BasePhosphate = 0;
+    File.BasePhosphate = sparse(zeros(length(File.NT)));
+  end
+
+  if isempty(File.BasePhosphate),
+    File.BasePhosphate = sparse(zeros(length(File.NT)));
+  end
+
+  if ~isfield(File,'Flank'),
+    File = xFlankingPairs(File);
   end
 
   if ~isfield(File,'Covalent'),

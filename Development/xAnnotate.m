@@ -1,3 +1,4 @@
+% xAnnotate(File) annotates a 3D structure with secondary structure elements
 
 File = zAddNTData('2AVY');
 

@@ -26,12 +26,11 @@ end
 
 UsingLibrary = 1;                                % so FR3D just searches
 
-for f = 1:length(File),
-  FN        = upper(File(f).Filename);
-  Filenames = {File(f).Filename};
+for ff = 1:length(File),
+  FN        = upper(File(ff).Filename);
+  Filenames = {File(ff).Filename};
 
-  File(f).Nucl(File.NumNT+1).Motif = [];
-
+  File(ff).Nucl(File(ff).NumNT+1).Motif = [];
 
   if WriteHTML > 0,
 
@@ -88,6 +87,7 @@ for f = 1:length(File),
     Query = Search.Query;
 
     clear Search
+    clear Candidates
 
     xFR3DSearch
 
@@ -101,12 +101,12 @@ for f = 1:length(File),
         Mot.Name = strrep(MotifName,'.mat','');
         Mot.Index = n;
         Mot.Number = MotifNumber;
-        if isempty(File(f).Nucl(Candidates(c,n)).Motif),
+        if isempty(File(ff).Nucl(Candidates(c,n)).Motif),
           L = 0;
         else
-          L = length(File(f).Nucl(Candidates(c,n)).Motif);
+          L = length(File(ff).Nucl(Candidates(c,n)).Motif);
         end
-        File(f).Nucl(Candidates(c,n)).Motif(L+1) = Mot;
+        File(ff).Nucl(Candidates(c,n)).Motif(L+1) = Mot;
        end
       end
 
@@ -139,11 +139,11 @@ end
 
 return
 
-f = 1;
-for n = 1:length(File(f).NT),
-  if ~isempty(File(f).Nucl(n).Motif),
-    for m = 1:length(File(f).Nucl(n).Motif),
-      fprintf('%4d %s %2d %s\n', n, File(f).Nucl(n).Motif(m).Number, File(f).Nucl(n).Motif(m).Index, File(f).Nucl(n).Motif(m).Name);
+ff = 1;
+for n = 1:length(File(ff).NT),
+  if ~isempty(File(ff).Nucl(n).Motif),
+    for m = 1:length(File(ff).Nucl(n).Motif),
+      fprintf('%4d %s %2d %s\n', n, File(ff).Nucl(n).Motif(m).Number, File(ff).Nucl(n).Motif(m).Index, File(ff).Nucl(n).Motif(m).Name);
     end
   end
 end

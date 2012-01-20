@@ -1,4 +1,0 @@
-% given a motif, do searches on all the stackings and see what sequence variability they exhibit when ranked by IDI
-
-load LIB00003_IL_tSH-tWH-tHS.mat
-

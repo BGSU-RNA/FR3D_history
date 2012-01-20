@@ -109,19 +109,7 @@ end
 
 if isfield(Query,'Flank'),
   if ~isempty(Query.Flank{p,q}),
-    E = triu(fix(abs(File.Edge))==1) .* (File.Range == 0); % nested cWW's
-    H = sparse(zeros(File.NumNT,File.NumNT));
-    [i,j] = find(E);                     % indices of NT's making nested cWW's
-    a = [i; j];                           % all indices of nested cWW pairs
-    a = sort(a);
-    for k = 1:(length(a)-1),
-      if a(k+1) - a(k) > 1,
-        H(a(k),a(k+1)) = 1;              % these two flank something
-      end
-    end
-    H = H + H';
-    D = D .* H;                          % only keep pairs between nested cWW
-
+    D = D .* File.Flank;                 % only keep pairs between nested cWW
   end
 end
 

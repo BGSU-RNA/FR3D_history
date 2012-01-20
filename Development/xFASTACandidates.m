@@ -72,7 +72,7 @@ for c = 1:L,                                      % loop through candidates
     j = File(F(c)).NT(Cand(c,n)).Code;
     CorrCodeList(c,n) = j;                        % store code of corresp base
     k = k + 1;
-    if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
+    if (MaxDiff(n) < Inf) | (maxinsert(n) < 4),   % if only few insertions
       if Cand(c,n+1) - Cand(c,n) > 1,             % increasing order
         for i = (Cand(c,n)+1):(Cand(c,n+1)-1),
           Text{t} = [Text{t} sprintf('%c', File(F(c)).NT(i).Base)];   % show insertions
@@ -91,7 +91,7 @@ for c = 1:L,                                      % loop through candidates
         k = k + 1;
       end
     else
-      Text{t} = [Text{t} sprintf('*')];
+      Text{t} = [Text{t} sprintf('*')];            % show break in strand
     end
 
     h = abs(Cand(c,n+1)-Cand(c,n));                % number of insertions + 1

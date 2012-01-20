@@ -216,6 +216,10 @@ for f=1:length(Filenames),
     ClassifyCode = 1;
   end
 
+  if ~isfield(File,'Flank'),
+    File = xFlankingPairs(File);
+  end
+
   if ~isfield(File,'Info'),
     File = zGetPDBInfo(File);          % get resolution and other info
     SaveCode = 1;
