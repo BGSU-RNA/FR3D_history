@@ -37,10 +37,10 @@ end
 
 %  For the PC compiled version, use this code:
 
-%if nargin < 3,
+if nargin < 3,
 %  WheretoOutput = 2;
 %  xListCandidates(Search,NumToOutput,3);
-%end
+end
 
 % -------------------------------------- print header line
 
