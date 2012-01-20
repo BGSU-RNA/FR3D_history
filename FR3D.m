@@ -5,8 +5,12 @@
 % Change the query by editing xSpecifyQuery
 
 if ~exist('GUIactive'),                      % if the GUI is not being used
-  Filenames = zFileNameList;                 % specify PDB Filenames to search
   Query     = xSpecifyQuery;                 % get search parameters
+  if isfield(Query,'SearchFiles'),           % if query specifies files
+    Filenames = Query.SearchFiles;
+  else
+    Filenames = zFileNameList;               % specify PDB Filenames to search
+  end
 end
 
 % Query

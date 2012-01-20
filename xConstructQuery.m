@@ -104,6 +104,10 @@ if ~isfield(Query,'Config'),
   for i=1:Query.NumNT,
     Query.Config{i} = '';
   end
+else
+  for i=(length(Query.Config)+1):Query.NumNT,
+    Query.Config{i} = '';
+  end
 end
 
 if (Query.Geometric == 0) & ~isfield(Query,'Diameter'),

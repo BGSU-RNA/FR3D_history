@@ -7,7 +7,9 @@
 clear s temp
 
 a = dir(['PDBFiles' filesep '*.pdb']);
+a = [a; dir(['PDBFiles' filesep '*.PDB'])];         % for the Mac
 a = [a; dir(['PrecomputedData' filesep '*.mat'])];
+a = [a; dir(['PrecomputedData' filesep '*.MAT'])];  % for the Mac
 
 p = path;
 c = [0 strfind(p,pathsep) length(p)+1];
@@ -17,7 +19,7 @@ end
 
 if ~isempty(a)
     for i=1:length(a)
-      temp{i} =regexprep(a(i).name,'.pdb|.mat| ','');   % strip extensions and spaces
+      temp{i} =regexprep(a(i).name,'.pdb|.mat|.MAT|.PDB| ','');   % strip extensions and spaces
     end
     
     temp = sort(temp);

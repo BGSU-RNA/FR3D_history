@@ -39,6 +39,10 @@ if nargin < 4,
     c1.NumNT           = Query.NumNT;
     c1.LDiscCutoff     = Inf;
     c1.AngleWeight     = Query.AngleWeight;
+    if N == 2,
+      c1.R  = c1.NT(2).Rot' * c1.NT(1).Rot;
+    end
+
     for j=1:k-1,
       f2 = Candidates(j,N+1);
       c2 = File(f2).NT(Candidates(j,1:N));     
@@ -59,6 +63,7 @@ end
   fprintf('Candidates sorted by centrality within these candidates:\n');
 
   [z,j] = sort(sum(Dist));
+  z = z / (length(S.Discrepancy)-1);        % average discrepancy
 
   S.Query       = Query;
   S.Candidates  = Candidates(j,:);

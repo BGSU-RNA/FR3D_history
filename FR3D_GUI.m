@@ -85,12 +85,14 @@ else
     savedff{i,1} = savedf(i).name;
   end
 end
+
 set(handles.LOAD,'String',savedff); %Update without having to reopen GUI
 
 v=get(handles.LOAD,'Value');
-f=savedf(v,1:end);
+f=savedff{v,1};
 l=strcat('SearchSaveFiles/',f);
 load(l)
+
 
 
 mSetLoadedParameters

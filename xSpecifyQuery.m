@@ -32,7 +32,7 @@ if nargin > 0,
   Query.Name = QName;
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
-%  Query.Name = 'Basepair';
+  Query.Name = 'Basepair';
 end
 
 switch Query.Name
@@ -128,8 +128,10 @@ case 'GNRA5'
 % -------------------------------------------- Additional searches
 
 case 'Basepair'
-  Query.Edges{1,2}  = 'cWH';
-  Query.Diff{1,2} = '> <1000';
+  Query.Edges{1,2}     = 'pair ~cWW';
+%  Query.Diff{1,2}      = '> <1000';
+  Query.Config{1}      = 'syn';
+  Query.SearchFiles    = {'1s72', '1j5e'};
 
 case 'GNRA4NonSeq'
   Query.Description    = 'GRNA hairpin without sequential constraint';

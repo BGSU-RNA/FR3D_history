@@ -189,6 +189,19 @@ while stop == 0,
 
     end  % switch statement for menu
 
+  if any([1 2 10] == k),
+    n       = Display(i).n;
+    f       = Search.Candidates(n,N+1);
+    Indices = double(Search.Candidates(n,1:N));
+    if Model.Geometric > 0,
+      fprintf('Discrepancy %6.4f', Search.Discrepancy(n));
+    else
+      fprintf('Candidate #%d', Search.Discrepancy(n));  % integer is cand num
+    end
+    zShowInteractionTable(File(f),double(Indices));
+    drawnow
+  end
+
   if any([1 2 4 5 6 7 8 9 10 13 14] == k),
     PlotMotif(File,Search,Model,Display,i);
     drawnow
@@ -244,13 +257,9 @@ function  PlotMotif(File,Search,Model,Display,i)
   end
 
   [s,t] = size(Search.Candidates);
-  n       = Display(i).n;
-  f       = Search.Candidates(n,N+1);
-  Disc    = Search.Discrepancy(n);
-  Indices = double(Search.Candidates(n,1:N));
-  zShowInteractionTable(File(f),double(Indices),Disc);
-
-  drawnow
+    n       = Display(i).n;
+    f       = Search.Candidates(n,N+1);
+    Indices = double(Search.Candidates(n,1:N));
 
   VP.Sugar    = Display(i).sugar;
 
@@ -284,8 +293,8 @@ function  PlotMotif(File,Search,Model,Display,i)
 
   zDisplayNT(File(f),Indices,VP);
  
-  xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Disc: ',...
-          num2str(Disc)]);
+  xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Discrepancy ',...
+          num2str(Search.Discrepancy(n))]);
   if Search.Marked(n) == 1;
     yl = 'Marked';
   else

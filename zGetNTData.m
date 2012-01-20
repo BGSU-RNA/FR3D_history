@@ -36,12 +36,25 @@ end
 
 for f=1:length(Filenames),
   Filename = Filenames{f};
-
+  FILENAME = upper(Filename);
+  filename = lower(Filename);
   if (ReadCode < 4) & (exist(strcat(Filename,'.mat'),'file') > 0),
       load(strcat(Filename,'.mat'),'File','-mat');
       File.Distance = tril(File.Distance) + tril(File.Distance)';  
                                           % only saved lower triangular part
       fprintf('Loaded %s\n', [Filename '.mat']);
+      ClassifyCode = 0;
+  elseif (ReadCode < 4) & (exist(strcat(FILENAME,'.MAT'),'file') > 0),  % helps on a Mac
+      load(strcat(FILENAME,'.MAT'),'File','-mat');
+      File.Distance = tril(File.Distance) + tril(File.Distance)';  
+                                          % only saved lower triangular part
+      fprintf('Loaded %s\n', [FILENAME '.MAT']);
+      ClassifyCode = 0;
+  elseif (ReadCode < 4) & (exist(strcat(filename,'.mat'),'file') > 0),  % helps on a Mac
+      load(strcat(filename,'.mat'),'File','-mat');
+      File.Distance = tril(File.Distance) + tril(File.Distance)';  
+                                          % only saved lower triangular part
+      fprintf('Loaded %s\n', [FILENAME '.MAT']);
       ClassifyCode = 0;
   else
       File = zReadandAnalyze(Filename);
@@ -68,7 +81,7 @@ for f=1:length(Filenames),
     File.Edge = sparse(File.NumNT,File.NumNT);
 
     d = sort(nonzeros(File.Distance));
-    if d(10) < 1,
+    if d(min(10,length(d))) < 1,
       fprintf('%s has overlapping nucleotides and should be re-read\n',File.Filename);
       Overlap = 1;
     else

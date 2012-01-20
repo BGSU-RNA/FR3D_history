@@ -120,11 +120,11 @@ end
 
 % --------- Screen according to configuration (syn or anti)
 
-if length(Model.Config{p} > 0,
+if length(Model.Config{p}) > 0,
   switch Model.Config{p}
-    case 'Syn'
+    case 'syn'
       k = find(cat(1,File.NT(i).Syn) == 1);
-    case 'Anti'
+    case 'anti'
       k = find(cat(1,File.NT(i).Syn) == 0);
     otherwise
       k = 1:length(i);
@@ -135,11 +135,11 @@ if length(Model.Config{p} > 0,
   d = d(k);
 end
 
-if length(Model.Config{q} > 0,
+if length(Model.Config{q}) > 0,
   switch Model.Config{q}
-    case 'Syn'
+    case 'syn'
       k = find(cat(1,File.NT(j).Syn) == 1);
-    case 'Anti'
+    case 'anti'
       k = find(cat(1,File.NT(j).Syn) == 0);
     otherwise
       k = 1:length(j);
