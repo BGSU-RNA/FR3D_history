@@ -105,7 +105,7 @@ for c = 1:L,                                      % loop through candidates
         k = k + 1;
       end
     else
-      Text{t} = [Text{t} sprintf('****')];
+      Text{t} = [Text{t} sprintf('*')];
     end
 
     h = abs(Cand(c,n+1)-Cand(c,n));                % number of insertions + 1

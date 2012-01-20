@@ -70,8 +70,8 @@ for p = 1:(N-1),                               % distance from diagonal
 
   end
 
-  if length(k) > 0,
-    fprintf('Diagonal %4d\n',p);
+  fprintf('Diagonal %4d\n',p);
+  if length(k) > 10000000,
     figure(1)
     clf
     spy(C);

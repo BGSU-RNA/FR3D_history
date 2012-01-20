@@ -98,6 +98,12 @@ if WheretoOutput < 3,
       Text{t} = [Text{t} sprintf('%6s', [num2str(i) '-' num2str(j)])];
     end
   end
+
+  for i=1:N,
+    for j=1:N,
+      Text{t} = [Text{t} sprintf('%5s', [num2str(i) '-' num2str(j)])];
+    end
+  end
 end   
 
 if N == 2,
@@ -156,6 +162,12 @@ for i=1:min(s,NumToOutput),
     for k=1:length(Indices),
       for j=(k+1):length(Indices),
         Text{i+t} = [Text{i+t} sprintf('%6d', abs(double(Indices(k))-double(Indices(j))))];
+      end
+    end
+
+    for k=1:length(Indices),
+      for j=1:length(Indices),
+        Text{i+t} = [Text{i+t} sprintf('%5s', zBasePhosphateText(File(f).BasePhosphate(Indices(k),Indices(j))))];
       end
     end
   end

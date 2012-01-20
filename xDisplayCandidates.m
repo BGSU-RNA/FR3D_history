@@ -236,11 +236,6 @@ while stop == 0,
 
     end  % switch statement for menu
 
-  if Display(i).n ~= nn,
-    DisplayTable(File(FIndex),Search,Model,Display,i)
-    nn = Display(i).n;
-  end
-
   if any([1 2 3 7] == k),
       PlotMotif(File(FIndex),Search,Model,Display,i);
   end
@@ -249,6 +244,11 @@ while stop == 0,
     [File,FIndex] = zAddNTData(Search.CandidateFilenames,2,FullFile);
     FullFile = [];
     UsingFull = 1;
+  end
+
+  if (Display(i).n ~= nn) || (k == 4),
+    DisplayTable(File(FIndex),Search,Model,Display,i)
+    nn = Display(i).n;
   end
 
   if any([4 5 6 8] == k),
