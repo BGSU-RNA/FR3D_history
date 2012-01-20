@@ -176,7 +176,7 @@ clf
 figure(ViewParam.FigNum)
 clf
 
-set(gcf,'Renderer','OpenGL');
+%set(gcf,'Renderer','OpenGL');
 %set(gcf,'Renderer','zbuffer')
 
 for k = 1:length(Pair),                              % Loop through pairs
@@ -184,7 +184,7 @@ for k = 1:length(Pair),                              % Loop through pairs
   c = Color(k);
   e = p.Displ;
 
-  scatter3(e(1),e(2),e(3),18,c,'filled')
+  scatter3(e(1),e(2),e(3),4,c,'filled')
   hold on
 
   if ViewParam.Normal == 1,
@@ -250,7 +250,7 @@ clf
 figure(ViewParam.FigNum + 1)
 clf
 
-set(gcf,'Renderer','OpenGL');
+%set(gcf,'Renderer','OpenGL');
 %set(gcf,'Renderer','zbuffer')
 
 cut = 90;                                             % cut at angle -cut
@@ -261,7 +261,7 @@ for k = 1:length(Pair),                               % Loop through pairs
 
   c = Color(k);
 
-  scatter3(mod(p.Ang+cut,360)-cut,p.Normal(3),p.Gap,18,c,'filled')
+  scatter3(mod(p.Ang+cut,360)-cut,p.Normal(3),p.Gap,4,c,'filled')
   hold on
 end
 
@@ -343,38 +343,6 @@ if ViewParam.Color > 1,
     case 14, title('Histogram of parallel displacement'); % Color(k) = p.Displ(2);
     case 15, title('Histogram of vertical displacement'); % Color(k) = p.Displ(3);
   end
-end
-
-%---------------------------------------------- Plot displacements again
-
-figure(ViewParam.FigNum+3)
-clf
-figure(ViewParam.FigNum+3)
-clf
-
-set(gcf,'Renderer','OpenGL');
-%set(gcf,'Renderer','zbuffer')
-
-for k = 1:length(Pair),                              % Loop through pairs
-  p = Pair(k);
-  c = Color(k);
-  e = p.Displ;
-
-  scatter3(e(1),e(2),e(3),18,c,'filled')
-  hold on
-
-  if ViewParam.Normal == 1,
-    v = p.Normal/3;                                      % add normal vector
-    plot3([e(1) e(1)+v(1)], [e(2) e(2)+v(2)], [e(3) e(3)+v(3)], 'b');
-  end
-end
-
-if max(modcode) == min(modcode),             % all have same first base
-  zPlotStandardBase(modcode);                % plot base at the origin
-  Lett = 'ACGU';  
-  Title =[Lett(modcode) ' shown at the origin, N1/N9 atom of second base shown by dots'];
-else
-  Title = ['N1/N9 atom of second base shown by dots'];
 end
 
 

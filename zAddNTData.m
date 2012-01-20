@@ -17,6 +17,9 @@ if nargin == 3,
   for j = 1:length(File),
     LoadedFiles{j} = lower(File(j).Filename);
   end
+  if isempty(File),
+    clear File
+  end
 end
 
 if SizeCode == 0,

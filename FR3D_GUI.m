@@ -248,7 +248,8 @@ delete(h);
     if get(handles.ViewQuery,'Value')==1
         figure(3)
         clf
-        zDisplayNT(File(QIndex),Indices);
+        VP.Sugar = 1;
+        zDisplayNT(File(QIndex),Indices,VP);
         grid off
         rotate3d on
         zShowInteractionTable(File(QIndex),Indices)

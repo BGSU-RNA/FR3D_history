@@ -6,20 +6,7 @@
 
 % Model and Cand are two list of indices or nucleotide numbers
 
-function [Disc,R] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
-
-L = length(Cand);
-
-if nargin < 5,
-  LocationWeight = ones(1,length(Model));
-  AngleWeight    = ones(1,length(Model));
-else
-  LocationWeight = L * LocationWeight / sum(LocationWeight);
-end
-
-if length(Model) ~= length(Cand),           % motif sizes must be the same
-  Disc = [];
-else
+function [Disc,R,MM,CM] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 
 % if File1 is a text string (filename), load the file
 
@@ -59,9 +46,26 @@ else
   Cand = File2.NT(Cand);
 end
 
+if length(Model) ~= length(Cand),           % motif sizes must be the same
+  Disc = [];
+  R    = eye(3);
+else
+
+L = length(Cand);
+
+if nargin < 5,
+  LocationWeight = ones(1,L);
+else
+  LocationWeight = length(LocationWeight) * LocationWeight / sum(LocationWeight);
+end
+
+if nargin < 6,
+  AngleWeight    = ones(1,L);
+end
+
 % ------------------------------ Calculate discrepancy
 
-if (L == 2),                                % two-nucleotide motif
+if (L == 2) && (length(LocationWeight == L)),     % two-nucleotide motif
 
   ModelR  = Model(2).Rot' * Model(1).Rot;
   ModelT1 = (Model(2).Center - Model(1).Center)*Model(1).Rot;
@@ -82,9 +86,13 @@ if (L == 2),                                % two-nucleotide motif
 
   R = eye(2);                               % not really how to rotate them
 
-else                                        % more than two nucleotides
+  MM = (Model(1).Center+Model(2).Center)/2;
+  CM = ( Cand(1).Center+ Cand(2).Center)/2;
+
+elseif (length(LocationWeight) == L),             % more than two nucleotides
 
   ModelCenters = cat(1,Model.Center);
+
   ModelWeightedCenter = LocationWeight * ModelCenters / L;
   MCC                 = ModelCenters-ones(L,1)*ModelWeightedCenter;
 
@@ -107,5 +115,48 @@ else                                        % more than two nucleotides
 
   Disc = sqrt(S)/L;
 
+  MM = ModelWeightedCenter;
+  CM = CMean;
+
+disp('No phosphates')
+
+else
+
+disp('Using phosphates')
+
+  ModelCenters = cat(1,Model.Center);
+  CandiCenters = cat(1,Cand.Center);
+
+  for j = 1:length(Model),
+    ModelCenters = [ModelCenters; Model(j).Sugar(10,:)];
+    CandiCenters = [CandiCenters;  Cand(j).Sugar(10,:)];
+  end
+
+  ModelWeightedCenter = LocationWeight * ModelCenters / (2*L);
+  MCC                 = ModelCenters-ones(2*L,1)*ModelWeightedCenter;
+
+  CMean = LocationWeight * CandiCenters / (2*L);
+  CC = CandiCenters - ones(2*L,1) * CMean;  % subtract mean
+  
+  R = zBestRotation(CC, diag(LocationWeight)*MCC);      % candidate onto model
+  
+  S = LocationWeight * sum(((MCC - CC*R').^2)')';  % distances between centers
+
+  n = 1;                                    % nucleotide number for angles
+  v = 4 * AngleWeight.^2;                   % precompute a little
+  
+  while (n <= L),
+    angbytwo = acos(min(1,sqrt(trace(R*Cand(n).Rot*(Model(n).Rot)')+1)/2));
+    S   = S + (angbytwo^2)*v(n);
+    n   = n + 1;
+  end
+
+  Disc = sqrt(S)/L;
+
+  MM = ModelWeightedCenter;
+  CM = CMean;
+
 end
 end
+
+R = R';

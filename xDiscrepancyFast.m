@@ -62,4 +62,7 @@ else
   else
     Disc = -1;
   end
+
+  % add in contributions to the discrepancy from sugar locations
+
 end

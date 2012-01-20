@@ -25,7 +25,9 @@ end
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
   paircode = 4*(N2.Code-1) + N1.Code;           % AA is 1, CA is 2, etc.
-  switch paircode
+
+  if Force == 0,
+   switch paircode
     case {2, 3, 4, 8, 10, 12},                  % put N2 at the origin
       M1 = N2;
       M2 = N1;
@@ -34,6 +36,11 @@ end
       M1 = N1;
       M2 = N2;
       s  = 1;                                   % bases in original order
+   end
+  else
+   M1 = N1;
+   M2 = N2;
+   s  = 1;
   end
 
   sh = (M2.Fit(1,:)-M1.Fit(1,:)) * M1.Rot;   % vector shift from 1 to 2

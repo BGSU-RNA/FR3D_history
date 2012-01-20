@@ -377,5 +377,8 @@ function  DisplayTable(File,Search,Model,Display,i)
     end
 
     zShowInteractionTable(File(f),double(Indices));
-    zBasePhosphateTable(File(f),double(Indices));
+
+    if isfield(File(f),'BasePhosphate'),
+      zBasePhosphateTable(File(f),double(Indices));
+    end
     drawnow
