@@ -60,7 +60,7 @@ if isfield(Query,'ExcludeEdges'),                 % if excluding by edges
     D = D .* (E == 0);
   end
 end
-    
+
 if isfield(Query,'OKPairs'),                 % if screening by paircode
   if length(Query.OKPairs{p,q} > 0),
     E = sparse(zeros(size(D)));
@@ -70,7 +70,7 @@ if isfield(Query,'OKPairs'),                 % if screening by paircode
     D = D .* (E > 0);
   end
 end
-    
+
 if isfield(Query,'ExPairs'),                 % if screening by paircode
   if length(Query.ExPairs{p,q} > 0),
     E = sparse(zeros(size(D)));
@@ -90,7 +90,7 @@ if isfield(Query,'OKBB'),           % if screening by backbone
     D = D .* (E > 0);                         % include only those that match
   end
 end
-    
+
 if isfield(Query,'ExBB'),                 % if excluding by backbone
   if length(Query.ExBB{p,q} > 0),
     E = sparse(zeros(size(D)));
@@ -117,7 +117,7 @@ if isfield(Query,'BasePhos'),                 % if screening by base-phosphate
     D = D .* (E > 0);
   end
 end
-    
+
 if isfield(Query,'ExcludeBasePhos'),                 % if excluding by edges
   if length(Query.ExcludeBasePhos{p,q} > 0),
     E = sparse(zeros(size(D)));

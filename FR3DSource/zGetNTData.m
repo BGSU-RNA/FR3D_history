@@ -108,6 +108,11 @@ for f=1:length(Filenames),
     File.BasePhosphate = sparse(zeros(length(File.NT)));
   end
 
+  if ~isfield(File,'Coplanar'),
+    ClassifyCode = 1;
+    File.Coplanar = sparse(zeros(length(File.NT)));
+  end
+
   if isempty(File.BasePhosphate),
     File.BasePhosphate = sparse(zeros(length(File.NT)));
   end

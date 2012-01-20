@@ -1,0 +1,14 @@
+
+for BPh = 1:19,
+  [Distance, Score, MinBPh] = zBasePhosphateGeometry(BPh)
+  [T,B] = zBasePhosphateText(BPh);
+  fprintf('%s %s substitutions ', T, B);
+  for c = 1:4,
+    [T,B] = zBasePhosphateText(BPh);
+    fprintf('%s %s %8.4f ');
+  end
+  fprintf('\n');
+end
+
+
+

@@ -54,6 +54,8 @@ for i=1:length(e),
     case  -22,    E = [E 's33'];
     case   23,    E = [E 's55'];
     case  -23,    E = [E 's55'];
+    case   28,    E = [E 'perp'];
+    case  -28,    E = [E 'perp'];
     case  101,    E = [E 'ncWw'];
     case  102,    E = [E 'ntWw'];
     case  103,    E = [E 'ncWH'];
@@ -111,7 +113,7 @@ if nargin == 3,
   end
 end
 
-if any(fix(abs(e)) == [13 14 113 114]),
+if any(fix(abs(e)) == [13 14 28 113 114]),
   EE = E;
 end
 

@@ -141,6 +141,12 @@ BPequiv{39} = [8];
 EdgeStr{40} = 'thH';
 BPequiv{40} = [-8];
 
+EdgeStr{41} = 'perp';
+BPequiv{41} = [28 -28];
+
+EdgeStr{42} = 'perpendicular';
+BPequiv{42} = [28 -28];
+
 %BPCat = [2 6 8 0 6 7 8 9 0 1 3 4 5 0 5 8 0];  % updated 8-7-2008
 %         1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 
 
@@ -296,9 +302,9 @@ for i=1:length(lim)-1                    % loop through tokens
   newBP2   = [];
   CP       = 0;
   nCP      = 0;
-  bb       = 0;
+  BBCode   = [];
 
-  if ~isempty(EdgeNum)                      % Token IS a string
+  if ~isempty(EdgeNum)                      % Token is a number
 
     if any (fix(abs(EdgeNum)) == [1 2 7 8]),
       EdgeNum = [EdgeNum -EdgeNum];
@@ -392,14 +398,14 @@ for i=1:length(lim)-1                    % loop through tokens
     OKPairs = [OKPairs PairCode];
     BP1     = [BP1 newBP1];
     BP2     = [BP2 newBP2];
-    ReqBB   = [ReqBB bb];
+    ReqBB   = [ReqBB BBCode];
   else
     ExEdge  = [ExEdge EdgeNum];
     ExPairs = [ExPairs PairCode];
     EBP1    = [EBP1 newBP1];
     EBP2    = [EBP2 newBP2];
     Range   = RRange;
-    ExBB    = [ExBB bb];
+    ExBB    = [ExBB BBCode];
   end
 
   if (CP ~= 0),
