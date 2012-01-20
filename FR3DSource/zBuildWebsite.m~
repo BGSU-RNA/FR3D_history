@@ -1,0 +1,8 @@
+
+[NamesLists,Names] = mGetPDBFilenames;
+
+for f = 1:length(Names),
+  File = zAddNTData(Names{f},2);            % load RNA data
+  zAnalyzedFilesHTML(File);                 % make HTML
+  xAnnotateWithKnownMotifs(File);           % find and list motifs
+end

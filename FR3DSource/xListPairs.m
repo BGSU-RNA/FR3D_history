@@ -3,7 +3,7 @@
 function [void] = zListPairs(Pair,VP)
 
 if ~isfield(VP,'ListItems')
-  ListItems = [1 22 2 3 4 5 6 9 10 11 12 13 14 16 17 18];
+  ListItems = [1 22 2 3 4 5 6 9 10 11 12 13 14 16 17];
 else
   ListItems = VP.ListItems;
 end
@@ -61,18 +61,8 @@ for k=1:length(Pair)
         case 12, Text{k+1} = [Text{k+1} sprintf('%7.2f',p.Gap)];
         case 13, Text{k+1} = [Text{k+1} sprintf('%8.2f',p.MinDist)];
         case 14, Text{k+1} = [Text{k+1} sprintf('%8.2f',p.Class)];
-        case 16, 
-          if p.Distances(1) > 999,
-            Text{k+1} = [Text{k+1} '  None'];
-          else
-            Text{k+1} = [Text{k+1} sprintf('%7.2f',p.Classes(1))];
-          end
-        case 17, 
-          if p.Distances(1) > 999,
-            Text{k+1} = [Text{k+1} '   '];
-          else
-            Text{k+1} = [Text{k+1} sprintf('%7.2f',p.Distances(1))];
-          end
+        case 16, Text{k+1} = [Text{k+1} sprintf('%7.2f',p.Classes(1))];
+        case 17, Text{k+1} = [Text{k+1} sprintf('%7.2f',p.Distances(1))];
         case 18, if length(p.Hydrogen) > 0,
                    for i=1:length(p.Hydrogen),
                      Text{k+1} = [Text{k+1} sprintf('%6.1f ', p.Hydrogen(i).Angle)];

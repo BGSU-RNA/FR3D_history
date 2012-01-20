@@ -216,11 +216,10 @@ if isfield(Query,'Edges'),
   Query.ExcludeBasePhos{Query.NumNT,Query.NumNT} = 0;
   Query.Flank{Query.NumNT,Query.NumNT} = [];
   Query.Range{Query.NumNT,Query.NumNT} = [];
-  Query.Coplanar{Query.NumNT,Query.NumNT} = [];
   for i=1:Query.NumNT,
     for j=(i+1):Query.NumNT,
       if ~isempty(Query.Edges{j,i}),
-        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar] = xGetEdgeNums(Query.Edges{j,i});
+        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range] = xGetEdgeNums(Query.Edges{j,i});
         Query.EdgeNums{j,i}     =  ReqEdge;
         Query.EdgeNums{i,j}     = -ReqEdge;
         Query.ExcludeEdges{j,i} =  ExEdge;
@@ -235,9 +234,9 @@ if isfield(Query,'Edges'),
         Query.ExcludeBasePhos{i,j} = EBP2;
 	Query.Flank{i,j}           = Flank;
 	Query.Range{i,j}           = Range;
-        Query.Coplanar{i,j}        = Coplanar;
+
       elseif ~isempty(Query.Edges{i,j}),
-        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar] = xGetEdgeNums(Query.Edges{i,j});
+        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range] = xGetEdgeNums(Query.Edges{i,j});
         Query.EdgeNums{j,i}     = -ReqEdge;
         Query.EdgeNums{i,j}     =  ReqEdge;
         Query.ExcludeEdges{j,i} = -ExEdge;
@@ -252,7 +251,6 @@ if isfield(Query,'Edges'),
         Query.ExcludeBasePhos{j,i} = EBP2;
         Query.Flank{j,i}           = Flank;
         Query.Range{j,i}           = Range;
-        Query.Coplanar{j,i}        = Coplanar;
       else
         Query.EdgeNums{i,j} = [];
         Query.EdgeNums{i,j} = [];
@@ -293,7 +291,6 @@ if Query.Geometric > 0,
 
 else
   Query.SSCutoff = Inf * ones(1,Query.NumNT);
-  Query.DistCutoff = 30;        % default distance cutoff for symbolic search
 end
 
 % --------- Read minimum and maximum distance specifications

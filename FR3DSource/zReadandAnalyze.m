@@ -21,45 +21,25 @@
 %  Shift    Best shift from standard to observed locations
 %  Fit      Best fit of observed locations to standard base locations
 
-function [File] = zReadandAnalyze(PDBFilename,Verbose)
+function [File] = zReadandAnalyze(Filename)
 
-i = strfind(PDBFilename,'.');
-Filename = PDBFilename(1:(i(end)-1));
+% read Filename.pdb ----------------------------------------------------
 
-if nargin < 2,
-  Verbose = 1;
-end
+fid = fopen([Filename '.pdb'],'r');
 
-% read PDBFilename ----------------------------------------------------
-
-if exist([pwd filesep 'PDBFiles' filesep 'Trouble reading']) == 7,
-  if exist([pwd filesep 'PDBFiles' filesep 'Trouble reading' filesep PDBFilename]) == 2,
-    Stop = 1;
-    if Verbose > 0,
-      fprintf('Skipping %s because it could not be read\n', PDBFilename);
-    end
-  else
-    Stop = 0;
-  end
-else
-  Stop = 0;
-end
-
-fid = fopen(PDBFilename,'r');
-
-if (fid > 0) && (Stop == 0),
+if fid > 0,
 
 fclose(fid);
 
 a = 1000+round(8900*rand);
 
-TempFileName = ['##TempPDB' num2str(a) '.pdb'];
+TempFileName = ['##TempPDB' num2str(a)];
 
-Header = zExtractAtomsPDB(PDBFilename,TempFileName,Verbose);
+Header = zExtractAtomsPDB(Filename,TempFileName);
 
 [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P] = zReadPDBTextRead(TempFileName);
 
-delete(TempFileName);
+delete([TempFileName '.pdb']);
 
 % Move models in NMR file apart ---------------------------------------------
 
@@ -86,10 +66,9 @@ Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
 NT = [];                                    % nucleotide data structure
 n  = 1;                                     % current NT index
 i  = 1;                                     % current atom/row number
-unrec = 0;                                  % count unrecognized nucleotides
 
 while i < length(NTNUMBER),                 % go through all atoms
-  Flag = 0;                                 % not a recognized nucleotide
+  Flag = 0;
   j = [];                                   % initialize rows of next nucleo.
   ntnum = NTNUMBER{i};                      % nucleotide number from pdb file
 
@@ -244,12 +223,7 @@ while i < length(NTNUMBER),                 % go through all atoms
     NT(n).Center = mean(Loc(1:8,:));
     NT(n).Code   = 4;                          % A is 1, C is 2, etc.
   else 
-    if unrec < 5,
-      if Verbose > 0,
-        fprintf('Unrecognized: %s %s\n', NT(n).Base,NT(n).Number);
-      end
-      unrec = unrec + 1;
-    end
+%    fprintf('Unrecognized nucleotide: %s %s\n', NT(n).Base,NT(n).Number);
     n = n - 1;                                 % not a recognized
                                                % nucleotide, do nothing
     Flag = 1;
@@ -257,10 +231,7 @@ while i < length(NTNUMBER),                 % go through all atoms
 
   if (Flag < 1),
     if (max(max(Loc)) == Inf),                 % base atoms missing
-      if Verbose > 0,
-        NumGood = length(find((Loc(1,:) < Inf) .* (abs(Loc(1,:)) > 0)));
-        fprintf('Base %s%s has %d atoms, so it will be skipped\n',NT(n).Base,NT(n).Number,NumGood);
-      end
+      fprintf('Base %s%s is missing an atom, so it will be skipped\n',NT(n).Base,NT(n).Number);
       n = n - 1;
     elseif (max(max(Sugar)) == Inf),          % sugar atom missing
       for k = 1:12,
@@ -295,7 +266,7 @@ for n=1:NumNT,                                   % analyze all nucleotides
   F  = (sh*ones(1,L2) + r*X2')';                 % best fit without scaling
   e  = sqrt(sum(sum((Y - F(1:L,:)).^2)))/L;      % error measure;
                                                  % should be between 0 and 10
-  if (e > 0.1) && Verbose > 0,
+  if (e > 0.1),
     fprintf('Nucleotide %c%s has average fitting error %6.4f Angstroms\n', NT(n).Base, NT(n).Number, e);
   end
 
@@ -306,7 +277,6 @@ end
 
 % Fill in fields of File ----------------------------------------------------
 
-File.PDBFilename = PDBFilename;
 File.Filename  = Filename;
 File.NT        = NT(1:NumNT);
 File.NumNT     = NumNT;
@@ -333,7 +303,7 @@ end
 
 else
 
-  fprintf('Could not open file %s\n', PDBFilename);
+  fprintf('Could not open file %s.pdb\n', Filename);
   NumNT = 0;
   File.Filename = Filename;
   File.NT        = [];
@@ -343,22 +313,18 @@ else
   File.Comment   = [];
   File.CI        = sparse(NumNT,NumNT);
   File.Edge      = sparse(NumNT,NumNT);
-  File.Coplanar  = sparse(NumNT,NumNT);
   File.Modified  = 0;
   File.Pair      = [];
   File.ClassVersion = 0;
   File.Header    = [];
-  File.Info.Resolution  = [];
-  File.Info.Descriptor  = '';
-  File.Info.ExpTechnique= '';
-  File.Info.ReleaseDate = '';
-  File.Info.Author      = '';
-  File.Info.Keywords    = '';
-  File.Info.Source      = '';
+  File.Info.Resolution = [];
+  File.Info.Type       = '';
+  File.Info.RNA        = '';
+  File.Info.Species    = '';
+  File.Info.LigandsAndComments = '';
   File.BasePhosphate = [];
 
 end
 
 File = orderfields(File);
 
-end

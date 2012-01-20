@@ -24,7 +24,7 @@ VP.Grid      = 1;                % add a grid to the graph
 VP.FontSize  = 10;               % will use Matlab's default unless overridden
 VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
-VP.LabelBases = 10;              % font size; use 0 to not label bases at all
+VP.LabelBases = 10;
 VP.WritePDB      = 0;
 VP.Animate   = 0;
 VP.AnimationFilename = '';
@@ -119,7 +119,7 @@ if strcmp(class(File),'char'),
   File = zGetNTData(Filename,0);
 end
 
-if nargin == 1 || isempty(NTList),
+if nargin == 1,
   NTList = 1:File.NumNT;                  % display them all
 end
 
@@ -158,13 +158,7 @@ for j=2:length(Indices),
   Title = strcat(Title,'-',nt.Base,nt.Number);
 end;
 
-if isfield(File,'Filename'),
-  FN = File.Filename;
-else
-  FN = '';
-end
-
-Title = strcat(Title,[' ' strrep(FN,'_','\_')]);
+Title = strcat(Title,[' ' strrep(File.Filename,'_','\_')]);
 
 title(Title);
 axis equal
@@ -255,14 +249,8 @@ if VP.Animate == 1,
       nt = File.NT(Indices(j));
       Title = strcat(Title,'-',nt.Base,nt.Number);
     end;
-
-    if isfield(File,'Filename'),
-      FN = File.Filename;
-    else
-      FN = '';
-    end
   
-    Title = strcat(Title,[' ' strrep(FN,'_','\_')]);
+    Title = strcat(Title,[' ' strrep(File.Filename,'_','\_')]);
   
 %    title(Title);
     axis equal

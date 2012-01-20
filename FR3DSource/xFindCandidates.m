@@ -1,6 +1,6 @@
 % xFindCandidates finds and ranks candidate fits to Model
 
-function Found = xFindCandidates(File,Model,Verbose)
+function Found = xFindCandidates(File,Model)
 
 Found = uint16([]);                         % store indices as integers
 
@@ -51,9 +51,7 @@ for f=1:length(File),
   [s,t] = size(List);
   if s > 0,
     Found = [Found; [List uint16(f*ones(s,1))]];
-    if Verbose > 0,
-      fprintf('Found %7d possibilities from %10s in %8.3f seconds\n', s, File(f).Filename, cputime-filestarttime);
-    end
+    fprintf('Found %7d possibilities from %10s in %8.3f seconds\n', s, File(f).Filename, cputime-filestarttime);
   end
 
   drawnow
@@ -62,7 +60,7 @@ for f=1:length(File),
 end  % end of for loop length(File)
 
 [s,t] = size(Found);
-if (length(File) > 1) && (Verbose > 0),
+if length(File) > 1,
   fprintf('Found %7d possible candidates in %8.3f seconds\n', s, (cputime-starttime));
 end
 

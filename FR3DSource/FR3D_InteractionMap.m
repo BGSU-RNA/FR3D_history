@@ -66,7 +66,7 @@ set(gcf,'Renderer','OpenGL');
 
 for a = 1:length(Indices),                          % Loop through nucleotides
   k = Indices(a);
-  i  = abs(File.Edge(k,Indices));
+  i  = abs(File.Inter(k,Indices));
   ii = find((i < 30) .* (i > 0));
   iii = Indices(ii);
   ni(k) = length(iii);                           % number of interactions
@@ -84,25 +84,25 @@ for a = 1:length(Indices),                          % Loop through nucleotides
   for j = 1:length(iii),
     if iii(j) < k,                            % only plot once
       f = File.NT(iii(j)).Center;
-      inter = abs(fix(File.Edge(k,iii(j))));
+      inter = abs(fix(File.Inter(k,iii(j))));
       if inter == 1,
         if DL(2) > 0,
-          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'b');  % WC-WC
+          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'r');  % WC-WC
         end
         c = c + 1;
       elseif abs(inter) < 15,
         if DL(3) > 0,
-          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'c');  % other planar
+          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'b');  % other planar
         end
         c = c + 1;
       elseif (inter == 21),
         if DL(4) > 0,
-          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'y');  % 35 or 53 stacking
+          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'g');  % 35 or 53 stacking
         end
         c = c + 1;
       elseif (inter == 22) | (inter == 23),
         if DL(5) > 0,
-          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'y');  % 33 or 55 stacking
+          plot3([e(1) f(1)],[e(2) f(2)],[e(3) f(3)],'c');  % 33 or 55 stacking
         end
         c = c + 1;
       end
@@ -110,8 +110,8 @@ for a = 1:length(Indices),                          % Loop through nucleotides
   end
 
   if DL(6) > 0,
-    g = File.NT(k).Fit(1,:);                         
-    h = File.NT(max(1,k-1)).Fit(1,:);
+    g = File.NT(k).Loc(1,:);                         
+    h = File.NT(max(1,k-1)).Loc(1,:);
     if sum((g-h).^2) < 200,                           % reasonable distance
       plot3([g(1) h(1)],[g(2) h(2)],[g(3) h(3)],'k')  % connect glycosidics
     end

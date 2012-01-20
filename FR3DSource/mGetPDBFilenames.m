@@ -19,18 +19,14 @@ end
 
 if ~isempty(a)
     for i=1:length(a)
-      temp{i} = regexprep(a(i).name,'.mat|.MAT|.PDB1|.pdb1|.PDB2|.pdb2|.PDB3|.pdb3|.PDB4|.pdb4|.PDB5|.pdb5|.PDB6|.pdb6|.PDB7|.pdb7|.PDB8|.pdb8','');   % strip extensions and spaces
-      temp{i} = regexprep(temp{i},'.pdb|.PDB ','');   % strip extensions and spaces
+      temp{i} = regexprep(a(i).name,'.pdb|.mat|.MAT|.PDB| ','');   % strip extensions and spaces
       temp{i} = regexprep(temp{i},'_small','');     % don't list small's too
       if ~isempty(strfind(temp{i},'_list')),
         temp{i} = [' ' temp{i}];                    % lists appear first
       end
     end
-
-    temp = [' AllFiles_list' temp];
     
-    [t,i] = sort(upper(temp));                       % sort list of PDB names
-    temp = temp(i);
+    temp = sort(temp);                              % sort list of PDB names
 
     for i=1:length(temp),
       temp{i} =regexprep(temp{i},' ','');           % strip spaces from lists
@@ -39,7 +35,7 @@ if ~isempty(a)
     s{1,1}=temp{1};
     count=2;
     for i=2:length(temp)
-      if ~strcmpi(temp{i},s{count-1,1})              % remove duplicates
+      if ~strcmp(temp{i},s{count-1,1})              % remove duplicates
         s{count,1}=temp{i};
         count=count+1;
       end

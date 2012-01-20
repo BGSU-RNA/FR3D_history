@@ -1,6 +1,6 @@
 % xGetEdgeNums parses the entries in the GUI concerning base-base interactions
 
-function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar] = xGetEdgeNums(str)
+function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range] = xGetEdgeNums(str)
 
 ReqEdge = [];
 ExEdge  = [];
@@ -12,11 +12,7 @@ EBP1     = [];
 EBP2     = [];
 Flank    = [];
 Range    = [];
-RRange   = [];
-Coplanar = 0;
-NearCoplanar = 0;
 
-% ------------------------------ Define relevant strings and associated codes
 
 EdgeStr{1} = 'cWW';
 BPequiv{1} = [1 -1];
@@ -121,106 +117,53 @@ BPequiv{33} = [2 4 6 8 10 12 -2 -4 -6 -8 -10 -12];
 EdgeStr{34} = 'bif';
 BPequiv{34} = [13 -13];
 
-EdgeStr{35} = 'cWw';
-BPequiv{35} = [1];
+BPStr{1}    = 'BP';
+basephoscode{1}  = 1:15;
 
-EdgeStr{36} = 'cwW';
-BPequiv{36} = [-1];
+BPStr{2}    = 'B1P';
+basephoscode{2}  = [1];
 
-EdgeStr{37} = 'cHh';
-BPequiv{37} = [7];
+BPStr{3}    = 'B2P';
+basephoscode{3}  = [2];
 
-EdgeStr{38} = 'chH';
-BPequiv{38} = [-7];
+BPStr{4}    = 'B3P';
+basephoscode{4}  = [3];
 
-EdgeStr{39} = 'tHh';
-BPequiv{39} = [8];
+BPStr{5}    = 'B4P';
+basephoscode{5}  = [4];
 
-EdgeStr{40} = 'thH';
-BPequiv{40} = [-8];
+BPStr{6}    = 'B5P';
+basephoscode{6}  = [5];
 
-%BPCat = [2 6 8 0 6 7 8 9 0 1 3 4 5 0 5 8 0];  % updated 8-7-2008
-%         1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 
+BPStr{7}    = 'B6P';
+basephoscode{7}  = [6];
 
-% Convert external category names for BP interactions to internal codes
+BPStr{8}    = 'B7P';
+basephoscode{8}  = [7];
 
-BPStr{1}    = 'BPh';
-basephoscode{1}  = 1:17;
+BPStr{8}    = 'B9P';
+basephoscode{8}  = [9];
 
-BPStr{2}    = '1BPh';
-basephoscode{2}  = [10];
+BPStr{9}    = 'B10P';
+basephoscode{9}  = [10];
 
-BPStr{3}    = '2BPh';
-basephoscode{3}  = [1];
+BPStr{10}    = 'B11P';
+basephoscode{10}  = [11];
 
-BPStr{4}    = '3BPh';
-basephoscode{4}  = [11];
+BPStr{21}    = 'PB';
+basephoscode{21}  = [1 2 3 4];
 
-BPStr{5}    = '4BPh';
-basephoscode{5}  = [12];
+BPStr{22}    = 'P1B';
+basephoscode{22}  = [1];
 
-BPStr{6}    = '5BPh';
-basephoscode{6}  = [13 15];
+BPStr{23}    = 'P2B';
+basephoscode{23}  = [2];
 
-BPStr{7}    = '6BPh';
-basephoscode{7}  = [2 5];
+BPStr{24}    = 'P3B';
+basephoscode{24}  = [3];
 
-BPStr{8}    = '7BPh';
-basephoscode{8}  = [3 6];
-
-BPStr{9}    = '8BPh';
-basephoscode{9}  = [7];
-
-BPStr{10}    = '9BPh';
-basephoscode{10}  = [8 16];
-
-BPStr{11}    = '0BPh';
-basephoscode{11}  = [4 9 14 17];
-
-BPStr{12}    = '4bBP';
-basephoscode{12}  = [19];
-
-BPStr{13}    = '8bBP';
-basephoscode{13}  = [18];
-
-BPStr{21}    = 'PhB';
-basephoscode{21}  = 1:17;
-
-BPStr{22}    = '1PhB';
-basephoscode{22}  = [10];
-
-BPStr{23}    = '2PhB';
-basephoscode{23}  = [1];
-
-BPStr{24}    = '3PhB';
-basephoscode{24}  = [11];
-
-BPStr{25}    = '4PhB';
-basephoscode{25}  = [12];
-
-BPStr{26}    = '5PhB';
-basephoscode{26}  = [13 15];
-
-BPStr{27}    = '6PhB';
-basephoscode{27}  = [2 5];
-
-BPStr{28}    = '7PhB';
-basephoscode{28}  = [3 6];
-
-BPStr{29}    = '8PhB';
-basephoscode{29}  = [7];
-
-BPStr{30}    = '9PhB';
-basephoscode{30}  = [8 16];
-
-BPStr{31}    = '0PhB';
-basephoscode{31}  = [4 9 14 17];
-
-BPStr{32}    = '4bPB';
-basephoscode{32}  = [19];
-
-BPStr{33}    = '8bPB';
-basephoscode{33}  = [18];
+BPStr{25}    = 'P4B';
+basephoscode{25}  = [4];
 
 BPequiv{100} = [];
 
@@ -229,7 +172,7 @@ BPequiv{100} = [];
 
 Pairs = {'AA' 'CA' 'GA' 'UA' 'AC' 'CC' 'GC' 'UC' 'AG' 'CG' 'GG' 'UG' 'AU' 'CU' 'GU' 'UU' ''};
 
-str    = strrep(str,'any','');      % no restriction
+str    = strrep(str,'any','');        % no restriction
   
 str    = strrep(str,';',',');       % replace delims by commas
 str    = strrep(str,':',',');       % replace delims by commas
@@ -253,140 +196,87 @@ commas = strfind(str,',');               % find locations of commas
 if isempty(str),
   lim = [];
 else
-  lim = [0 commas length(str)+1];        % locations of edge specifications
+  lim    = [0 commas length(str)+1];       % locations of edge specifications
 end
 
 for i=1:length(lim)-1                    % loop through tokens
-  Token = str(lim(i)+1:lim(i+1)-1);     % extract next token
-  if Token(1) == '~',                   % this token, opposite of usual sense
-    Token = Token(2:length(Token));
-    Reverse = 1;
-  else
-    Reverse = 0;
-  end
+    NewStr = str(lim(i)+1:lim(i+1)-1);   % extract next token
+    if NewStr(1) == '~',                 % opposite of usual sense
+      NewStr = NewStr(2:length(NewStr));
+      Reverse = 1;
+    else
+      Reverse = 0;
+    end
+    if (NewStr(1) == 'n') | (NewStr(1) == 'N'),  % near
+      NewStr = NewStr(2:length(NewStr));
+      Near = 1;
+    else
+      Near = 0;
+    end
 
-  if ((Token(1) == 'n') | (Token(1) == 'N')) && (length(Token) > 1),  % near
-    Token = Token(2:length(Token));
-    Near = 1;
-  else
-    Near = 0;
-  end
+    EdgeNum = str2num(NewStr);               % convert to number
+    PairCode = [];                           % default; nothing
+    newBP1   = [];
+    newBP2   = [];
 
-  EdgeNum  = str2num(Token);               % try converting to a number
-  PairCode = [];                           % default; nothing
-  newBP1   = [];
-  newBP2   = [];
-  CP       = 0;
-  nCP      = 0;
+    if isempty(EdgeNum)                      % NewStr IS a string
+      edg  = find(strcmp(EdgeStr,NewStr));   % case sensitive
+      edgi = find(strcmpi(EdgeStr,NewStr));  % case insensitive
+      pair = find(strcmpi(Pairs,NewStr));    % case insensitive
+      basephos = find(strcmpi(BPStr,NewStr));% case insensitive
 
-  if isempty(EdgeNum)                      % Token IS a string
-    edg  = find(strcmp(EdgeStr,Token));    % case sensitive
-    edgi = find(strcmpi(EdgeStr,Token));   % case insensitive
-    pair = find(strcmpi(Pairs,Token));     % case insensitive
-    basephos = find(strcmpi(BPStr,Token)); % case insensitive
+      EdgeCode = 99;                         % default; nothing
 
-    EdgeCode = 99;                         % default; nothing
+      if ~isempty(edg),
+        EdgeCode = edg(1);
+      elseif ~isempty(edgi),
+        EdgeCode = edgi(1);
+      elseif ~isempty(pair),
+        PairCode = pair(1);
+      elseif ~isempty(basephos),
+        if basephos(1) < 20,
+          newBP1 = basephoscode{basephos(1)};
+        else
+          newBP2 = basephoscode{basephos(1)};          
+        end
+      end
 
-    if ~isempty(edg),
-      EdgeCode = edg(1);
-    elseif ~isempty(edgi),
-      EdgeCode = edgi(1);
-    elseif ~isempty(pair),
-      PairCode = pair(1);
-    elseif ~isempty(basephos),
-      if basephos(1) < 20,
-        newBP1 = basephoscode{basephos(1)};
-      else
-        newBP2 = basephoscode{basephos(1)};          
+      if strcmpi(NewStr,'flank'),
+        Flank = 1 - Reverse;
+      elseif strcmpi(NewStr,'local'),
+        Range = [1 10];
+      elseif strcmpi(NewStr,'nested'),
+        Range = [1 1];
+      elseif strcmpi(NewStr,'long-range'),
+        Range = [11 Inf];
+      elseif strcmpi(NewStr,'LR'),
+        Range = [11 Inf];
+      end
+
+      EdgeNum = BPequiv{EdgeCode};
+
+      if Near > 0,
+        NearEdgeNum = [];
+        for j = 1:length(EdgeNum),
+          e = EdgeNum(j);
+          NearEdgeNum = [NearEdgeNum sign(e) * (100 + abs(e))];
+        end
+        EdgeNum = NearEdgeNum;
+
+        newBP1 = newBP1 + 100;
+        newBP2 = newBP2 + 100;
       end
     end
 
-    newRange = [];
-
-    if strcmpi(Token,'flank') || strcmpi(Token,'f'),
-      Flank = 1 - Reverse;
-    elseif strcmpi(Token,'coplanar') || strcmpi(Token,'cp'),
-      CP = 1 - 2*Reverse;
-    elseif strcmpi(Token,'local') || strcmpi(Token,'L'),
-      newRange = [1 10];
-      newRRange = [11 Inf];
-    elseif strcmpi(Token,'ested') || strcmpi(Token,'n'),
-      newRange = [0 0];
-      newRRange = [1 Inf];
-    elseif strcmpi(Token,'long-range') || strcmpi(Token,'LR') || strcmpi(Token,'D') || strcmpi(Token,'Distant'),
-      newRange = [11 Inf];
-      newRRange = [0 10];
+    if Reverse == 0,
+      ReqEdge = [ReqEdge EdgeNum];
+      OKPairs = [OKPairs PairCode];
+      BP1     = [BP1 newBP1];
+      BP2     = [BP2 newBP2];
+    else
+      ExEdge  = [ExEdge EdgeNum];
+      ExPairs = [ExPairs PairCode];
+      EBP1    = [EBP1 newBP1];
+      EBP2    = [EBP2 newBP2];
     end
-
-    if isempty(Range),
-      if ~isempty(newRange),
-        Range = newRange;
-        RRange = newRRange;
-      end
-    elseif ~isempty(newRange),
-      Range(1) = min(Range(1),newRange(1));     % expand range
-      Range(2) = max(Range(2),newRange(2));
-      RRange(1) = max(RRange(1),newRRange(1));  % narrow RRange
-      RRange(2) = min(RRange(2),newRRange(2));
-    end
-
-    EdgeNum = BPequiv{EdgeCode};
-
-    if Near > 0,
-      NearEdgeNum = [];
-      for j = 1:length(EdgeNum),
-        e = EdgeNum(j);
-        NearEdgeNum = [NearEdgeNum sign(e) * (100 + abs(e))];
-      end
-      EdgeNum = NearEdgeNum;
-
-      newBP1 = newBP1 + 100;
-      newBP2 = newBP2 + 100;
-
-      if (CP ~= 0),
-        nCP = CP;
-        CP  = 0;
-      end
-    end
-  end
-
-  if Reverse == 0,
-    ReqEdge = [ReqEdge EdgeNum];
-    OKPairs = [OKPairs PairCode];
-    BP1     = [BP1 newBP1];
-    BP2     = [BP2 newBP2];
-  else
-    ExEdge  = [ExEdge EdgeNum];
-    ExPairs = [ExPairs PairCode];
-    EBP1    = [EBP1 newBP1];
-    EBP2    = [EBP2 newBP2];
-    Range   = RRange;
-  end
-
-  if (CP ~= 0),
-    Coplanar = CP;
-  end
-  if (nCP ~= 0)
-    NearCoplanar = nCP;
-  end
-end
-
-if     (Coplanar == 0) && (NearCoplanar == 0),
-  Coplanar = [];
-elseif (Coplanar == -1) && (NearCoplanar == 0),
-  Coplanar = 0;
-elseif (Coplanar == 1) && (NearCoplanar == 0),
-  Coplanar = 1;
-elseif (Coplanar == 1) && (NearCoplanar == -1),
-  Coplanar = 1;
-elseif (Coplanar == 1) && (NearCoplanar == 1),
-  Coplanar = 2;
-elseif (Coplanar == 0) && (NearCoplanar == 1),
-  Coplanar = 3;
-elseif (Coplanar == -1) && (NearCoplanar == 1),
-  Coplanar = 3;
-elseif (Coplanar == 0) && (NearCoplanar == -1),
-  Coplanar = 4;
-elseif (Coplanar == -1) && (NearCoplanar == -1),
-  Coplanar = 5;
 end

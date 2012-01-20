@@ -1,0 +1,17 @@
+
+load PairExemplars
+
+[s,t] = size(Exemplar);
+
+c = 1;
+
+for i = 1:s,
+  for j = 1:t,
+    Filenames{c} = Exemplar.Filename;
+    c = c + 1;
+  end
+end
+
+Filenames
+
+Filenames = sort(Filenames)

@@ -10,16 +10,12 @@
 % allchains is a Cx1 cell array.  Each cell lists all chains that match the
 % corresponding nucleotide number
 
-function [ind,allchains] = zIndexLookup(File,Num,Chain,Verbose)
+function [ind,allchains] = zIndexLookup(File,Num,Chain)
 
 if nargin < 3,
   for k = 1:length(Num),
     Chain{k} = '';
   end
-end
-
-if nargin < 4,
-  Verbose = 1;
 end
 
 if strcmp(class(Num),'char'),
@@ -65,17 +61,13 @@ for k = 1:length(Numb),
   end
 end
 
-% check for element or chain indicated by underscore
+% check for chain indicated by underscore
 
 for k = 1:length(Numb),
-  if any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz'),
-    % this is an element, leave it alone
-  else                      % check for chain indicated by underscore
-    if ~isempty(strfind(Numb{k},'_')),
-      a = strfind(Numb{k},'_');
-      Chai{k} = Numb{k}(a(end)+1:end);        % extract chain
-      Numb{k} = Numb{k}(1:a(end)-1);          % remove chain reference
-    end
+  if ~isempty(strfind(Numb{k},'_')),
+    a = strfind(Numb{k},'_');
+    Chai{k} = Numb{k}(a(end)+1:end);        % extract chain
+    Numb{k} = Numb{k}(1:a(end)-1);          % remove chain reference
   end
 end
 
@@ -93,13 +85,28 @@ Numbers = cat(1,{File.NT(:).Number});
 allchains = [];
 
 for k = 1:length(Numb)                      % loop through nucleotide numbers
-  if ~isempty(strfind(Numb{k},':')),        % a range of numbers
+  if isempty(strfind(Numb{k},':')),         % a single number, not a range
+    L   = LookUpOne(File,Numbers,Numb{k},Chai{k});
+
+    if length(L) > 0,
+      ind = [ind L(1)];                       % add the first hit to the list
+
+      m = length(ind);
+      ch = [];
+
+      for i=1:length(L),
+        ch{i} = File.NT(L(i)).Chain;
+      end
+
+      allchains{m} = ch;
+    end
+  else                                      % process a range of numbers
     n = Numb{k};                            % kth specified number or range
     i = strfind(n,':');                     % find the colon
     Numb1 = n(1:(i-1));                     % first nucleotide number
-    p = LookUpOne(File,Numbers,Numb1,Chai{k},Verbose);
+    p = LookUpOne(File,Numbers,Numb1,Chai{k});
     Numb2 = n((i+1):length(n));             % second nucleotide number
-    q = LookUpOne(File,Numbers,Numb2,Chai{k},Verbose);
+    q = LookUpOne(File,Numbers,Numb2,Chai{k});
 
     m = length(ind);
 
@@ -127,40 +134,7 @@ for k = 1:length(Numb)                      % loop through nucleotide numbers
     for j = (m+1):mm,
       allchains{j} = ch;
     end
-  elseif strcmpi(Numb{k},'all'),
-    ind = 1:length(File.NT);                  % all nucleotides
-  elseif any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz') && isfield(File.NT(1),'Hierarchy'),
-    c = 1;                        % counter for number of indices found
-    newind = [];
-    for n = 1:length(File.NT),
-      p = find(ismember(File.NT(n).Hierarchy,Numb{k}));
-      if ~isempty(p),
-        newind(c) = n;
-        c = c + 1;
-      end
-    end
 
-    if ~isempty(newind),
-      for j = 1:length(newind),
-        allchains{length(ind)+j} = File.NT(newind(j)).Chain;
-      end
-      ind = [ind newind];
-    end
-  else
-    L = LookUpOne(File,Numbers,Numb{k},Chai{k},Verbose);
-
-    if length(L) > 0,
-      ind = [ind L(1)];                       % add the first hit to the list
-
-      m = length(ind);
-      ch = [];
-
-      for i=1:length(L),
-        ch{i} = File.NT(L(i)).Chain;
-      end
-
-      allchains{m} = ch;
-    end
   end
 end
 
@@ -194,31 +168,23 @@ for k = 1:length(Numb),
 end
 
 %-------------------------------------------------------------------------
-function [ind] = LookUpOne(File,Numbers,N,Chain,Verbose)
+function [ind] = LookUpOne(File,Numbers,N,Chain)
 
-    if any(N(1) == 'ACGU'),
-      N = N(2:end);
-    end
+    N = regexprep(N,'A|C|G|U','','ignorecase');
 
     % later, add the ability to infer the chain from the base specified
 
     ind = [];
     p = find(ismember(Numbers,N));
     if length(p) == 0,
-      if Verbose > 0,
-        fprintf('Could not find nucleotide %s in %s\n',N,File.Filename);
-      end
+      fprintf('Could not find nucleotide %s in %s\n',N,File.Filename);
     elseif length(p) == 1 & length(Chain) == 0, % one match, no chain specified
       ind = [ind p];
     elseif length(p) > 1 & length(Chain) == 0,% two matches, no chain specified
       ind = [ind p];
-      if Verbose > 0,
-        fprintf('Multiple matches found for %s in %s, consider specifying a chain\n', N, File.Filename);
-      end
+      fprintf('Multiple matches found for %s in %s, consider specifying a chain\n', N, File.Filename);
       for a = 1:length(ind),
-        if Verbose > 0,
-          fprintf('Nucleotide %s%s Chain %5s Index %5d\n', File.NT(ind(a)).Base, File.NT(ind(a)).Number, File.NT(ind(a)).Chain, ind(a));
-        end
+        fprintf('Nucleotide %5s Chain %5s Index %5d\n', File.NT(ind(a)).Number, File.NT(ind(a)).Chain, ind(a));
       end
     elseif length(Chain) > 0,                    % chain specified
       c = 0;
@@ -229,12 +195,8 @@ function [ind] = LookUpOne(File,Numbers,N,Chain,Verbose)
         end
       end
       if c == 0,
-        if Verbose > 0,
-          fprintf('Could not find nucleotide %s in chain %s in %s\n',N,Chain,File.Filename);
-        end
+        fprintf('Could not find nucleotide %s in chain %s in %s\n',N,Chain,File.Filename);
       elseif c > 1,
-        if Verbose > 0,
-          fprintf('Multiple matches found for %s in chain %s in %s\n', N,Chain,File.Filename);
-        end
+        fprintf('Multiple matches found for %s in chain %s in %s\n', N,Chain,File.Filename);
       end
     end

@@ -16,14 +16,14 @@ switch v,
   case 1,
     NewIndices = Indices;
     for n = 1:(N-1),
-      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 16),   % if only few insertions
+      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 5),   % if only few insertions
         NewIndices = [NewIndices (Indices(n)+1):(Indices(n+1)-1)];
       end
     end
   case 2,
     NewIndices = Indices;
     for n = 1:(N-1),
-      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 20),   % if only few insertions
+      if (MaxDiff(n) < Inf) | (MaxInsert(n) < 10),   % if only few insertions
         NewIndices = [NewIndices (Indices(n)+1):(Indices(n+1)-1)];
       end
     end
@@ -40,7 +40,3 @@ switch v,
 end
 
 NewIndices = sort(NewIndices);
-
-% it should make sure there are no duplicates in NewIndices
-% it should check File to make sure that everything in NewIndices really
-% is present in File, otherwise something will crash

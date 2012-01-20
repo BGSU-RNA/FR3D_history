@@ -1,6 +1,6 @@
 % zStandardBase returns QM optimized base geometries
 
-function [A, X, Y, Z] = zStandardBase(Base)
+function [A, X, Y, Z] = zStandardBases(Base)
 
 P = [];
 

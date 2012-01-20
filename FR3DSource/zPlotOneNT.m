@@ -50,13 +50,10 @@ gray = 0.5*[1 1 1];
 if isfield(ViewParam,'Color'),
   if length(ViewParam.Color) == 3,
     col = ViewParam.Color;
+    bc  = gray;
   end
-end
-
-if strcmp(LS,'-.'),
-  col = 0.7*col;
-  gray = 0.7*gray;
-  LS = '-';
+else
+  bc = [0 0 0];
 end
 
 bc = gray;
@@ -142,8 +139,7 @@ if Sugar == 1,
   k = [2 1]; 
   plot3(Z(k,1),Z(k,2),Z(k,3),'Color',bc,'LineWidth',2,'LineStyle',LS);
 
-  % connect backbone, if distance is small enough
-  if norm(Z(13,1)-Z(10,1)) < 6,       % O3' from previous nucleotide is known
+  if Z(13,1) < Inf,                % O3' from previous nucleotide is known
     k = [10 13];
     plot3(Z(k,1),Z(k,2),Z(k,3),'Color',bc,'LineWidth',2,'LineStyle',LS);
   end  
@@ -151,7 +147,7 @@ if Sugar == 1,
   if LSugar > 0,
     A = {'C1*','C2*','O2*','C3*','O3*','C4*','O4*','C5*','O5*','P','O1P','O2P'};
     for j=1:12,
-      text(Z(j,1)+0.1,Z(j,2),Z(j,3), A{j},'fontweight','bold','FontSize',LSugar);
+      text(Z(j,1)+0.5,Z(j,2),Z(j,3), A{j},'fontweight','bold','FontSize',LSugar);
     end
   end
  elseif length(NT.Sugar(:,1)) == 12,   % for some reason, some have 9
@@ -172,7 +168,7 @@ if Sugar == 1,
   if LSugar > 0,
     A = {'C1*','C2*','O2*','C3*','O3*','C4*','O4*','C5*','O5*','P','O1P','O2P'};
     for j=1:12,
-      text(Z(j,1)+0.1,Z(j,2),Z(j,3), A{j},'fontweight','bold','FontSize',LSugar);
+      text(Z(j,1)+0.5,Z(j,2),Z(j,3), A{j},'fontweight','bold','FontSize',LSugar);
     end
   end
  end

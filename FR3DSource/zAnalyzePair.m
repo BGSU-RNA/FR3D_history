@@ -1,7 +1,7 @@
 % zAnalyzePair(N1,N2,CL) computes distances, angles, and classification
 % codes.
 
-function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
+function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   if nargin < 3,
     CL = zClassLimits;                              % read ClassLimits matrix
@@ -50,44 +50,15 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
   a = zCheckCutoffs(Pair.Displ,Pair.Normal,Pair.Ang,Pair.Gap,CL(:,:,Pair.Paircode));
                                            % find possible classifications
 
-  % ------------------------ check for coplanarity
-
-  Pair.Coplanar = 0;                      % default value
-  if (abs(Pair.Gap) < 2) && (Pair.MinDist < 5),
-    v  = N1.Center - N2.Center;           % vector from center to center
-    v  = v / norm(v);                     % normalize
-
-    dot1 = abs(v * N1.Rot(:,3));          % to calculate angle: v and normal
-    dot2 = abs(v * N2.Rot(:,3));
-
-    yy = 0.5;
-
-    if (dot1 < yy) && (dot2 < yy),         % angle > acos(yy) = 60 degrees
-
-      d = zDistance(N1.Fit(1:Lim(2,N1.Code),:), N2.Center); 
-                                           % distances to base 2 center
-      [y,m] = min(d);                      % identify the closest atom
-      m = m(1);                            % in case of a tie, use the first
-      Gap2 = N2.Rot(:,3)'*(N1.Fit(m,:)-N2.Center)';% height above plane of 1
-
-      if abs(Gap2) < 2,
-        Pair.Coplanar = min([(2-abs(Pair.Gap))/2 (2-abs(Gap2))/2 (yy-dot1)/yy (yy-dot2)/yy min(1,5-Pair.MinDist)]);
-
-      end
-    end
-  end
-
   % ---------- Notify and remove multiple classifications
 
   if length(a) > 1,
     if max(fix(a)) > min(fix(a)),              % different integer parts
-      if Verbose > 1,
-        fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) fall into categories ', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
-        for k=1:length(a),
-          fprintf('%6.2f ',a(k));
-        end
-        fprintf('\n');
+      fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) fall into categories ', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
+      for k=1:length(a),
+        fprintf('%6.2f ',a(k));
       end
+      fprintf('\n');
       a = a(1);
     else
       a = sign(a(1))*min(abs(a));               % use primary version of class
@@ -196,9 +167,9 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
 
   if (fix(a) >= 21) && (fix(a) < 24) && (Pair.StackingOverlap == 0),
     a = 30;
-%    if N1.Loc(1,1) < N2.Loc(1,1),     % only print each pair once
-      % fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) have no stacking overlap\n', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
-%    end
+    if N1.Loc(1,1) < N2.Loc(1,1),     % only print each pair once
+      fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) have no stacking overlap\n', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
+    end
   end
 
   % -------------------------- find distance to nearest exemplar
@@ -222,15 +193,15 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
   % ------------------------ record nearest exemplar if no classification yet
 
   if (fix(a) == 30),
-    if (Pair.Distances(1) < 0.8) && (Pair.Normal(3) * Exemplar(ff(1),gg(1)).R(3,3) > 0), % same flip
+    if (Pair.Distances(1) < 0.8) && (Pair.Normal(3) * Exemplar(ff(1),gg(1)).Pair.Normal(3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(1);
       a = sign(c) * (100 + abs(c) + b/1000);
-    elseif (Pair.Distances(2) < 0.8) && (Pair.Normal(3) * Exemplar(ff(2),gg(2)).R(3,3) > 0), % same flip
+    elseif (Pair.Distances(2) < 0.8) && (Pair.Normal(3) * Exemplar(ff(2),gg(2)).Pair.Normal(3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(2);
       a = sign(c) * (100 + abs(c) + b/1000);
-    elseif (Pair.Distances(3) < 0.8) && (Pair.Normal(3) * Exemplar(ff(3),gg(3)).R(3,3) > 0), % same flip
+    elseif (Pair.Distances(3) < 0.8) && (Pair.Normal(3) * Exemplar(ff(3),gg(3)).Pair.Normal(3) > 0), % same flip
       b = a-fix(a);                          % extract decimal code for reason
       c = Pair.Classes(3);
       a = sign(c) * (100 + abs(c) + b/1000);
@@ -243,8 +214,6 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
 
   % ------------------------ store the edge information
 
-  % reverse classification for GC and CG pairs, but why, exactly????
-
   if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (abs(Pair.Class) < 14),
     Pair.Edge = -Pair.Class;
   else
@@ -252,5 +221,4 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
   end
 
   Pair.EdgeText = zEdgeText(Pair.Edge,1,Pair.Paircode);  % ever used?
-
 

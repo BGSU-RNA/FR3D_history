@@ -2,14 +2,10 @@
 % between bases in File that are close enough to possibly be interacting, then
 % classifies the interaction
 
-function [File] = zClassifyPairs(File,Verbose)
+function [File] = zClassifyPairs(File)
 
 if isfield(File,'Pair'),
   File = rmfield(File,'Pair');                  % remove previous pair info
-end
-
-if nargin < 2,
-  Verbose = 1;
 end
 
 if File.NumNT > 0,
@@ -26,16 +22,14 @@ end
 
 % -------- First screening of base pairs ------------------------------------ 
 
-DistCutoff = 10.5;                              % max distance for interaction
+DistCutoff = 10.5;                                % max distance for interaction
 [i,j] = find((File.Distance < DistCutoff).*(File.Distance > 0)); 
                                                 % screen by C-C distance
 k = find(i<j);                                  % look at each pair only once
 i = i(k);                                       % reduce list of indices
 j = j(k);                                       % reduce list of indices
 
-if Verbose > 0,
-  fprintf('Classifying %5d pairs of bases for interactions ...', length(i));
-end
+fprintf('Classifying %5d pairs of bases for interactions ...', length(i));
 
 % -------- Screen and analyze base pairs ------------------------------------ 
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
@@ -48,10 +42,7 @@ for k = 1:length(i),                            % loop through possible pairs
   Ni = File.NT(i(k));                           % nucleotide i information
   Nj = File.NT(j(k));                           % nucleotide j information
 
-  [Pair,s,coplanar] = zClassifyPair(Ni,Nj,CL,Exemplar,0,Verbose);
-
-  File.Coplanar(i(k),j(k)) = coplanar;
-  File.Coplanar(j(k),i(k)) = coplanar;
+  [Pair,s] = zClassifyPair(Ni,Nj,CL,Exemplar);
 
   if ~isempty(Pair),
 
@@ -66,7 +57,7 @@ for k = 1:length(i),                            % loop through possible pairs
       File.Edge(i(k),j(k)) = -Pair.Edge;
       File.Edge(j(k),i(k)) =  Pair.Edge;
     end
-
+ 
     % --------------------------- code class to distinguish AA, CC, ... cases
 
     if (Ni.Code == Nj.Code) & (abs(Pair.Class) < 15),
@@ -76,14 +67,31 @@ for k = 1:length(i),                            % loop through possible pairs
       end
     end
 
+    % --------------------------- record interaction
+
+    File.Pair(pc) = Pair;                           % store in File data
+
     pc = pc + 1;                                    % increment pair counter
 
   end
 end   % loop over pairs
 
-if Verbose > 1,
-  fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
-  fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
+if pc > 1,                                         % if pairs were found
+  A = cat(1, File.Pair(:).Base1Index);
+  B = cat(1, File.Pair(:).Base2Index);
+  C = min(A,B);
+
+  [y,ii] = sort(C);
+
+  File.Pair = File.Pair(ii);                       % order by lower base index
+else
+  File.Pair = [];
 end
 
+%fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
+
+%fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
+
+else                                                % no nucleotides
+  File.Pair = [];
 end

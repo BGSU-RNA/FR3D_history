@@ -1,8 +1,6 @@
-% xScatterPairs displays multiple 3d scatter plots of pair parameters, with a menu that allows one to color points in different orders, or display different nucleotides from the candidates
+% xScatterPairs displays multiple 3d scatter plots of pair parameters
 
-function [ppp] = xScatterPairs(Search,N1,N2,ViewParam,Param)
-
-warning off
+function [FigsDone] = xScatterPairs(Search,N1,N2,ViewParam,Param)
 
 if nargin < 3,
   N1 = 1;
@@ -17,8 +15,6 @@ Candidates = Search.Candidates;
 N     = t - 1;                                     % number of nucleotides
 File  = Search.File;
 CL    = zClassLimits;                              % read ClassLimits matrix
-
-ppp = 1:L;                                         % default ordering
 
 if exist('PairExemplars.mat','file') > 0,
   load('PairExemplars','Exemplar');
@@ -149,7 +145,6 @@ if Recolor > 0,
  end
 
   [y,i] = sort(Color);
-  ppp   = i;                                    % permutation
   Pair  = Pair(i);
   Color = Color(i);
 
@@ -163,13 +158,12 @@ switch ViewParam.Color,
   case 3, ColorAxis =  [15 19];
   case 4, ColorAxis =  [-12 30];
   case 5, ColorAxis =  [1 16];
-  case 6, ColorAxis =  [min(Color) max(Color)];      % color by angle
+  case 6, ColorAxis =  [-90 270];
   case 7, ColorAxis =  [min(Color) max(Color)];
   case 8, ColorAxis =  [-1 3];
   case 9, ColorAxis =  [0 4];
   case 10, ColorAxis = [-12 12];
   case 11, ColorAxis = [0 10];
-  case 12, ColorAxis = [min(Color) max(Color)];
   case 13, ColorAxis =  [min(Color) max(Color)];
   case 14, ColorAxis =  [min(Color) max(Color)];
   case 15, ColorAxis =  [min(Color) max(Color)];
@@ -185,9 +179,8 @@ clf
 figure(ViewParam.FigNum)
 clf
 
-%set(gcf,'Renderer','OpenGL');     % fast rotation
+%set(gcf,'Renderer','OpenGL');
 %set(gcf,'Renderer','zbuffer')
-%set(gcf,'Renderer','painters')
 
 for k = 1:length(Pair),                              % Loop through pairs
   p      = Pair(k);
@@ -196,7 +189,7 @@ for k = 1:length(Pair),                              % Loop through pairs
 
   if ViewParam.Normal == 1,
     v = p.Normal/3;                                      % add normal vector
-    plot3([e(k,1) e(k,1)+v(1)], [e(k,2) e(k,2)+v(2)], [e(k,3) e(k,3)+v(3)], 'b');
+    plot3([e(1) e(1)+v(1)], [e(2) e(2)+v(2)], [e(3) e(3)+v(3)], 'b');
     hold on
   end
 end
@@ -429,7 +422,7 @@ end
   case  5, ViewParam.Color = 6;
   case  6, ViewParam.Color = 5;
   case  7, ViewParam.Color = 2;
-  case  8, ViewParam.Color = 12;
+  case  8, ViewParam.Color = 3;
   case  9, ViewParam.Color = 13;
   case 10, ViewParam.Color = 14;
   case 11, ViewParam.Color = 15;
@@ -467,4 +460,3 @@ end
 
 FigsDone = 2;
 
-warning on
