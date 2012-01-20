@@ -92,7 +92,7 @@ if Verbose > 0,
   full(fix(File.Edge(i,i)))
 
   fprintf('Consensus interactions:\n')
-  full(F.Edge)                                  % consensus interactions
+  full(F.Edge)                                    % consensus interactions
 end
 
 % File.Edge(i,i) = F.Edge;                  % substitute consensus
@@ -100,22 +100,26 @@ F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
 F.Crossing = zeros(N,N);                    % small enough, pretend none
 
 %Node = pMakeNodes(File,NTNumber,LastNTNumber,Truncate);
-Node = pMakeNodes(F,Verbose,1,N,Truncate);          % make the SCFG/MRF model
+Node = pMakeNodes(F,1,N,Truncate);          % make the SCFG/MRF model
+
+for m = 1:length(Node),
+%  Node(m)
+end
 
 % ---------------------------- Shift indices down to 1
 
 % This should not be necessary since the model is based on F, not File
 
 if 0 > 1,
-  a = Node(1).LeftIndex;
-  b = Node(1).RightIndex-length(Node);
+a = Node(1).LeftIndex;
+b = Node(1).RightIndex-length(Node);
 
-  for n = 1:length(Node),
+for n = 1:length(Node),
 %  Node(n).LeftIndex  = Node(n).LeftIndex - a + 1;
 %  Node(n).RightIndex = Node(n).RightIndex - b + 1;
 %  Node(n).RightIndex = max(Node(n).RightIndex,max(Node(n).LeftIndex)+1);
 %  Node(n).MiddleIndex = Node(n).MiddleIndex - a + 1;
-  end
+end
 end
 
 % ---------------------------- Set parameters for the nodes from instances
@@ -188,7 +192,5 @@ for n = 1:length(Node),
 
   end
 
-  if Verbose > 0,
-    fprintf('\n')
-  end
+  fprintf('\n')
 end
