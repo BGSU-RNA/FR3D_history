@@ -119,6 +119,10 @@ if Verbose > 1,
   end
 end
 
+else
+
+  File(f).Range = [];
+
 end
 
 end
