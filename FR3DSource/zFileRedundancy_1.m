@@ -3,12 +3,23 @@
 % zFileRedundancy('Allfiles_list') % should give a huge report
 % zFileRedundancy('NonRedundant_2008_02_21_list') % should show very little possible redundancy
 
-function [ChosenNames] = zFileRedundancy(Filenames)
+Filenames = 'Allfiles_list';
 
-p = 0.90;                         % cutoff base match fraction
-maxd = 0.5;
+Timeline = [];
 
-% ----------------------------------------- Read PDB lists, if any
+% function [ChosenNames] = zFileRedundancy(Filenames)
+
+p = 0.95;                         % cutoff base match fraction
+maxd = 0.5;                       % cutoff discrepancy between structures
+NTLimit = 7300;                   % above this limit, do not align sequences
+MaxRes  = 4;                      % maximum resolution value to use
+Criterion = 1;                    % 1-earliest release date 
+                                  % 2-resolution 
+                                  % 3-number of nucleotides
+                                  % 4-#pairs
+
+
+% ----------------------------------------- Read PDB structure names and lists
 
 if strcmp(class(Filenames),'char'),
   Filenames = {Filenames};                % make into a cell array
@@ -20,11 +31,9 @@ for j=1:length(Filenames),
   FullList = [FullList; zReadPDBList(Filenames{j})];
 end
 
-
-
 % FullList = FullList(1:50);
 
-
+% --------------------------------- Look up information on these structures
 
 load PDBInfo
 
@@ -33,11 +42,15 @@ i = [];
 for f = 1:length(FullList),
   pp = find(ismember(upper(t(:,1)),upper(FullList{f})));
   if ~isempty(pp),
-    if n(pp(1),1) > 0,            % avoid NMR structures, which have res. 0
-      i = [i pp(1)];   
-    end
+    i = [i pp(1)];   
+  else
+    fprintf('No information on file %s\n', FullList{f});
   end
 end
+t = t(i,:);                       % omit structures with no information
+n = n(i,:);           
+
+i = find(n(:,1) > 0);             % omit structures with no resolution, esp NMR
 t = t(i,:);
 n = n(i,:);           
 
@@ -45,50 +58,131 @@ i = find(n(:,2) > 1);             % restrict to structures with nucleotides
 t = t(i,:);
 n = n(i,:);           
 
+i = find(n(:,1) <= MaxRes);       % restrict to structures with res <= MaxRes
+t = t(i,:);
+n = n(i,:);           
+
 [y,i] = sort(n(:,2));             % sort by number of nucleotides
-
-
-% i = i(1:50);  % shorten!
-
-
-
 t = t(i,:);
 n = n(i,:);
 
+%i = find(n(:,2) > 1300);       % ribosomes only, for now
+%t = t(i,:);
+%n = n(i,:);
+
 F = length(i);                    % number of files
 
-close = 0.5*sparse(eye(F));
+% ---------------------------------------------- Growth of whole database
+
+for i = 1:F,
+  d = datenum(t{i,4}, 'mm/dd/yyyy');
+  Timeline = [Timeline; [d 1 n(i,2) n(i,3)]];
+end
+
+  [y,i] = sort(Timeline(:,1));                 % sort by date of increase
+  Timeline = Timeline(i,:);                    % re-order data
+
+  Date  = Timeline(:,1);
+  NumF  = Timeline(:,2);
+  NumNT = Timeline(:,3);
+  NumP  = Timeline(:,4);
+
+  Year = 1995 + (Date - datenum('01/01/1995','mm/dd/yyyy'))/365;
+
+  figure
+  clf
+  subplot(3,1,1)
+  stairs(Year,cumsum(NumF));
+  title('Total number of non-NMR RNA 3D structures');
+  axis([1992 2009 0 1.05*sum(NumF)]);
+
+  subplot(3,1,2)
+  stairs(Year,cumsum(NumNT));
+  title('Number of nucleotides in these structures');
+  axis([1992 2009 0 1.05*sum(NumNT)]);
+
+  subplot(3,1,3)
+  stairs(Year,cumsum(NumP));
+  title('Number of basepairs in these structures');
+  axis([1992 2009 0 1.05*sum(NumP)]);
+
+RTimeline = Timeline;
+
+diary Redundancy_Report_4_Angstrom_2008_06_17.txt
+
+fprintf('Preparing a redundancy report on %d RNA 3D structures\n',F);
+[p maxd MaxRes]
+
+% --------------------------------- Compare sequences between files
+
+close = 0.5*sparse(eye(F));       % indicator of whether sequences are close
 prop  = 0.5*sparse(eye(F));
 
+clear align
 align{F,F} = [];
 
 tim = cputime;
 
+Linked = zeros(1,F);
+
 for i = 1:(F-1),
-  if (cputime - tim > 60) || (mod(i,20) == 0),
-    fprintf('Comparing structure %4d, which has %d nucleotides, to %d others of a similar size\n', i, n(i,2), length(find(p*n(i:F,2) < n(i,2))));
+ if Linked(i) <= 1 || n(i,2) < 1300,
+  if (cputime - tim > 60) || (mod(i,20) == 0) || (i==1),
+    fprintf('Comparing structure %4d, %s which has %4d nucleotides, to %2d others of a similar size\n', i, t{i,1}, n(i,2), length(find(p*n(i:F,2) < n(i,2))));
     tim = cputime;
   end
-  j = i + 1;
+
+  j = i + 1;                              % index of structure to compare to
+
   while (j <= F) && (p*n(j,2) < n(i,2)),  % while seqs COULD match well enough,
-    [matches,a,b,ss,tt]   = dNeedlemanWunsch(t{i,9}, t{j,9}, 0.9999, 2);
-    matches = sum(t{i,9}(a) == t{j,9}(b));
-    pro = matches/min(n([i j],2));
-    if ((n(i,2) - matches < 4) || (prop(i,j) > p)),
-      close(i,j) = 1;
-      prop(i,j) = pro;
+    SameName = 0;
+    ti = lower(t{i,8});
+    tj = lower(t{j,8});
 
-%pro
-%[ss;tt]
+    % simply comparing names doesn't work so well since they can be wrong!
 
+    if n(i,2) > 9300 && length(ti) > 0 && length(tj) > 0,
+      [namematch,a,b,ss,tt] = dNeedlemanWunsch(ti, tj, 0.9999, 2);  % compare source organism instead of sequence
+      namematch = sum(ti(a) == tj(b));
+      if namematch / min(length(ti),length(tj)) > 0.9,
+%        fprintf('%s matches %s\n', t{i,8}, t{j,8});
+         SameName = 1;
+         close(i,j) = 1;
+      else
+%        fprintf('           %s does not match %s\n', t{i,8}, t{j,8});
+      end
+    end                
+
+    if n(i,2) <= NTLimit || length(t{i,8}) == 0 || length(t{j,8}) == 0,
+      ti = t{i,9};
+      ti = ti(1:min(length(ti),300));
+      tj = t{j,9};
+      tj = tj(1:min(length(tj),300));
+      [matches,a,b,ss,tt] = dNeedlemanWunsch(ti,tj, 0.9999, 2);
+      e = (t{i,9}(a) == t{j,9}(b));           % locations of agreement
+      matches = sum(e);
+      pro = matches/min(length(ti),length(tj));          % percent agreement
+
+%fprintf('%s %6.4f ', t{j,1}, pro);
+drawnow
+
+      if ((n(i,2) - matches < 4) || (pro > p)),
+        close(i,j) = 1;
+        prop(i,j)  = pro;
+        Linked(j)  = Linked(j) + 1;
+        if n(i,2) > NTLimit,
+          fprintf('Sequence identity with %s is %6.4f\n', t{j,1}, pro);
+        end
+      end
+      if prop(i,j) > 0.2,
+        align{i,j} = [a(e); b(e)];        % save alignment data
+        align{j,i} = [b(e); a(e)];
+      end
     end
-    if prop(i,j) > 0.8,
-      align{i,j} = [a; b];        % save alignment data
-      align{j,i} = [b; a];
-    end
-
     j = j + 1;
   end
+ end
+%fprintf('\n');
 end
 
 close = close + close';
@@ -106,7 +200,9 @@ spy(close)
 title(['Structures connected by a chain of more than ' num2str(p*100) '% similarity']);
 drawnow
 
-fprintf('Finding structures with more than %5.2f%% sequence similarity.\n',100*p);
+% ---------------------------------------- Superimpose geometrically
+
+fprintf('Superimposing structures with more than %5.2f%% sequence similarity.\n',100*p);
 
 done = zeros(1,F);                % whether each file has been considered
 
@@ -115,15 +211,9 @@ for i = 1:(F-1),
     j = find(close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
       done(i) = 1;
-    else
-%      if length(j) < 6,
-%        [a,k] = sort(n(j,1));       % sort by resolution, best first
-%      else
-%        k = zOrderbySimilarity(-prop(j,j));  % sort by sequence similarity
-%      end
-%      j = j(k);
-
-      File = zAddNTData(t(j,1),2);
+    elseif n(i,2) < NTLimit,
+      File = zAddNTData(t(j,1),2);     % load nucleotide data
+      File = zOrderChains(File);
 
       for m = 1:length(j),
         E  = abs(triu(File(m).Edge));
@@ -141,8 +231,8 @@ for i = 1:(F-1),
       end
 
       fprintf('Percent agreement of base sequence, using alignment of sequences\n');
-      fprintf('           ');
 
+      fprintf('           ');
       for m = 1:length(j),
         fprintf(' %4s  ', File(m).Filename);
       end
@@ -157,7 +247,7 @@ for i = 1:(F-1),
           fprintf('%5.2f ', File(m).Info.Resolution);
         end
         for nn = 1:length(j),
-          if nn == m,
+          if nn == m || prop(j(m),j(nn)) == 0,
             fprintf('       ');
           else
             fprintf(' %5.1f ', 100*prop(j(m),j(nn)));
@@ -174,15 +264,12 @@ for i = 1:(F-1),
       end
       fprintf('\n');
 
-      fprintf('Geometric discrepancy between aligned bases\n');
-      fprintf('           ');
-
-      for m = 1:length(j),
-        fprintf(' %4s  ', File(m).Filename);
-      end
-      fprintf('\n');
-
       discmat = zeros(length(j));
+
+if length(j) > 30,
+  fprintf('Starting to calculate discrepancies\n');
+  drawnow
+end
 
       for m = 1:length(j),
         for nn = (m+1) : length(j),
@@ -190,7 +277,8 @@ for i = 1:(F-1),
             malign = align{j(m),j(nn)}(1,:);     % use stored data
             nalign = align{j(m),j(nn)}(2,:);
           else
-            [matches,malign,nalign] = dNeedlemanWunsch(t{j(m),9},t{j(nn),9},0.9999,2);
+            malign = [];
+            nalign = [];
           end
 
           if isempty(malign),
@@ -209,6 +297,14 @@ for i = 1:(F-1),
 
       discmat = discmat + discmat';
 
+      fprintf('Geometric discrepancy between aligned bases\n');
+      fprintf('           ');
+
+      for m = 1:length(j),
+        fprintf(' %4s  ', File(m).Filename);
+      end
+      fprintf('\n');
+
       for m = 1:length(j),
         fprintf('%4s', File(m).Filename);
         if isempty(File(m).Info.Resolution),
@@ -219,19 +315,19 @@ for i = 1:(F-1),
         for nn = 1:length(j),
           if nn == m,
             fprintf('       ');
-          else
+          elseif discmat(m,nn) < Inf,
             fprintf(' %5.2f ', discmat(m,nn));
+          else
+            fprintf('       ');
           end
         end
         fprintf('\n');
       end
       fprintf('\n');
-      
-
-    end
+    end      
   end
+  drawnow
 end
-
 
 
 % Now repeat the analysis, having removed links between structures that are
@@ -246,7 +342,11 @@ fprintf('Final analysis\n');
 fprintf('Final analysis\n');
 fprintf('Final analysis\n');
 fprintf('Final analysis\n');
-fprintf('Final analysis\n');
+fprintf('Final analysis\n\n');
+
+Timeline = [];
+clear ChosenNames
+clear Text
 
 close = closeseq;                 % 
 
@@ -260,32 +360,48 @@ spy(close)
 title(['Structures connected by ' num2str(p*100) '% sequence similarity and ' num2str(maxd) ' discrepancy']);
 drawnow
 
-fprintf('Finding structures with more than %5.2f%% sequence similarity.\n',100*p);
+fprintf('Listing structures with more than %5.2f%% sequence similarity and less than %5.2f geometric discrepancy.\n',100*p,maxd);
 
 done = zeros(1,F);                % whether each file has been considered
 c = 0;                            % counts the number of files selected so far
 
 for i = 1:(F-1),
-  if done(i) == 0,
+  if done(i) == 0,                % file does not already appear in a report
     j = find(close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
-      done(i) = 1;
-      ChosenNames{c+1} = t{i,1};
-      c = c + 1;
+      done(i) = 1;                % no need to display this one again
+      File = zAddNTData(t(i,1),2); % load this file
+      E  = abs(triu(File(1).Edge));
+      np(1) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
     else
-%      if length(j) < 6,
-%        [a,k] = sort(n(j,1));       % sort by resolution, best first
-%      else
-%        k = zOrderbySimilarity(-prop(j,j));  % sort by sequence similarity
-%      end
-%      j = j(k);
+       
+      File = zAddNTData(t(j,1),2); % load these files
+      File = zOrderChains(File);
 
-      File = zAddNTData(t(j,1),2);
+      crit = [];                   % criterion for sorting and choosing
+      np   = [];
+
+      for f = 1:length(j),
+        done(j(f)) = 1;
+        E  = abs(triu(File(f).Edge));
+        np(f) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
+        switch Criterion
+          case 1, crit(f) = datenum(File(f).Info.ReleaseDate, 'mm/dd/yyyy');
+          case 2, crit(f) = n(j(f),1);            % resolution
+          case 3, crit(f) = -length(File(f).NT);  % number of nucleotides
+          case 4, crit(f) = -np(f);               % number of pairs
+        end
+      end
+
+      [y,k] = sort(crit);
+      j     = j(k);                         % order by the criterion
+      File  = File(k);
+      np    = np(k);
+
+      fprintf('\n');
 
       for m = 1:length(j),
-        E  = abs(triu(File(m).Edge));
-        np = full(sum(sum((E > 0) .* (E < 16))));
-        fprintf('%4s has %4d nucleotides, %4d pairs, ', File(m).Filename, File(m).NumNT, np);
+        fprintf('%4s has %4d nucleotides, %4d pairs, ', File(m).Filename, File(m).NumNT, np(m));
        if isempty(File(m).Info.Resolution),
          fprintf('resolution  ---- ');
        else
@@ -294,108 +410,187 @@ for i = 1:(F-1),
 
        Info = File(m).Info;
 
-       fprintf(' %10s %s %s %s\n', Info.ReleaseDate, Info.Source, Info.Descriptor, Info.Author);
+       fprintf(' %10s | %s | %s | %s\n', Info.ReleaseDate, Info.Source, Info.Descriptor, Info.Author);
       end
 
-      fprintf('Percent agreement of base sequence, using alignment of sequences\n');
-      fprintf('           ');
+      if n(i,2) <= NTLimit,
 
-      for m = 1:length(j),
-        fprintf(' %4s  ', File(m).Filename);
-      end
-      fprintf('\n');
+        fprintf('Percent agreement of base sequence, using alignment of sequences\n');
+        fprintf('           ');
 
-      for m = 1:length(j),
-        done(j(m)) = 1;
-        fprintf('%4s', File(m).Filename);
-        if isempty(File(m).Info.Resolution),
-          fprintf(' ---- ');
-        else
-          fprintf('%5.2f ', File(m).Info.Resolution);
+        for m = 1:length(j),
+          fprintf(' %4s  ', File(m).Filename);
         end
-        for nn = 1:length(j),
-          if nn == m,
-            fprintf('       ');
+        fprintf('\n');
+
+        for m = 1:length(j),
+          fprintf('%4s', File(m).Filename);
+          if isempty(File(m).Info.Resolution),
+            fprintf(' ---- ');
           else
-            fprintf(' %5.1f ', 100*prop(j(m),j(nn)));
+            fprintf('%5.2f ', File(m).Info.Resolution);
+          end
+          for nn = 1:length(j),
+            if nn == m || prop(j(m),j(nn)) == 0,
+              fprintf('       ');
+            else
+              fprintf(' %5.1f ', 100*prop(j(m),j(nn)));
+            end
+          end
+          fprintf('\n');
+        end
+        fprintf('\n');
+
+        for m = 1:length(j),
+          if length(File(m).NT) < 80,
+            fprintf('%4s %s\n', File(m).Filename, t{j(m),9});
           end
         end
         fprintf('\n');
-      end
-      fprintf('\n');
 
-      for m = 1:length(j),
-        if length(File(m).NT) < 80,
-          fprintf('%4s %s\n', File(m).Filename, t{j(m),9});
-        end
-      end
-      fprintf('\n');
+        discmat = zeros(length(j));
 
-      fprintf('Geometric discrepancy between aligned bases\n');
-      fprintf('           ');
+        for m = 1:length(j),
+          for nn = (m+1) : length(j),
+            if ~isempty(align{j(m),j(nn)}),
+              malign = align{j(m),j(nn)}(1,:);     % use stored data
+              nalign = align{j(m),j(nn)}(2,:);
+            else
+              malign = [];
+              nalign = [];
+%              [matches,malign,nalign] = dNeedlemanWunsch(t{j(m),9},t{j(nn),9},0.9999,2);
+            end
 
-      for m = 1:length(j),
-        fprintf(' %4s  ', File(m).Filename);
-      end
-      fprintf('\n');
+            if isempty(malign),
+              d = Inf;
+            else
+              d = xDiscrepancy(File(m),malign,File(nn),nalign);
+            end
+            discmat(m,nn) = d;
 
-      discmat = zeros(length(j));
-
-      for m = 1:length(j),
-        for nn = (m+1) : length(j),
-          if ~isempty(align{j(m),j(nn)}),
-            malign = align{j(m),j(nn)}(1,:);     % use stored data
-            nalign = align{j(m),j(nn)}(2,:);
-          else
-            [matches,malign,nalign] = dNeedlemanWunsch(t{j(m),9},t{j(nn),9},0.9999,2);
           end
-
-          if isempty(malign),
-            d = Inf;
-          else
-            d = xDiscrepancy(File(m),malign,File(nn),nalign);
-          end
-          discmat(m,nn) = d;
-
         end
-      end
 
-      discmat = discmat + discmat';
+        discmat = discmat + discmat';
 
-      for m = 1:length(j),
-        fprintf('%4s', File(m).Filename);
-        if isempty(File(m).Info.Resolution),
-          fprintf(' ---- ');
-        else
-          fprintf('%5.2f ', File(m).Info.Resolution);
-        end
-        for nn = 1:length(j),
-          if nn == m,
-            fprintf('       ');
-          else
-            fprintf(' %5.2f ', discmat(m,nn));
-          end
+        fprintf('Geometric discrepancy between aligned bases\n');
+        fprintf('           ');
+
+        for m = 1:length(j),
+          fprintf(' %4s  ', File(m).Filename);
         end
         fprintf('\n');
+
+        for m = 1:length(j),
+          fprintf('%4s', File(m).Filename);
+          if isempty(File(m).Info.Resolution),
+            fprintf(' ---- ');
+          else
+            fprintf('%5.2f ', File(m).Info.Resolution);
+          end
+          for nn = 1:length(j),
+            if nn == m || discmat(m,nn) == Inf,
+              fprintf('       ');
+            else
+              fprintf(' %5.2f ', discmat(m,nn));
+            end
+          end
+          fprintf('\n');
+        end
       end
-      fprintf('\n');
-      
-      crit = [];
-      for f = 1:length(j),
-        crit(f) = datenum(File(f).Info.ReleaseDate, 'mm/dd/yyyy');
-      end
-
-      [y,k] = min(crit);
-
-      fprintf('Chosen structure is %4s\n\n', File(k).Filename);
-
-      ChosenNames{c+1} = File(k).Filename;
-      c = c + 1;
-
     end
+
+    c = c + 1;
+    ChosenNames{c} = File(1).Filename;
+    if length(File) == 1,
+      Text{c} = sprintf('Unique structure is %4s, which ', File(1).Filename);
+    else
+      Text{c} = sprintf('Chosen structure is %4s, which ', File(1).Filename);
+    end
+    Text{c} = [Text{c} sprintf('has %4d nucleotides, %4d pairs, ', File(1).NumNT, np(1))];
+    if isempty(File(1).Info.Resolution),
+      Text{c} = [Text{c} sprintf('resolution  ---- ')];
+    else
+      Text{c} = [Text{c} sprintf('resolution %5.2f ', File(1).Info.Resolution)];
+    end
+
+    Info = File(1).Info;
+
+    Text{c} = [Text{c} sprintf(' %10s | %s | %s | %s', Info.ReleaseDate, Info.Source, Info.Descriptor, Info.Author)];
+
+    fprintf('%s\n', Text{c});
+
+    if Criterion == 1,                            % date of deposition
+      maxNT = length(File(1).NT);
+      maxNP = np(1);
+      Timeline = [Timeline; [y(1) 1 maxNT maxNP]];
+      for m = 1:length(j),
+        newNT = length(File(m).NT);
+        newNP = np(m);
+        if newNT > maxNT,
+          Timeline = [Timeline; [y(m) 0 (newNT-maxNT) max(0,newNP-maxNP)]];
+          maxNT = newNT;
+          maxNP = max(maxNP,newNP);
+        end
+        if newNP > maxNP,
+          Timeline = [Timeline; [y(m) 0 max(0,newNT-maxNT) (newNP-maxNP)]];
+          maxNT = newNT;
+          maxNP = max(maxNP,newNP);
+        end
+      end
+    end
+
   end
 end
+
+
+
+fprintf('List of chosen files:\n');
 
 for c = 1:length(ChosenNames),
   fprintf('%4s\n', ChosenNames{c});
 end
+
+
+
+
+fprintf('Information about chosen files:\n');
+
+for c = 1:length(ChosenNames),
+  fprintf('%4s\n', Text{c});
+end
+
+% ---------------------------------------------- Graphs of growth of database
+
+if Criterion == 1,
+  [y,i] = sort(Timeline(:,1));                 % sort by date of increase
+  Timeline = Timeline(i,:);                    % re-order data
+
+  Date  = Timeline(:,1);
+  NumF  = Timeline(:,2);
+  NumNT = Timeline(:,3);
+  NumP  = Timeline(:,4);
+
+  Year = 1995 + (Date - datenum('01/01/1995','mm/dd/yyyy'))/365;
+
+  figure(3)
+  clf
+  subplot(3,1,1)
+  stairs(Year,cumsum(NumF));
+  title('Number of distinct RNA 3D structures');
+  axis([1992 2009 0 1.05*sum(NumF)]);
+
+  subplot(3,1,2)
+  stairs(Year,cumsum(NumNT));
+  title('Number of nucleotides in distinct structures');
+  axis([1992 2009 0 1.05*sum(NumNT)]);
+  get(gca,'YTickLabel')
+  set(gca,'YTickLabel',{'0','20000','40000'});
+
+  subplot(3,1,3)
+  stairs(Year,cumsum(NumP));
+  title('Number of basepairs in distinct structures');
+  axis([1992 2009 0 1.05*sum(NumP)]);
+end
+
+diary off

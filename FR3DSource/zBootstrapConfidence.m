@@ -3,7 +3,7 @@
 
 clear d
 
-for cc = 1:12,
+for cc = 7:7,
 
 fprintf('Analyzing the %s family\n', zEdgeText(cc));
 
@@ -47,6 +47,7 @@ end
 % ------------------------------- Symmetrize for cWW, tWW, ... families
 
 NumPairs = 16;
+pc = 1:16;
 
 if any(cc == [1 2 7 8]),
 
@@ -64,6 +65,7 @@ Counts(8,:)  = 0 * Counts(8,:);
 Counts(12,:) = 0 * Counts(12,:);
 
 NumPairs = 10;
+pc = [1 5 6 9 10 11 13 14 15 16];
 
 end
 
@@ -84,9 +86,13 @@ Total  = Total(i);
 Perc = Counts ./ (ones(16,1) * Total);
 Numb = sum(Counts,2);             % number of observations of each type
 
+% ------------------------------- Save for later
+
+BPCountsFromSequences{cc} = Counts;
+
 % ------------------------------- Estimates using all columns equally
 
-pp = sum(Perc,2) / T;           % weigh each column equally
+pp = sum(Perc,2) / T;           % weigh each column equally to est percentages
 for m = 1:16,
   if sum(Counts(m,:)) > 0,
     fprintf('%2s %6d %7.4f\n', Pairs{m}, Numb(m), 100*pp(m));
@@ -94,21 +100,19 @@ for m = 1:16,
 end
 
 
-if T > 40,
+if T > 10,
 
 % ------------------------------- Bootstrap estimates of probabilities
 
 B = 1000000;                     % number of bootstrap estimates
+
+fprintf('Conducting %d bootstrap calculations of the proportions,\n', B);
 
 p = zeros(16,B);                % to store each estimated proportion
 
 for b = 1:B,
   c = ceil(T * rand(1,T));      % choose T columns randomly, iid
   p(:,b) = sum(Perc(:,c),2) / T;
-%  sum(p(:,b))
-%  for m = 1:16,
-%    fprintf('%2s %7.4f\n', Pairs{m}, p(m,b));
-%  end
 end
 
 % ------------------------------ Choose intervals to get good family rate
@@ -125,8 +129,9 @@ while ((FamSuccess < 0.95)||(FamSuccess > 0.9505)) && (n < 50),
 
   % ------------------------------ Calculate the family-wise error rate
 
-  OKInt = (p > l*ones(1,B)) .* (p < u*ones(1,B)); %
-  AllOK = (sum(OKInt,1) == NumPairs);
+  OKInt = (p >= l*ones(1,B)) .* (p <= u*ones(1,B));
+
+  AllOK = (sum(OKInt,1) == 16);
   FamSuccess = sum(AllOK)/B;
 
   fprintf('Level %16.14f AA left %8.6f AA right %8.6f Family success %8.6f\n', q, l(1), u(1), FamSuccess);

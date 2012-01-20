@@ -4,8 +4,9 @@
 %   Value 1 : prints a wide listing to the Matlab command window
 %   Value 2 : prints a wide listing to an Editbox
 %   Value 3 : prints a narrow listing to an Editbox
-%   Value 5 : returns a wide listing
+%   Value 5 : returns a wide listing, doesn't print anything
 %   Value 6 : returns the text of the narrow listing
+%   Value 7 : narrow listing with information on the organism
 
 % The PC compiled version does both 2 and 3.
 
@@ -86,7 +87,7 @@ if isfield(Search,'GroupLabel'),
   Text{t} = [Text{t} ' Group    '];
 end
 
-if WheretoOutput < 3,
+if any(WheretoOutput == [1 2 5]),
   for i=1:N,
     for j=(i+1):N,
       Text{t} = [Text{t} sprintf('%6s', [num2str(i) '-' num2str(j)])];
@@ -121,16 +122,11 @@ Config = {'A' , 'S'};
 
 for i=1:min(s,NumToOutput),
 
-  Text{i+t} = '';
-
   f = double(Candidates(i,N+1));               % file number for this candidate
-  if WheretoOutput < 4,
-    Text{i+t} = [Text{i+t} sprintf('%10s', File(f).Filename)];
-  else
-    Text{i+t} = [Text{i+t} sprintf('%10s', File(f).Filename)];
-  end
-
   Indices = Candidates(i,1:N);                 % indices of nucleotides
+
+  Text{i+t} = '';
+  Text{i+t} = [Text{i+t} sprintf('%10s', File(f).Filename)];
 
   if isfield(Search,'DisttoCenter'),
     Text{i+t} = [Text{i+t} sprintf('%12.4f',Search.DisttoCenter(i))];
@@ -145,7 +141,7 @@ for i=1:min(s,NumToOutput),
     Text{i+t} = [Text{i+t} sprintf('%5s',File(f).NT(Indices(j)).Number)];    
   end
 
-  Text{i+t} = [Text{i+t} sprintf(' ')];
+  Text{i+t} = [Text{i+t} ' '];
 
   for j=1:N,
     Text{i+t} = [Text{i+t} sprintf('%s',File(f).NT(Indices(j)).Chain)];
@@ -156,7 +152,7 @@ for i=1:min(s,NumToOutput),
     Text{i+t} = [Text{i+t} ' ' GL(1:10)];
   end
 
-  if WheretoOutput < 3,
+  if any(WheretoOutput == [1 2 5]),
     for k=1:length(Indices),
       for j=(k+1):length(Indices),
         C1 = File(f).NT(Indices(k)).Code;
@@ -214,6 +210,9 @@ for i=1:min(s,NumToOutput),
     end
   end
 
+  if WheretoOutput == 7,
+    Text{i+t} = [Text{i+t} ' ' File(f).Info.Source ' | ' File(f).Info.Descriptor];
+  end
 end
 
 % -------------------------------------- Additional notifications and info
@@ -243,7 +242,7 @@ if WheretoOutput == 3,
   mEditbox(Text,'List of Candidates',10);
 elseif WheretoOutput == 2,
   mEditbox(Text,'Wide list of Candidates',7);
-elseif WheretoOutput == 1,
+elseif any(WheretoOutput == [1 7]),
   for i=1:length(Text),
     fprintf('%s\n',Text{i});
   end

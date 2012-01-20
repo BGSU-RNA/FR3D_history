@@ -6,7 +6,7 @@
 % and after this,
 %    [Search,File] = xDisplayCandidates(File,Search);
 
-function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull,Order)
+function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull)
 
 if strcmp(class(Search),'double'),
   S = Search;
@@ -52,20 +52,21 @@ if nargin < 3,
   QuitButton = 'Quit display';
 else
   MenuTitle  = ['Subset depth ' num2str(Level)];
-  QuitButton = 'Return to larger set';
+  QuitButton = 'Quit level';
 end
-
-if nargin < 5,
-  if Query.Geometric == 0,
-    Order = 2;
-  else
-    Order = 1;
-  end
-end
-
-OrderText = {'by discrepancy from query', 'by file, then sum of nucleotide numbers', 'by similarity', 'by centrality', 'by pair criteria'};
 
 warning off
+
+% if there is no geometric model, use the first candidate to align to
+
+if Query.Geometric == 0,
+  f              = Search.Candidates(1,N+1);
+  Query.Indices  = double(Search.Candidates(1,1:N));
+  Query.NT       = File(f).NT(Query.Indices);
+  Query.LocWeight= ones(1,Query.NumNT);
+  Query          = xPrecomputeForDiscrepancy(Query);
+  Query.Filename = '';
+end
 
 if ~isfield(Search,'Marked'),
   Search.Marked = zeros(1,L);         % allow marking certain candidates
@@ -102,6 +103,26 @@ Display(1).p         = r;
 Display(1).MaxDiff   = MaxDiff;
 Display(1).MaxInsert = maxinsert;
 
+% -------------------------------------------------------------------------
+
+Display(1).n            = 1;    % which candidate is in display window 1
+Display(1).sugar        = 1;    % display sugars or not
+Display(1).neighborhood = 0;    % how large a neighborhood to show
+Display(1).superimpose  = 0;    % superimpose the first candidate?
+Display(1).supersugar   = 0;    % show sugars of first when superimposing?
+Display(1).labelbases   = 10;   % show nucleotide numbers
+Display(1).az           = -37.5;% standard view
+Display(1).el           = 30;
+
+Numplots = 1;                              % number of figure windows for cand
+stop     = 0;                              % stop the menu?
+i        = 1;                              % current window
+nn       = 1;
+PlotMotif(File,Search,Query,Display,i);    % graph in display window i
+rotate3d on
+DisplayTable(File,Search,Query,Display,i)
+drawnow
+
 % ------------------------------------------- Display distance matrix
 
 Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
@@ -126,68 +147,14 @@ for i=1:L,
   Search.Lab{i} = [b n ' ' File(f).Filename];
 end
 
-% --------- if there is no geometric model, align to the central candidate
 
-if Query.Geometric == 0,
-  [z,j] = sort(sum(Search.Disc));           % sort by average discrepancy
-  f              = Search.Candidates(j(1),N+1);
-  Query.Indices  = double(Search.Candidates(j(1),1:N));
-  Query.NT       = File(f).NT(Query.Indices);
-  Query.LocWeight= ones(1,Query.NumNT);
-  Query          = xPrecomputeForDiscrepancy(Query);
-  Query.Filename = 'Central candidate';
-end
-
-% ------------------------------------------- Parameters to display candidates
-
-Display(1).n            = 1;     % which candidate is in display window 1
-Display(1).sugar        = 1;     % display sugars or not
-Display(1).neighborhood = 0;     % how large a neighborhood to show
-Display(1).superimpose  = 0;     % superimpose the first candidate?
-Display(1).supersugar   = 0;     % show sugars of first when superimposing?
-Display(1).labelbases   = 10;    % show nucleotide numbers
-Display(1).az           = -37.5; % standard view
-Display(1).el           = 30;
-
-stop     = 0;                              % stop the menu?
-i        = 1;                              % current window
-nn       = 1;                              % current candidate
-
-PlotMotif(File,Search,Query,Display,i);    % graph in display window i
-rotate3d on
-DisplayTable(File,Search,Query,Display,i)
-drawnow
+figure(99)
+pp = p(1:Limit);
+zGraphDistanceMatrix(Search.Disc(pp,pp),Search.Lab(pp));
 
 % ------------------------------- display menu -----------------------------
 
-figure(99)
-axis([1 Limit+1 1 Limit+1]);
-
 while stop == 0,                            
-  % ---------------------------------------- Display table of discrepancies
-  figure(99)
-  ax = axis;
-  clf
-  pp = p(1:Limit);
-  zGraphDistanceMatrix(Search.Disc(pp,pp),Search.Lab(pp));
-  hold on
-  co = {'w*','wo','wd','ws','wv','w<','w>','w^','w+','wx'};
-  co = [co co co co co co co co];
-  for j = 1:length(Display),
-    plot(q(Display(j).n)+0.5,q(Display(j).n)+0.5,co{j});
-  end
-  m = q(find(Search.Marked));
-  plot(m+0.5,m+0.5,'w.');
-  axis(ax);
-  title(['Discrepancies between candidates, ordered by ' OrderText{Order}]);
-  colormap('default');
-  map = colormap;
-  map = map((end-8):-1:8,:);
-  colormap(map);
-  caxis([0 0.8]);
-  colorbar('location','eastoutside');
-
-
 
   if (Display(1).neighborhood == NeighMax),
     Neighborhood = 'No Neighborhood';
@@ -209,7 +176,7 @@ while stop == 0,
   k=menu(MenuTitle,Buttons);
 
   ii=gcf;                                 % get current active figure
-  if (abs(ii) > length(Display)) | (ii == 0), % other window active?
+  if (abs(ii) > 20) | (ii == 0),          % FR3D_GUI could be active window
     ii = i;
   end
   i = ii;                                 % record and save active figure
@@ -241,8 +208,9 @@ while stop == 0,
       end
 
     case 3                                      % Add plot
-      Display(end+1) = Display(i);              % use current settings
-      i = length(Display);                      % current figure number
+      Numplots = Numplots + 1;                  % increase number of windows
+      Display(Numplots) = Display(i);           % use current settings
+      i = Numplots;
       figure(i);
 
     case 4                                      % toggle Neighborhood
@@ -267,7 +235,6 @@ while stop == 0,
     case 6                                      % toggle superimpose/numbers
       if Display(1).superimpose == 0 & Display(1).labelbases == 0,
         Display(1).superimpose = 1;
-        fprintf('Superimposing candidate in darker colors');
       elseif Display(1).superimpose == 1 & Display(1).labelbases == 0,
         Display(1).labelbases = fontsize;
       elseif Display(1).superimpose == 1 & Display(1).labelbases > 0,
@@ -291,26 +258,22 @@ while stop == 0,
     case 9                                      % display marked only
       j = find(Search.Marked);
       if length(j) > 0,
-        [y,m] = sort(q(j));
-        j = j(m);                               % put j in display order
         Search2 = SearchSubset(Search,j);
         xDisplayCandidates(File(FIndex),Search2,Level+1);
-        figure(99)
-        axis(ax);
       end
 
     case 10                                      % list on screen
       j  = find(Search.Marked);
       jj = find(Search.Marked == 0);
       if (length(j) > 0) && (length(jj) > 0),
-        [y,m] = sort(q(j));
-        j = j(m);                                % put j in display order
+        [y,k] = sort(q(j));
+        j = j(k);                                % put j in display order
         Search2 = SearchSubset(Search,j);
         fprintf('Marked candidates listed first\n');
         xListCandidates(Search2,Inf);
 
-        [y,m] = sort(q(jj));
-        jj = jj(m);                             % put jj in display order
+        [y,kk] = sort(q(jj));
+        jj = jj(kk);                             % put jj in display order
         Search2 = SearchSubset(Search,jj);
         fprintf('Unmarked candidates listed second\n');
         xListCandidates(Search2,Inf);
@@ -330,17 +293,11 @@ while stop == 0,
       p(1:Limit) = j;
       p((Limit+1):L) = (Limit+1):L;      
       q(p) = 1:L;
-%      Search = xSortByCentrality(File(FIndex),Search,Level,UsingFull);
-      Order = 4;
+      Search = xSortByCentrality(File(FIndex),Search,Level,UsingFull);
 
     case 13                                     % group candidates
 %      Search = xGroupCandidates(File(FIndex),Search,Level,UsingFull);
-%      Search = xOrderCandidates(File(FIndex),Search,Level,UsingFull);
-
-      p(1:Limit) = zOrderbySimilarity(Search.Disc(1:Limit,1:Limit));
-      p((Limit+1):L) = (Limit+1):L;
-      q(p) = 1:L;
-      Order = 3;
+      Search = xOrderCandidates(File(FIndex),Search,Level,UsingFull);
 
     case 14                                     % align
       xAlignCandidates(File(FIndex),Search,1);
@@ -358,13 +315,15 @@ while stop == 0,
       pt = get(gca,'CurrentPoint')
 
       if abs(pt(1,1)-pt(1,2)) > L/15,           % clicked off the diagonal
-        Search.Marked = 0 * Search.Marked;      % unmark all candidates
+        Search.Marked = 0 * Search.Marked;
         a = sort(pt(1,[1 2]));
-        j = p(max(1,floor(a(1))):min(L,floor(a(2))));      % 
+        j = max(1,floor(a(1))):min(L,floor(a(2)));      % 
         Search.Marked(j) = ones(1,length(j));   % select these candidates
+        fprintf('Marked candidates %d to %d\n', j(1), j(end));
       else                                      % clicked near the diagonal
         newn = max(min(floor(pt(1,1)),L),1);
-        Display(i).n = p(newn);
+        Display(i).n = newn;
+        fprintf('Jumped to candidate %d\n', newn);
       end
 
     case 17                                     % quit Display
@@ -373,8 +332,7 @@ while stop == 0,
       end
       stop = 1;
 
-  end  % switch statement for menu
-
+    end  % switch statement for menu
 
   if any([1 2 3 7 16] == k),
       PlotMotif(File(FIndex),Search,Query,Display,i);
@@ -395,18 +353,19 @@ while stop == 0,
   end
 
   if (Display(i).n ~= nn) || (k == 4),
+    
     DisplayTable(File(FIndex),Search,Query,Display,i)
     nn = Display(i).n;
   end
 
   if any([4 5 6 8] == k),
-    for j=1:length(Display)
+    for j=1:Numplots
       PlotMotif(File(FIndex),Search,Query,Display,j);
     end
   end
 
-  if length(Display) > 1,
-      for j=1:length(Display),
+  if Numplots > 1,
+      for j=1:Numplots,
         figure(j)
         sh(j) = subplot(1,1,1);
         rotate3d on

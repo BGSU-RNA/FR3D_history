@@ -7,7 +7,13 @@
 % Direction can be +1 or -1; it tells the order in which to put the
 % nucleotides in the first candidate
 
-function [Text] = xFASTACandidates(File,Search,Direction,Param)
+function [Text] = xFASTACandidates(File,Search,Direction,ModelName)
+
+if nargin < 4,
+  MN = Search.Query.Name;
+else
+  MN = ModelName;
+end
 
 Query      = Search.Query;
 Candidates = Search.Candidates;
@@ -41,28 +47,8 @@ end
 
 % ---------------------------- Print header line
 
-t = 1;                                          % line of text we're on
+t = 0;                                          % line of text we're on
 k = N;                                          % number of columns being shown
-Text{t} = sprintf('               ');
-if Query.Geometric > 0,
-  Text{t} = [Text{t} sprintf('           ')];
-end
-for j=1:N,
-  Text{t} = [Text{t} sprintf('        ')];
-end
-Text{t} = [Text{t} sprintf('    ')];
-for n = 1:(N-1),
-  Text{t} = [Text{t} sprintf('%d',mod(n,10))];
-  if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
-    for i=1:maxinsert(n),
-      Text{t} = [Text{t} sprintf(' ')];
-      k = k + 1;                                % more columns being shown
-    end
-  else
-    Text{t} = [Text{t} sprintf('    ')];
-  end
-end
-Text{t} = [Text{t} sprintf('%d', mod(N,10))];
 
 % ----------------------------- Print alignment
 
@@ -75,7 +61,7 @@ end
 for c = 1:L,                                      % loop through candidates
   f = F(c);                                       % file number
   t = t + 1;
-  Text{t} = [sprintf('> %s %5s %s%5s %s%5s', Search.Query.Name, File(f).Filename, File(f).NT(Cand(c,1)).Base, File(f).NT(Cand(c,1)).Number, File(f).NT(Cand(c,end)).Base, File(f).NT(Cand(c,end)).Number)];
+  Text{t} = [sprintf('> %s %5s %s%5s %s%5s', MN, File(f).Filename, File(f).NT(Cand(c,1)).Base, File(f).NT(Cand(c,1)).Number, File(f).NT(Cand(c,end)).Base, File(f).NT(Cand(c,end)).Number)];
   t = t + 1;
   Text{t} = '';
 
@@ -121,10 +107,4 @@ for c = 1:L,                                      % loop through candidates
   CorrCodeList(c,N) = j;                           % store last corresp base
 
   drawnow
-end
-
-if nargin < 4,
-  for t = 1:length(Text),
-    fprintf('%s\n', Text{t});
-  end
 end

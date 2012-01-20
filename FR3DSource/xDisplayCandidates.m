@@ -227,7 +227,16 @@ while stop == 0,
     case 1                                      % next plot
       n = Display(i).n;                         % actual candidate displayed
       if q(n) + 1 > L,                          % q(n) is display order
+        Limit = min(Limit*2,L);                 % increase limit
         Display(i).n = p(1);
+
+Limit
+disp('Calculating more discrepancies');
+Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
+
+p = 1:L;                                     % default permutation for display
+q(p) = 1:L;                                  % inverse permutation
+
       else
         Display(i).n = p(q(n) + 1);
       end
@@ -344,7 +353,10 @@ while stop == 0,
 
     case 14                                     % align
       xAlignCandidates(File(FIndex),Search,1);
-%      xFASTACandidates(File(FIndex),Search,1);
+%      Text = xFASTACandidates(File(FIndex),Search,1);
+%      for t = 1:length(Text),
+%        fprintf('%s\n', Text{t});
+%      end
 
     case 15
       ViewParam.Color  = 6;
