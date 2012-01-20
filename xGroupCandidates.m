@@ -24,6 +24,12 @@ for i=1:length(Done),
 end
 
 D = Search.Disc(Done,Done);                    % mutual distances to consider
+
+[s,t] = size(D);
+for i=1:s,
+  D(i,i) = 0;                                  % just in case
+end
+
 Y = squareform(full(D));                       % convert to a vector
 Z = linkage(Y,'average');                      % compute cluster tree
 figure(25)

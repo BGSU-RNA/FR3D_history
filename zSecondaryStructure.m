@@ -39,7 +39,7 @@ else
 end
 
 if nargin < 4,
- Basepairs = (File.Inter < 15) .* (File.Inter ~= 0); % basepairing only
+ Basepairs = (abs(File.Inter) < 15) .* (File.Inter ~= 0); % basepairing only
  for a = 1:N,                              % loop through nucleotides
   k = find(Basepairs(a,:));                % find indices of interacting bases
   [y,L] = sort(abs(File.Inter(a,k)));      % sort by interaction category
@@ -71,7 +71,7 @@ while (a < B) & (a <= N), % while not the end of the loop,
   if length(Interact{a}.Categ) > 0,        % if a interacts with something,
     b = Interact{a}.Index(1);              % get index 
     c = Interact{a}.Categ(1);              % and category of interaction
-
+    t = zEdgeText(File.Edge(a,b));         % edge notation
     if (a < b),                            % if b comes after a
 
       % ---------------------------------- Check for junction
@@ -92,14 +92,15 @@ while (a < B) & (a <= N), % while not the end of the loop,
       if (b < B-1),
         if sum(sum(File.Inter((b+1):(B-1),(b+1):(B-1)) == 1)) == 0,
           for e = (B-1):-1:(b+1),
-            fprintf('               %1s%4s', File.NT(e).Base, File.NT(e).Number);
+            fprintf('           %1s%4s', File.NT(e).Base, File.NT(e).Number);
             if length(Interact{e}.Categ) > 0,
              fprintf('   Right ');
              for k=1:length(Interact{e}.Categ),
               bb = Interact{e}.Index(k);
               cc = Interact{e}.Categ(k);
+              te = zEdgeText(File.Edge(e,bb));
               fprintf('%1s%4s',File.NT(e).Base,File.NT(e).Number);
-              fprintf('  >%5.1f< %1s%4s | ',cc,File.NT(bb).Base,File.NT(bb).Number);
+              fprintf(' %4s %1s%4s | ',te,File.NT(bb).Base,File.NT(bb).Number);
              end
             end
             fprintf('\n');
@@ -113,13 +114,13 @@ while (a < B) & (a <= N), % while not the end of the loop,
           (sum(sum(File.Inter((a+1):B,    (a+1):B)     == 1))  > 0)) | ...
          (b > B),
         fprintf('%1s%4s',File.NT(a).Base,File.NT(a).Number); % display a
-        fprintf('               ');       % move to next column
+        fprintf('           ');       % move to next column
         d = 1;
       else
         % ---------------------------------- Show interaction between a and b
 
         fprintf('%1s%4s',File.NT(a).Base,File.NT(a).Number); % display a
-        fprintf('  >%5.1f< %1s%4s', c, File.NT(b).Base, File.NT(b).Number);
+        fprintf(' %4s %1s%4s', t, File.NT(b).Base, File.NT(b).Number);
         d = 2;
         A = a;                               % a of last pair
         B = b;                               % b of last pair
@@ -130,7 +131,7 @@ while (a < B) & (a <= N), % while not the end of the loop,
       end
     else
       fprintf('%1s%4s',File.NT(a).Base,File.NT(a).Number); % display a
-      fprintf('               ');       % move to next column
+      fprintf('           ');       % move to next column
       d = 1;
     end
   else
@@ -145,8 +146,9 @@ while (a < B) & (a <= N), % while not the end of the loop,
     for k = d:length(Interact{a}.Categ),
       bb = Interact{a}.Index(k);
       cc = Interact{a}.Categ(k);
+      te = zEdgeText(File.Edge(a,bb));
       fprintf('%1s%4s',File.NT(a).Base,File.NT(a).Number);
-      fprintf('  >%5.1f< %1s%4s | ',cc,File.NT(bb).Base, File.NT(bb).Number);
+      fprintf(' %4s %1s%4s | ',te,File.NT(bb).Base, File.NT(bb).Number);
     end
   end
 
@@ -158,9 +160,10 @@ while (a < B) & (a <= N), % while not the end of the loop,
       for k=1:length(Interact{b}.Categ),
         bb = Interact{b}.Index(k);
         cc = Interact{b}.Categ(k);
+        te = zEdgeText(File.Edge(b,bb));
         if bb ~= a,
           fprintf('%1s%4s',File.NT(b).Base,File.NT(b).Number);
-          fprintf('  >%5.1f< %1s%4s | ',cc,File.NT(bb).Base,File.NT(bb).Number);
+          fprintf(' %4s %1s%4s | ',te,File.NT(bb).Base,File.NT(bb).Number);
         end
       end
     end

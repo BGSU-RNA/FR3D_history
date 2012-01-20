@@ -1,4 +1,4 @@
-% xMutualDiscrepancy re-orders the candidates according to their centrality
+% xMutualDiscrepancy computes the mutual distances between candidates
 
 function [Search] = xMutualDiscrepancy(File,Search)
 
