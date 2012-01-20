@@ -1,7 +1,20 @@
-% the function xDisplayCandidates(File,Search,Level) displays candidates
+% xDisplayCandidates(File,Search,Level) displays candidates
 % graphically and allows various types of analysis
 
-function Search = xDisplayCandidates(File,Search,Level)
+% It may be run directly from Matlab using the command:
+%    [Search,File] = xDisplayCandidates([],Search);
+% and after this,
+%    [Search,File] = xDisplayCandidates(File,Search);
+
+function [Search, File] = xDisplayCandidates(File,Search,Level)
+
+if isempty(File),
+  [File,SIndex] = zAddNTData(Search.Filenames,2);   % load PDB data
+else
+  [File,SIndex] = zAddNTData(Search.Filenames,2,File); % add PDB data if needed
+end
+
+File = File(SIndex);                   % re-order file numbers
 
 fontsize = 10;                               % for nucleotide numbers
 

@@ -2,12 +2,15 @@
 % number Num and, if specified, Chain
 % Num can be a cell array of N nucleotide numbers
 % Any entry of that cell array can use the notation '1830:1835' for a range
-% Nucleotide numbers can be followed by (A) to indicate chain A
-% ind is a 1xN vector of the first match to each, the easy answer
-% allindices is a 1xN cell array, each row being a 1xN vector
-% allchains is a Cx1 cell array as well.
+% Any entry can also use commas to separate nucleotide numbers
+% Nucleotide numbers can be followed by (A) or _A to indicate chain A
+% Someday: Base letters can be specified to help identify the correct chain
 
-function [ind,allindices,allchains] = zIndexLookup(File,Num,Chain)
+% ind is a Cx1 vector of the first match to each, the easy answer
+% allchains is a Cx1 cell array.  Each cell lists all chains that match the
+% corresponding nucleotide number
+
+function [ind,allchains] = zIndexLookup(File,Num,Chain)
 
 if nargin < 3,
   for k = 1:length(Num),
@@ -67,7 +70,76 @@ for k = 1:length(Numb),
   end
 end
 
-% check for indicated base - what if this happens like A65:G67?
+ind = [];
+  
+% if File is a text string (filename), load the file
+
+if strcmp(class(File),'char'),
+  Filename = File;
+  File = zGetNTData(Filename,0);
+end
+
+Numbers = cat(1,{File.NT(:).Number});
+
+allchains = [];
+
+for k = 1:length(Numb)                      % loop through nucleotide numbers
+  if isempty(strfind(Numb{k},':')),         % a single number, not a range
+    L   = LookUpOne(File,Numbers,Numb{k},Chai{k});
+
+    if length(L) > 0,
+      ind = [ind L(1)];                       % add the first hit to the list
+
+      m = length(ind);
+      ch = [];
+
+      for i=1:length(L),
+        ch{i} = File.NT(L(i)).Chain;
+      end
+
+      allchains{m} = ch;
+    end
+  else                                      % process a range of numbers
+    n = Numb{k};                            % kth specified number or range
+    i = strfind(n,':');                     % find the colon
+    Numb1 = n(1:(i-1));                     % first nucleotide number
+    p = LookUpOne(File,Numbers,Numb1,Chai{k});
+    Numb2 = n((i+1):length(n));             % second nucleotide number
+    q = LookUpOne(File,Numbers,Numb2,Chai{k});
+
+    m = length(ind);
+
+    if length(p) > 0 && length(q) > 0,      % both numbers are valid
+      if p(1) < q(1),
+        ind = [ind p(1):q(1)];
+      else
+        ind = [ind p(1):-1:q(1)];
+      end
+    end
+
+    mm = length(ind);
+    ch = [];
+    c  = 1;
+
+    for j = 1:length(p),
+      for jj = 1:length(q),
+        if File.NT(p(j)).Chain == File.NT(q(jj)).Chain,
+          ch{c} = File.NT(p(j)).Chain;
+          c = c + 1;
+        end
+      end
+    end
+
+    for j = (m+1):mm,
+      allchains{j} = ch;
+    end
+
+  end
+end
+
+return
+
+% check for indicated base - add to LookUpOne in the future
 
 for k = 1:length(Numb),
   Numb{k} = upper(Numb{k});
@@ -94,53 +166,12 @@ for k = 1:length(Numb),
   end
 end
 
-Numb
-Chai
-Base
-
-
-ind = [];
-  
-% if File is a text string (filename), load the file
-
-if strcmp(class(File),'char'),
-  Filename = File;
-  File = zGetNTData(Filename,0);
-end
-
-Numbers = cat(1,{File.NT(:).Number});
-
-for k = 1:length(Num)                      % loop through nucleotide numbers
-  if isempty(strfind(Num{k},':')),         % a single number, not a range
-    L   = LookUpOne(File,Numbers,Num{k},Chain{k});
-    ind = [ind L];                         
-    for j = 1:length(L),
-      allindices{k,j} = L(j);
-      allchains{k,j}  = File.NT(L(j)).Chain;
-    end
-  else                                     % process a range of numbers
-    n = Num{k};                            % kth specified number or range
-    i = strfind(Num{k},':');               % find the colon
-    Num1 = n(1:(i-1));
-    p = LookUpOne(File,Numbers,Num1,Chain{k});
-    Num2 = n((i+1):length(n));
-    q = LookUpOne(File,Numbers,Num2,Chain{k});
-    c = 1;
-    for j = 1:length(p),
-      for jj = 1:length(q),
-        if File.NT(p(j)).Chain == File.NT(q(jj)).Chain,
-          ind = [ind p(j):q(jj)];
-          allindices{k,c} = [p(j):q(jj)];
-          allchains{k,c} = File.NT(p(j)).Chain;
-          c = c + 1;
-        end
-      end
-    end
-  end
-end
-
-
+%-------------------------------------------------------------------------
 function [ind] = LookUpOne(File,Numbers,N,Chain)
+
+    N = regexprep(N,'A|C|G|U','','ignorecase');
+
+    % later, add the ability to infer the chain from the base specified
 
     ind = [];
     p = find(ismember(Numbers,N));

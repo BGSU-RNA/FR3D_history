@@ -1,9 +1,11 @@
-%mSpecifyQuery_forGUI
+% mSpecifyQuery_forGUI reads the entries in the GUI to set query constraints
+
 % The variable Query has several fields:
 % xSpecifyQuery returns the description of a model motif
 % The variable Query has several fields:
-%   Query.Filename       a string like rr0033_23S
-%   Query.NTList         a list of nucleotide numbers
+%   Query.Filename       a string like 1s72
+%   Query.NTList         list of nucleotide numbers
+%   Query.ChainList      list of chains, to uniquely identify NTs from numbers
 %   Query.Mask           a mask for which nucleotides to allow
 %   Query.AngleWeight    weights to put on the angles
 %   Query.DistanceWeight weights to put on nucleotide distances
@@ -56,18 +58,6 @@ else
     Query.Geometric=0;
 end
 
-
-% % %%%Read Query.ChainList from GUI  %%%%Now this is done just once before the Matrix is created, and then exported to this function
-% % % Query.ChainList      = {'9' '9' '9'};
-% % for i=1:NTlen %length(Query.NTList)
-% %     h=findobj('Tag',strcat('ChainList',num2str(i)));
-% %     s=get(h,'String');
-% %     v=get(h,'Value');
-% %     Query.ChainList(i)=s(v);
-% % end
-% % %%%End Read Query.ChainList from GUI
-
-
 %%%Read Query.Diagonal from GUI
 % Query.Diagonal includes Mask information and also some other info
 for i=1:NTlen
@@ -81,35 +71,18 @@ end
 %%%Read Query.Diff from GUI
 % Query.Diff        = [4 4];
 for i=1:NTlen
-    for j=1:NTlen
-        if i>j
-            h=findobj('Tag',strcat('Diff',num2str(i),num2str(j)));
-            s=get(h,'String');
-            Query.Diff{i,j}=s;
-%             v=str2num(s);
-%             if ~isempty(v)
-%                 Query.Diff(i,j)=round(v);
-%             else
-%                 Query.Diff(i,j)=Inf;
-%             end
-%             if Query.Diff(i,j)==0;
-%                 Query.Diff(i,j)=Inf;
-%             end
-        end
+    for j=1:(i-1)
+        h=findobj('Tag',strcat('Diff',num2str(i),num2str(j)));
+        s=get(h,'String');
+        Query.Diff{i,j}=s;
     end
 end
 
 for i=1:NTlen
-    for j=1:NTlen
-        if i<j
-            h=findobj('Tag',strcat('BPType',num2str(i),num2str(j)));
-            s=get(h,'String');
-            %Query.ReqInter{i,j}=mGetReqInterFromGUI(s);
-            Query.Edges{i,j}= regexprep(s,',',' '); %users can enter , instead of spaces between interaction codes
-            
-% % %             [Query.ReqEdge{i,j},Query.ExEdge{i,j},Query.OKPairs{i,j},Query.ExPairs{i,j}]=...
-% % %                 xInterpretEdgeText(Query.Edges{i,j});
-        end
+    for j=(i+1):NTlen
+        h=findobj('Tag',strcat('BPType',num2str(i),num2str(j)));
+        s=get(h,'String');
+        Query.Edges{i,j}= regexprep(s,',',' '); %users can enter , instead of spaces between interaction codes
     end
 end
 

@@ -1,16 +1,18 @@
-%mCreateMatrix
+% mCreateMatrix is a script that sets up the interaction matrix for FR3D_GUI
 
 % modify the nucleotide index lookup to be aware of the given chain
 
 %%%%%%Create the basepair matrix (and delete extra ones) for determining
 %%%%%%Query.Diff, Query.ReqInter, Query.Diagonal
 %%%%%%Query.Config added
+
 PreviousConfig=ones(1,12);
 for i=1:12
     h=findobj('Tag',strcat('Config',num2str(i)));
     try,PreviousConfig(i)=get(h,'Value');end
     delete(h);
 end
+
 for i=1:length(NT)
     str={'','anti','syn'};
     handles.Config(i) = uicontrol('Tag',strcat('Config',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.755) .054 .04],'Background',[1 1 1],'String',str,'Value',PreviousConfig(i));
@@ -22,12 +24,11 @@ for i=1:12
     hv=findobj('Tag',strcat('BPtextv',num2str(i)));
     delete(hv);
 end
+
 for i=1:length(NT)
     if get(handles.Geometric,'Value') == 1
-        ind = zIndexLookup(File(QIndex),NT(i),ChainList(i));
+        ind = zIndexLookup(File(QIndex),NT{i},ChainList{i});
         Bas = File(QIndex).NT(ind).Base;
-%        Bas=mGetBaseFromNTnumberAndChain(File(QIndex),NT{i},ChainList(i));
-
     else
         Bas='NT';
     end

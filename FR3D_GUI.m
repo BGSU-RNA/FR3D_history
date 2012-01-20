@@ -160,51 +160,37 @@ function ReadQuery_Callback(hObject, eventdata, handles)
 
   %%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
 
-  Indices = zIndexLookup(File(QIndex),get(handles.QueryNTs,'String'));
+  [Indices,Ch] = zIndexLookup(File(QIndex),get(handles.QueryNTs,'String'));
 
-  for i=1:length(Indices),
-    Query.NTList{i} = File(QIndex).NT(Indices(i)).Number;
+  if length(Indices) > 12,
+    set(handles.Status,'String','Error: It is not possible to use this GUI for a motif larger than 12 NTs.  Use FR3D.');
+    set(handles.GenerateMatrix,'Visible','off');
   end
 
-% This is in the middle of being altered, and needs to be finished!
+  %%%
 
-NTs = [',' get(handles.QueryNTs,'String') ',']; % pad with commas; useful below
-ind=findstr(',',NTs);                   % locations of commas, for parsing
-for i=1:length(ind)-1
-  NT{i}=NTs(ind(i)+1:ind(i+1)-1);       % extract nucleotide numbers
-end
+  %     mCreateDynamicGUI 
+  % Creates all dynamic popum menus and edit boxes and hides extra ones 
+  % from previous searches
 
+  % Create popupmenus (and delete extra ones) for determining Query.ChainPopup
 
-Query.NTList=NT;                        % cell array of nucleotide numbers
+  for i=1:12
+    h=findobj('Tag',strcat('ChainPopup',num2str(i)));
+    delete(h);
+  end
 
+  for i=1:min(12,length(Indices)),               % truncate at 12 nucleotides
+    Query.NTList{i} = File(QIndex).NT(Indices(i)).Number;
+    handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.795) .054 .04],'String',Ch{i},'Background',[1 1 1]);
+  end
 
-%%%End DetermineQuery.NTList
-
-if length(NT)<=12 %this is a limitation by the size of the GUI
-    %%%
-
-    %     mCreateDynamicGUI 
-    % Creates all dynamic popum menus and edit boxes and hides extra ones 
-    % from previous searches
-
-    % Create popupmenus (and delete extra ones) for determining Query.ChainPopup
-
-    for i=1:12
-      h=findobj('Tag',strcat('ChainPopup',num2str(i)));
-      delete(h);
-    end
-
-
-
-    for i=1:length(NT)
-      [a,b,Ch] = zIndexLookup(File(QIndex),NT(i));
-      handles.ChainPopup(i) = uicontrol('Tag',strcat('ChainPopup',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.795) .054 .04],'String',Ch,'Background',[1 1 1]);
-    end
-    set(handles.QueryChains,'Visible','on')
+  set(handles.QueryChains,'Visible','on')
                              % this is the text just to the left of the popups
 
     %Pass some variables created here to be used by other functions
-    handles.NT=NT;
+    handles.Indices = Indices;
+    handles.NT=Query.NTList;
     handles.Filename = Query.Filename;
     handles.File = File;
     handles.QIndex=QIndex;               % index of File for query file
@@ -220,10 +206,6 @@ if length(NT)<=12 %this is a limitation by the size of the GUI
     set(handles.Status,'String','Choose "Query Chains" and click "Generate Interaction Matrix"');
     set(handles.GenerateMatrix,'Visible','on');
 
-else
-    set(handles.Status,'String','Error: It is not possible to use this GUI for a motif longer than 12 NTs.  Use FR3D.');
-    set(handles.GenerateMatrix,'Visible','off');
-end
 set(handles.RunSearch,'Visible','off');
 set(handles.ListCandidates,'Visible','off');
 set(handles.DisplayCandidates,'Visible','off');
@@ -242,7 +224,7 @@ if get(handles.Geometric,'Value') == 1
         h=findobj('Tag',strcat('ChainPopup',num2str(i)));
         s=get(h,'String');
         v=get(h,'Value');
-        Query.ChainList(i)=s(v);
+        Query.ChainList{i}=s(v);
     end
     %%%End Read Query.ChainList from GUI
     ChainList=Query.ChainList;
@@ -258,12 +240,13 @@ else
     end
     NTlen=min(12,NTlen);
     for i=1:NTlen
-        NT{i}=num2str(i);
+      NT{i}=num2str(i);
     end
     handles.NTlen=NTlen;
 end
 
 mCreateMatrix                                  % generate interaction matrix
+
 set(handles.GuarCutoffText,'visible','on');
 set(handles.GuarCutoff,'visible','on');
 set(handles.RelCutoffText,'visible','on');
@@ -279,7 +262,7 @@ set(handles.SearchDescription,'visible','on');
 guidata(hObject, handles);
 
 
-% --- Executes on button press in RunSearch.
+% ----------------------------- Executes on button press in RunSearch
 function RunSearch_Callback(hObject, eventdata, handles)
 if ~isdeployed,clc,end
 
@@ -367,7 +350,7 @@ end
 
 
 
-% --- Executes on button press in Geometric.
+% ------------------ Executes on button press in Geometric.
 function Geometric_Callback(hObject, eventdata, handles)
 set(handles.Geometric,'Value',1);
 set(handles.NonGeometric,'Value',0);
@@ -387,7 +370,7 @@ set(handles.Status,'String','Hint: Choose "Query PDB" and "Query NTs", then clic
 Query.Geometric = 1;
 
 
-% --- Executes on button press in NonGeometric.
+% -----------------  Executes on button press in NonGeometric.
 function NonGeometric_Callback(hObject, eventdata, handles)
 set(handles.NonGeometric,'Value',1);
 set(handles.Geometric,'Value',0)
@@ -415,14 +398,14 @@ set(handles.Status,'String','Hint: Input "Number of NTs" (positive integer) and 
 Query.Geometric = 0;
 
 
-
+% --------------- 
 function SearchDescription_Callback(hObject, eventdata, handles)
 function SearchDescription_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
-
+% --------------- Executes on button press in Display Candidates
 function DisplayCandidates_Callback(hObject, eventdata, handles)
 
 Search=handles.Search;
@@ -437,30 +420,25 @@ end
 handles.File=File;
 handles.SIndex=SIndex;
 guidata(hObject, handles);
+
 xDisplayCandidates(File(SIndex),Search);
 
 
+% --------------- Executes on button press in List Candidates
 function ListCandidates_Callback(hObject, eventdata, handles)
 Search=handles.Search;
 
 if isfield(handles,'SIndex')
   File=handles.File;
   SIndex=handles.SIndex;
-[3 SIndex]
-Search.Filenames
-  xListCandidates(File(SIndex),Search,Inf);
-  %winopen(OUT) %%OUT is not outputted by the above function
-  %winopen('Query_51_Results.txt')
 else %If data is loaded from saved search results
   [File,SIndex]=zAddNTData(Search.Filenames,2);
-[4 SIndex]
-Search.Filenames
   handles.File=File;
   handles.SIndex=SIndex;
   guidata(hObject, handles);
-    
-  xListCandidates(File(SIndex),Search,Inf);
 end
+
+xListCandidates(File(SIndex),Search,Inf);
 
 
 % --- Executes on selection change in Overlap.
