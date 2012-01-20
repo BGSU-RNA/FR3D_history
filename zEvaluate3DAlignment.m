@@ -3,7 +3,9 @@
 % Stombaugh
 
 % do this once:
-%[n,t,r] = xlsread('23S_Ec_Tt_Struct_alignment_12_4_06_JS.xls');
+if ~exist('n') || ~exist('t') || ~exist('r'),
+  [n,t,r] = xlsread('23S_Ec_Tt_Struct_alignment_12_4_06_JS.xls');
+end
 
 for i = 1:length(n(:,1)),
   A{1,i} = {num2str(n(i, 1)), num2str(n(i, 3))};        % basepairs from file 1
@@ -32,7 +34,7 @@ L = length(Filenames);
 NumPlots     = (L^2 - L)/2;
 
 stop         = 0;
-w            = 1;                          % row of alignment to start at
+w            = 18;                          % row of alignment to start at
 neighborhood = 1;
 sugar        = 1;
 fontsize     = 8;
@@ -45,6 +47,8 @@ if SortByMaxDiscrep == 0,
   RowList = 1:length(n(:,1));
 
 else
+
+  Shift = [];
 
   % ------------------------------- loop through elements of alignment ------
 
@@ -93,7 +97,9 @@ else
       f = 1;
       for i= 1:L,
         for j = (i+1):L,    
-          Discrepancy(f,row) = zSuperimposeNucleotides(File(i),NTList{i},File(j),NTList{j},VP);
+          [d,s] = zSuperimposeNucleotides(File(i),NTList{i},File(j),NTList{j},VP);
+          Discrepancy(f,row) = d;
+%          Shift = [Shift; s];
           f = f + 1;
         end
       end
@@ -219,7 +225,7 @@ while stop == 0,
           clf
           zSuperimposeNucleotides(File(i),NTList{i},File(j),NTList{j},VP);
           view(az,el);
-
+     
           f = f + 1;  
         end
       end

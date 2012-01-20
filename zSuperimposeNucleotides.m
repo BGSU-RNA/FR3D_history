@@ -12,7 +12,7 @@
 % One can also use ranges of nucleotide numbers, as in
 % zDisplayNT('rr0033_23S',{'2548:2555','2557','2559:2566'},VP);
 
-function [disc] = zSuperimposeNucleotides(File1,NTList1,File2,NTList2,ViewParam)
+function [disc,Shift] = zSuperimposeNucleotides(File1,NTList1,File2,NTList2,ViewParam)
 
 % set default values for the display
 
@@ -28,6 +28,8 @@ VP.FontSize  = 10;               % will use Matlab's default unless overridden
 VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
 VP.LabelBases = 10;
+VP.Plot      = 1;
+VP.Write     = 0;
 
 if nargin < 5,
   ViewParam = VP;
@@ -98,6 +100,14 @@ if isfield(ViewParam,'LabelBases'),
   VP.LabelBases = ViewParam.LabelBases;
 end
 
+if isfield(ViewParam,'Plot'),
+  VP.Plot = ViewParam.Plot;
+end
+
+if isfield(ViewParam,'Write'),
+  VP.Write = ViewParam.Write;
+end
+
 % --------------------------------------- File1 ----------------------------
 % if File is a text string (filename), load the file and display
 
@@ -148,13 +158,10 @@ end
 
 % ---------------- Check that the lists are the same length
 
+L = min(length(Indices1),length(Indices2));
+
 if (length(Indices1) ~= length(Indices2))
-  fprintf('The two lists do not have the same length.  One will be shortened.\n');
-  if length(Indices1) > length(Indices2)
-    Indices1 = Indices1(1:length(Indices2));
-  else 
-    Indices2 = Indices2(1:length(Indices1));
-  end
+  fprintf('The two lists do not have the same length.  Extra nucleotides at the end of the list will not be superimposed.\n');
 
   % later, find the best match for one inside the other
 
@@ -162,24 +169,23 @@ end
 
 % ---------------- Check that the lists are long enough
 
-if length(Indices1) < 3
+if L < 3
   fprintf('You need more than two nucleotides in each set\n');
 end
 
 % ---------------- Calculate the discrepancy between the two structures --
 
-[disc,SuperR] = xDiscrepancy(File1,Indices1,File2,Indices2);
+[disc,SuperR] = xDiscrepancy(File1,Indices1(1:L),File2,Indices2(1:L));
 
 fprintf('Geometric discrepancy %8.4f between %s and %s\n', disc, File1.Filename, File2.Filename);
 
-
-L        = length(Indices1);
-
-Centers1 = cat(1,File1.NT(Indices1).Center);
+Centers1 = cat(1,File1.NT(Indices1(1:L)).Center);
 CC1      = ones(1,L) * Centers1 / L;
 
-Centers2 = cat(1,File2.NT(Indices2).Center);
+Centers2 = cat(1,File2.NT(Indices2(1:L)).Center);
 CC2      = ones(1,L) * Centers2 / L;
+
+Shift = CC2-CC1;
 
 R = File1.NT(Indices1(1)).Rot;             % Rotation matrix for first base
 R = eye(3);
@@ -222,15 +228,16 @@ end
 if ViewParam.Write > 0,
 
 Filename = File1.Filename;
-Filename = [Filename '_' File1.NT(min(Indices1)).Number '_' File1.NT(max(Indices1)).Number];
+Filename = [Filename '_' File1.NT(min(Indices1(1:L))).Number '_' File1.NT(max(Indices1(1:L))).Number];
 Filename = [Filename '.pdb'];
 
 fid = fopen(Filename,'w');                     % open for writing
 
 a = 1;                                         % atom number
 
-for i=1:length(Indices1)
+for i=1:length(Indices1(1:L))
   a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
+  a = a + 1;
 end
 
 fclose(fid);
@@ -239,7 +246,7 @@ fprintf('Wrote %s\n', Filename);
 % ---------------- Write PDB file for second set of nucleotides
 
 Filename = File2.Filename;
-Filename = [Filename '_' File2.NT(min(Indices2)).Number '_' File2.NT(max(Indices2)).Number];
+Filename = [Filename '_' File2.NT(min(Indices2(1:L))).Number '_' File2.NT(max(Indices2(1:L))).Number];
 Filename = [Filename '.pdb'];
 
 fid = fopen(Filename,'w');                     % open for writing
@@ -248,6 +255,7 @@ a = 1;                                         % atom number
 
 for i=1:length(Indices2)
   a = zWriteNucleotidePDB(fid,File2.NT(Indices2(i)),a,0,SuperR,CC2);
+  a = a + 1;
 end
 
 fclose(fid);
