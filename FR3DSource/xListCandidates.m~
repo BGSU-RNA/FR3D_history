@@ -182,7 +182,7 @@ for i=1:min(s,NumToOutput),
     for k=1:length(Indices),
       for j=1:length(Indices),
         if j ~= k,
-         Text{i+t} = [Text{i+t} sprintf('%6s', zBasePhosphateText(File(f).BasePhosphate(Indices(k),Indices(j))))];
+         Text{i+t} = [Text{i+t} sprintf('%5s', zBasePhosphateText(File(f).BasePhosphate(Indices(k),Indices(j))))];
         end
       end
     end

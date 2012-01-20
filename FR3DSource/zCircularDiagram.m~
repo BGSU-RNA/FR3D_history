@@ -126,7 +126,7 @@ end
 % ---------------------------------------- Draw the interactions in color
 
 [y,k] = sort(-abs(c));               % sort by decreasing color, for overlap
-%[y,k] = sort(abs(c));               % sort by increasing color, for overlap
+[y,k] = sort(abs(c));               % sort by increasing color, for overlap
 i = i(k);
 j = j(k);
 c = c(k);
@@ -141,21 +141,12 @@ for k = 1:length(i),
     if c(k) == 6,
       thetai = i(k)*tp/s;
       thetaj = j(k)*tp/s;
-
-  if cos(thetai) > 0,
-    angle = 180*thetai/pi;
-    ha    = 'left';
-  else
-    angle = 180*(thetai - pi)/pi;
-    ha    = 'right';
-  end
-
       if File.BasePhosphate(i(k),j(k)) > 0,
-        text(1.03*cos(thetai), 1.03*sin(thetai), 'B','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','m');
-%        text(1.03*cos(thetaj), 1.03*sin(thetaj), 'Ph','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
+        text(1.03*cos(thetai), 1.03*sin(thetai), 'B','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
+        text(1.03*cos(thetaj), 1.03*sin(thetaj), 'Ph','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
       else
         text(1.03*cos(thetai), 1.03*sin(thetai), 'Ph','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
-%        text(1.03*cos(thetai), 1.03*sin(thetai), 'B','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
+        text(1.03*cos(thetai), 1.03*sin(thetai), 'B','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
       end
     end
   end

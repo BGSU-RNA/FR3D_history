@@ -21,17 +21,17 @@ for i=1:length(e),
   end
 
   if a == 18,
-    E = [E '8BPhb'];
+    E = [E '8bBP'];
   elseif a == 19,
-    E = [E '4BPhb'];
+    E = [E '4bBP'];
   elseif a > 0,
-    E = [E num2str(BPCat(a)) 'BPh'];
+    E = [E num2str(BPCat(a)) 'BP'];
   elseif a == -18,
-    E = [E '8PhBb'];
+    E = [E '8bPB'];
   elseif a == -19,
-    E = [E '4PhBb'];
+    E = [E '4bPB'];
   elseif a < 0,
-    E = [E num2str(BPCat(-a)) 'PhB'];
+    E = [E num2str(BPCat(-a)) 'PB'];
   else
     E = [E '  -'];
   end

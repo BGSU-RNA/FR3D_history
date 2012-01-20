@@ -1,0 +1,74 @@
+
+% File = zAddNTData('1s72');
+
+S.File = File;
+S.Query = [];
+
+fprintf('Base-phosphate report for %s.\n', File.Filename);
+
+BPh = File.BasePhosphate;
+
+for m = 1:length(BPh(1,:)),
+  BPh(m,m) = 0;                             % omit self interactions
+end
+
+[i,j,k] = find(BPh .* (BPh > 0) .* (BPh < 100));
+
+fprintf('Found %d distinct base-phosphate interactions.  (One base could make more than one simultaneously, however.)\n', length(i));
+
+IR = [];
+Edge = [];
+for m = 1:length(i),
+  IR(m,1) = File.Range(i(m),j(m));
+  Edge(m,1) = File.Edge(i(m),j(m));
+end
+
+BPCat = [2 6 7 0 6 7 8 9 0 1 3 4 5 0 5 9 0 8 4]';  % updated 8-19-2008
+
+Data = [i j k IR i-j Edge min(5,IR) min(abs(i-j),3) fix(mod(Edge,100)) BPCat(k)];
+
+% columns:
+%  1 index of the base
+%  2 index of the phosphate
+%  3 code of the base-phosphate interaction
+%  4 interaction range
+%  5 signed distance in sequence
+%  6 pairwise interaction between the two
+%  7 IR limited to size 5
+%  8 distance in sequence limited to 3
+%  9 edge, not distinguishing near and true
+% 10 BPh category 0 to 9
+
+fprintf('Of these, %d have interaction range 0, %d have interaction range 1 to 5, and %d have interaction range above 5.\n', length(find(IR == 0)), length(find((IR > 0) .* (IR < 6))), length(find(IR > 5)));
+
+
+Data = sortrows(Data,[7 9 8 10]);
+
+S.Candidates = [Data(:,[1 2]) ones(length(i),1)];
+S.Discrepancy = ones(length(i),1);
+xListCandidates(S);
+
+xDisplayCandidates(File,S.Candidates);
+
+break
+
+
+
+File = xAnnotateWithKnownMotifs(File,1,0);
+File = xAnnotateWithKnownMotifs(File,1,0,{'Chained BPh.mat','BPh_pair_triple.mat'});
+
+
+
+fprintf('Pairs having interaction range 0:\n');
+
+r = find(Data(:,4) == 0);
+
+S.File = File;
+S.Candidates = [Data(r,[1 2]) ones(length(r),1)];
+S.Query = [];
+S.Discrepancy = ones(length(r),1);
+
+xListCandidates(S);
+
+%xDisplayCandidates(File,
+

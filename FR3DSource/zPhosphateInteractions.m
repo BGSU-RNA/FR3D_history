@@ -34,6 +34,7 @@ t = cputime;
     % 16  U C5-H5  interacts with oxygen of phosphate, called 9BPh
     % 17  U C6-H6  interacts with oxygen of phosphate, called 0BPh
 
+
 % ------------------------------ temporary cutoffs! 
 
 CarbonDist    = 4.0;                           % max massive - oxygen distance

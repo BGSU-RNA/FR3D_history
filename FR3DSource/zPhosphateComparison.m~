@@ -2,7 +2,7 @@
 
 % cat(2,File(3).NT(:).Chain)
 
-Set = 8;
+Set = 7;
 
 switch Set,
 
@@ -54,14 +54,6 @@ Representative = '2j01-2aw4';
 load PhosphateComparison2j01-2aw4
 OK = 'BA';                                    % use these chains
 OK = 'AB';                                    % use these chains
-
-case 8,
-Representative = '2aw4-2awb';
-% File = zAddNTData({'2aw4','2awb'});             % load data
-% [File,D] = zPhosphateInteractions(File,2,0); % analyze interactions
-% save PhosphateComparison2aw4-2awb D
-load PhosphateComparison2aw4-2awb
-OK = 'BB';                                    % use these chains
 
 end
 

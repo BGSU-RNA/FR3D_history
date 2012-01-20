@@ -130,8 +130,8 @@ if isfield(Query,'Coplanar'),            % screen by coplanarity
     D = D .* (File.Coplanar == 0);       % ~ncp ~cp
   end
 
-%figure(3)
-%hist(nonzeros(D),30)
+figure(3)
+hist(nonzeros(D),30)
 
  end
 end

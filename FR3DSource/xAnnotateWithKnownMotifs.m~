@@ -117,7 +117,7 @@ for f = 1:length(File),
       if WriteHTML > 0,
 
       fprintf(ffid,'<a name=%s>\n',MotifNumber);
-      fprintf(ffid,'<h2><a href="%s">%s</a></h2>\n',['http://rna.bgsu.edu/FR3D/MotifLibrary/' MotifNumber '/instances.html'], strrep(Motif(m).name,'.mat',''));
+      fprintf(ffid,'<h2><a href="%s">%s</a></h2>\n',['http://rna.bgsu.edu/FR3D/MotifLibrary/' MotifNumber '/index.html'], strrep(Motif(m).name,'.mat',''));
 
       fprintf(ffid,'<pre>\n');
       Text = xListCandidates(Search,Inf,6,{MotifNumber});

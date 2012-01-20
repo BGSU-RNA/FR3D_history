@@ -50,7 +50,7 @@ for f = 1:length(Names),
 
   % ----------------------------------------------- Annotate with known motifs
 
-  xAnnotateWithKnownMotifs(File,1,1);           % find and list motifs
+  xAnnotateWithKnownMotifs(File);           % find and list motifs
 
   t(end+1) = cputime;
 
