@@ -32,8 +32,8 @@ if nargin > 0,
   Query.Name = QName;
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
-  Query.Name = 'Basepair';
   Query.Name = 'Sarcin5Geo';
+  Query.Name = 'Basepair';
 end
 
 switch Query.Name
@@ -130,7 +130,7 @@ case 'GNRA5'
 % -------------------------------------------- Additional searches
 
 case 'Basepair'
-  Query.Edges{1,2}     = 'cWW AU';
+  Query.Edges{1,2}     = 'cWW AG';
 %  Query.Diff{1,2}      = '> <1000';
  % Query.Config{1}      = 'syn';
  % Query.SearchFiles    = {'1s72', '1j5e'};

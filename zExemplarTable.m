@@ -209,7 +209,7 @@ end
 
 % ----------------------------------------- Display basepairs by IsoDisc
 
-return
+%return
 
 fprintf('Comparison of basepairs, lowest IsoDiscrepancy first\n')
 

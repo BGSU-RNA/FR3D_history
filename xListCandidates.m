@@ -61,8 +61,14 @@ for i=1:s,
       fprintf('   C1*-C1*: %8.4f', CP(i));
       NT1 = File(f).NT(Candidates(i,1));
       NT2 = File(f).NT(Candidates(i,2));
-      Edge  = File(f).Edge(Candidates(i,1),Candidates(i,2));
+      Edge  = full(File(f).Edge(Candidates(i,1),Candidates(i,2)));
       fprintf('%s ', zEdgeText(Edge));
+      fprintf('%4.1f ', Edge);
+      SA = {'A', 'S'};
+%SA{1}
+%      1+File(f).NT(Candidates(i,1).Syn)
+      fprintf('%c', SA{1+File(f).NT(Candidates(i,1)).Syn});
+      fprintf('%c', SA{1+File(f).NT(Candidates(i,2)).Syn});
     end
     fprintf('\n');
   end
