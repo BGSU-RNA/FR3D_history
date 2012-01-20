@@ -30,6 +30,8 @@
 
 function [Tally] = zCircularDiagram(File,Thickness,View)
 
+Tally = zeros(1,6);
+
 if nargin < 2,
   Thickness = 1;
 end
@@ -71,7 +73,7 @@ j = [j; jj(k)];
 c = [c; cc(k)];
 
 if length(i) > 0,
-  A = zNumberCircularDiagram(File,View,Thickness,1);
+  [A,mA] = zNumberCircularDiagram(File,View,Thickness,1);
 
 % ---------------------------------------- Draw the interactions in color
 
@@ -138,17 +140,17 @@ if View(7) > 0,
   text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 
   cww = length(find(c == 1));
-  Tally(1) = cww;
+  Tally(1,1) = cww;
   noncww = length(find(c == 2));
-  Tally(2) = noncww;
+  Tally(1,2) = noncww;
   nonnestcww = length(find(c == 3));
-  Tally(3) = nonnestcww;
+  Tally(1,3) = nonnestcww;
   nonnestnoncww = length(find(c == 4));
-  Tally(4) = nonnestnoncww;
+  Tally(1,4) = nonnestnoncww;
   stack = length(find(c == 5));
-  Tally(5) = stack;
+  Tally(1,5) = stack;
   bph = length(find(c == 6));
-  Tally(6) = bph;
+  Tally(1,6) = bph;
 
   if View(1) > 0,
     text(-1.3,-1.4,['Dark blue chords indicate the ' num2str(cww) ' nested Watson-Crick basepairs']);

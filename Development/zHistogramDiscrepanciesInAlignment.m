@@ -5,6 +5,8 @@ function [discrep] = zHistogramDiscrepanciesInAlignment(File,i1,i2)
 itoa     = zeros(1,length(File(1).NT));
 itoa(i1) = 1:length(i1);                 % maps indices in File(1) to alignment
 
+discrep = [];
+
 for j = 1:length(i1),
   d = File(1).Distance(i1(j),:);
   k = find((d > 0) .* (d < 8));

@@ -865,7 +865,6 @@ end
       [y,p] = sort(Indices);               % some IL's are rotated 180 degrees
 
       [MotifNode,Truncate] = pMakeModelFromSearchSaveFile(File.Motifs(ModelIndex).Name,0,0);
-      Truncate
 
 if ModelIndex == -9,
   keyboard

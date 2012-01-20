@@ -44,16 +44,21 @@ Al(a).Name           = 'JAR3D Version 1';
 
 % --------------------------------------- Needleman-Wunsch alignment
 
-[matches,align1,align2,s1,s2] = zNeedlemanWunsch(cat(2,File(1).NT.Base),cat(2,File(2).NT.Base));
+for w = 1:10,
+%  [matches,align1,align2,s1,s2] = zNeedlemanWunsch(cat(2,File(1).NT.Base),cat(2,File(2).NT.Base),2*w);
+  g = -6.6 + 0.02*w;
+  [matches,align1,align2,s1,s2] = dNeedlemanWunsch(cat(2,File(1).NT.Base),cat(2,File(2).NT.Base),0.8,g);      % Ryan's alignment has 80% identical
 
-a = 4;
+a = 3+w;
 Al(a).ModelStructure = align1;
 Al(a).InferStructure = align2;
-Al(a).Name           = 'Needleman-Wunsch';
+Al(a).Name           = ['NW del ' num2str(g)];
+
+end
 
 % --------------------------------------- Calculations for each alignment
 
-for a = 4:length(Al),
+for a = 1:length(Al),
   Al(a).Matrix = sparse(Al(a).ModelStructure,Al(a).InferStructure,ones(1,length(Al(a).ModelStructure)));
   Al(a).Matrix(length(File(1).NT),length(File(2).NT)) = 0;
   if Verbose > 1,
@@ -73,16 +78,45 @@ figure(10)
 clf
 
 m = 3;
-
+s = ceil(sqrt(length(Al)));
 for a = 1:length(Al),
-  subplot(2,2,a)
-  n = hist(min(Al(a).Discrep,m),-0.025+(0:0.05:m));
-  hist(min(Al(a).Discrep,m),-0.025+(0:0.05:m))
+  subplot(s,s,a)
+  if length(Al(a).Discrep) > 0,
+    n = hist(min(Al(a).Discrep,m),-0.025+(0:0.05:m));
+    hist(min(Al(a).Discrep,m),-0.025+(0:0.05:m))
+    axis([0 m 0 max(n)*1.1])
+  end
   title(Al(a).Name);
-  axis([0 m 0 max(n)*1.1])
 end
 
 saveas(gcf,'Histogram Discrepancies in 16S Alignments.pdf','pdf')
+
+% -------------------------------- Calculate IDI of aligned base combinations 
+%                                  with basepairs in 3D structure
+
+for a = 1:length(Al),
+  Al(a).IDI     = zAlignmentIsostericity(File,Al(a).ModelStructure,Al(a).InferStructure);
+end
+
+figure(11)
+clf
+
+m = 10;
+s = ceil(sqrt(length(Al)));
+for a = 1:length(Al),
+  subplot(s,s,a)
+  if length(Al(a).IDI) > 0,
+    n = hist(min(Al(a).IDI,m),-0.025+(0:0.05:m));
+    hist(min(Al(a).IDI,m),-0.025+(0:0.05:m))
+    axis([-1 m 0 max(n)*1.1])
+  end
+  title(Al(a).Name);
+end
+
+saveas(gcf,'Histogram of IDI values in 16S Alignments.pdf','pdf')
+
+
+
 
 % --------------------------------------- Compare to Alignment 1
 
@@ -90,6 +124,7 @@ for a = 1:length(Al),
   Agree  = sum(sum(Al(a).Matrix .* Al(1).Matrix == 1));
   Missed = sum(sum(Al(1).Matrix > Al(a).Matrix));
   Extra  = sum(sum(Al(a).Matrix > Al(1).Matrix));
+  Identical = length(find(cat(1,File(1).NT(Al(a).ModelStructure).Code)==cat(1,File(2).NT(Al(a).InferStructure).Code)));
 
   T{ 1,a+1} = Al(a).Name;
   T{ 2,a+1} = length(Al(a).ModelStructure);
@@ -101,6 +136,9 @@ for a = 1:length(Al),
   T{11,a+1} = Extra;
   T{12,a+1} = mean(Al(a).Discrep);
   T{13,a+1} = median(Al(a).Discrep);
+  T{14,a+1} = mean(Al(a).IDI);
+  T{15,a+1} = median(Al(a).IDI);
+  T{16,a+1} = Identical;
 end
 
 T{1,1} = [File(1).Filename ' as the model, ' File(2).Filename ' as the unknown structure'];
@@ -116,7 +154,9 @@ T{10,1} = ['Number of correspondences missing, compared to ' Al(1).Name];
 T{11,1} = ['Number of correspondences extra, compared to ' Al(1).Name];
 T{12,1} = 'Mean geometric discrepancy at 8 Angstroms';
 T{13,1} = 'Median geometric discrepancy at 8 Angstroms';
-
+T{14,1} = 'Mean IDI between aligned base combinations and real pairs';
+T{15,1} = 'Median IDI between aligned base combinations and real pairs';
+T{16,1} = 'Number of exact base matches in alignment';
 xlswrite('16S_alignment_comparison.xls',T);
 
 T

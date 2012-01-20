@@ -1,5 +1,5 @@
 
-function [A] = zNumberCircularDiagram(File,View,Thickness,r)
+function [A,mA] = zNumberCircularDiagram(File,View,Thickness,r)
 
 N = length(File.NT);
 

@@ -5,11 +5,13 @@ File = zAddNTData({'2avy','1j5e'});
 
 Node = pMakeNodes(File(1));
 pWriteJavaNodeFile(File(1),Node,4,'16S_from_2avy.txt');
+fprintf('Running JAR3D\n');
+JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY.txt');
 
 F = xAnnotateWithKnownMotifs(File(1),1);
 NodeM = pMakeNodes(F);
 pWriteJavaNodeFile(F,NodeM,4,'16S_from_2avy_with_motifs.txt');
-
+fprintf('Running JAR3D\n');
 JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY_with_motifs.txt');
 
 % ------------------------------------------------ Start diagnostics
@@ -25,7 +27,7 @@ M = strrep(M,'{','');
 M = strrep(M,'}','');
 
 fprintf('Diagnostic:  Compare bases from structure (first line) with bases in experimental alignment:\n');
-fprintf('%s seq: %s\n', File(1).Filename, cat(2,File(1).NT(nMin:nMax).Base));
+fprintf('%s seq: %s\n', File(1).Filename, cat(2,File(1).NT.Base));
 fprintf('pTheoret: %s\n', M);
 fprintf('\n');
 

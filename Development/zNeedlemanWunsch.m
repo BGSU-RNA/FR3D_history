@@ -1,8 +1,13 @@
 % dNeedlemanWunsch(seq1,seq2,p,d) aligns sequences seq1 and seq2 using probability p of base conservation and gap penalty d
 
-function [matches,align1,align2,s1,s2] = zNeedlemanWunsch(seq1,seq2)
+function [matches,align1,align2,s1,s2] = zNeedlemanWunsch(seq1,seq2,gap)
 
-[Score, Alignment, Start] = nwalign(seq1,seq2,'Alphabet','NT');
+if nargin < 3,
+  gap = 8;                              % Matlab default open gap penalty
+end
+
+
+[Score, Alignment, Start] = nwalign(seq1,seq2,'Alphabet','NT','GapOpen',gap);
 
 i = find(Alignment(1,:) ~= '-');        % locations of letters in seq1
 align1 = find(Alignment(2,i) == '|');        % aligned indices of seq1

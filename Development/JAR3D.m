@@ -3,6 +3,8 @@ function [void] = JAR3D(FastaFile,ModelFile)
 
 JAR3D_path
 
+['java -cp "' JAR3Dpath filesep 'bin" JAR3DMoleculeAligner "' pwd '" ' FastaFile ' ' ModelFile]
+
 system(['java -cp "' JAR3Dpath filesep 'bin" JAR3DMoleculeAligner "' pwd '" ' FastaFile ' ' ModelFile]);
 
 

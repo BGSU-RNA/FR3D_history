@@ -3,11 +3,11 @@
 function [matches,align1,align2,s1,s2] = dNeedlemanWunsch(seq1,seq2,p,d)
 
 if nargin < 4,
-  d = 2;
+  d = 2;                            % default gap penalty
 end
 
 if nargin < 3,
-  p = 0.95;
+  p = 0.95;                         % default probability of base conservation
 end
 
 N = length(seq1);
@@ -23,21 +23,21 @@ nwmatrix = zeros(N+1,M+1);          % indices are 1 to N+1
 tracematrix = zeros(N+1,M+1);
 
 for i = 1:N,
-  nwmatrix(i+1,1) = -i*d;
-  tracematrix(i+1,1) = 2;
+  nwmatrix(i+1,1) = -i*d;           % gap penalties along edge
+  tracematrix(i+1,1) = 2;           % traceback option #2
 end
 
 for i = 1:M,
-  nwmatrix(1,i+1) = -i*d;
-  tracematrix(1,i+1) = 1;
+  nwmatrix(1,i+1) = -i*d;           % gap penalties along edge
+  tracematrix(1,i+1) = 1;           % traceback option #1
 end
 
-S1 = seq1'*ones(1,M);
-S2 = ones(N,1)*seq2;
+S1 = seq1'*ones(1,M);               % spread characters into NxM matrix
+S2 = ones(N,1)*seq2;                % spread characters into NxM matrix
 
 S = log(p)*(S1==S2) + log((1-p))*(S1~=S2) - log(pa*pb);
 
-for i = 1:N,
+for i = 1:N,                    % loop through all ways of extending alignment
   for j = 1:M,
     [a,b] = max([nwmatrix(i+1,j)-d nwmatrix(i,j+1)-d nwmatrix(i,j)+S(i,j)]);
     nwmatrix(i+1,j+1) = a;                % max value
