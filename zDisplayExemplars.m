@@ -37,17 +37,19 @@ function [void] = zDisplayExemplars(Paircode,Category)
 
 for pc = 1:length(Paircode),
  for ca = 1:length(Category),
-   row = find(fix(cat(1,Exemplar(:,Paircode(pc)).Class)) == Category(ca));
-   for su = 1:length(row),
+   for row = 1:length(Exemplar(:,Paircode(pc))),
 
-     E = Exemplar(row(su),Paircode(pc));
-     if ~isempty(E),
+     E = Exemplar(row,Paircode(pc));
+
+     if fix(E.Class) == Category(ca),
 
        [Pair,s] = zClassifyPair(E.NT1,E.NT2);
 
-fprintf('%s%s %s %s%s %s     \n',E.NT1.Base,E.NT1.Number,Pair.EdgeText,E.NT2.Base,E.NT2.Number);
+fprintf('%5s %s %5s   ',[E.NT1.Base E.NT1.Number],Pair.EdgeText,[E.NT2.Base E.NT2.Number]);
 
-       cla
+       figure(1)
+       clf
+
        F.NT(1) = E.NT1;
        F.NT(2) = E.NT2;
        F.Filename = E.Filename;
@@ -66,6 +68,8 @@ fprintf('%s%s %s %s%s %s     \n',E.NT1.Base,E.NT1.Number,Pair.EdgeText,E.NT2.Bas
        Title = [E.NT1.Base E.NT2.Base ' ' num2str(E.Class) ' ' strrep(E.Filename,'_','\_') ' '];
        Title = [Title E.NT1.Base E.NT1.Number '-' E.NT2.Base E.NT2.Number];
        title(Title);
+
+       rotate3d on
 
        fprintf('Press a key to go on\n');
        pause

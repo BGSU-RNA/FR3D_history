@@ -33,7 +33,7 @@ if nargin > 0,
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
   Query.Name = 'Sarcin5Geo';
-  Query.Name = 'Basepair';
+  Query.Name = 'BasepairGeometric';
 end
 
 switch Query.Name
@@ -128,6 +128,11 @@ case 'GNRA5'
   Query.ExcludeOverlap = 1;
 
 % -------------------------------------------- Additional searches
+
+case 'BasepairGeometric'
+  Query.Filename   = '1s72';
+  Query.NTList     = {'804' '809'};
+  Query.DiscCutoff = 0.4;
 
 case 'Basepair'
   Query.Edges{1,2}     = 'cWW AG';

@@ -57,6 +57,8 @@ end
 %caxis([1 4]);
 title('Colored by number of interactions');
 
+rotate3d on
+
 return
 
 

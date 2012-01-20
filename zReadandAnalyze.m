@@ -155,7 +155,7 @@ while i < length(NTNUMBER),                 % go through all atoms
         case 'C8',      Loc( 7,:) = P(k,:);
         case 'C5',      Loc( 8,:) = P(k,:);
         case 'C2',      Loc( 9,:) = P(k,:);
-        case 'N7',      Loc(10,:) = P(k,:);     % check the order here
+        case 'N7',      Loc(10,:) = P(k,:);
         case 'N2',      Loc(11,:) = P(k,:);
         case 'C1*',     Sugar( 1,:) = P(k,:);
         case 'C2*',     Sugar( 2,:) = P(k,:);

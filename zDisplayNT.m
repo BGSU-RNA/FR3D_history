@@ -26,6 +26,10 @@ VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
 VP.LabelBases = 10;
 
+if nargin == 1,
+  ViewParam = VP;
+end
+
 if nargin == 2,
   ViewParam = VP;
 end
@@ -100,6 +104,10 @@ end
 if strcmp(class(File),'char'),
   Filename = File;
   File = zGetNTData(Filename,0);
+end
+
+if nargin == 1,
+  NTList = 1:File.NumNT;                  % display them all
 end
 
 % if NTList is a cell array of numbers, look up the indices

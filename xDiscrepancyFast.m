@@ -23,6 +23,10 @@ if (L == 2),
 
   Disc = (sqrt(t1*t1' + (v^2)*ang1^2) + sqrt(t2*t2' + (v^2)*ang2^2))/4;
 
+  if (Disc > Model.LDiscCutoff),
+    Disc = -1;
+  end
+
 else
 
   MCC = Model.CenteredCenters;          % nucleotide centers in model
