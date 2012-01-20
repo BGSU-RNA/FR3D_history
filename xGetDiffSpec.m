@@ -1,15 +1,17 @@
 % xGetDiffSpec parses the text for nucleotide differences
 
-function [mindiff,maxdiff] = xGetDiffSpec(str)
+function [mindiff,maxdiff,sign] = xGetDiffSpec(str)
 
 mindiff = 1;                                % defaults
 maxdiff = Inf;
+
+sign    = 0;                                % default sign of difference
 
 if length(str) > 0,
 
   str    = regexprep(str,';| ',',');        % replace delims by commas
   while strfind(str,',,'),
-    str = regexprep(str,',,',',');
+    str = regexprep(str,',,',',');          % remove double commas
   end
   str    = regexprep(str,'>=','g');         % replace 
   str    = regexprep(str,'<=','l');         % replace 
@@ -21,27 +23,35 @@ if length(str) > 0,
   str    = regexprep(str,'=,','=');         % replace 
   str    = regexprep(str,'d','');           % replace d by nothing
   str    = regexprep(str,'D','');           % replace D by nothing
+  str    = regexprep(str,'>>','>,>');       % first denotes sign
+  str    = regexprep(str,'<>','<,>');       % first denotes sign
+  str    = regexprep(str,'><','>,<');       % first denotes sign
+  str    = regexprep(str,'<<','<,<');       % first denotes sign
 
   commas = strfind(str,',');                % find locations of commas
   lim    = [0 commas length(str)+1];        % locations of tokens
   
   for i=1:length(lim)-1                     % loop through tokens
     Token = str(lim(i)+1:lim(i+1)-1);       % extract next token
-    if length(Token) > 1,
+    if length(Token) > 1,                   % first character is a symbol
       n = str2num(Token(2:length(Token)));    % extract number
-    else
-      n = 0;
-    end
-
-    if length(Token) > 0,
+      if ~isempty(n),
+        switch Token(1)
+          case '<', maxdiff = min(maxdiff,n-1); % reduce maxdiff
+          case 'l', maxdiff = min(maxdiff,n);   % reduce maxdiff
+          case '>', mindiff = max(mindiff,n+1); % increase mindiff
+          case 'g', mindiff = max(mindiff,n);   % increase mindiff
+          case '=', mindiff = n;
+                    maxdiff = n;
+        end
+      end
+    elseif length(Token) > 0,
       switch Token(1)
-        case '<', maxdiff = min(maxdiff,n-1); % reduce maxdiff
-        case 'l', maxdiff = min(maxdiff,n);   % reduce maxdiff
-        case '>', mindiff = max(mindiff,n+1); % increase mindiff
-        case 'g', mindiff = max(mindiff,n);   % increase mindiff
-        case '=', mindiff = n;
-                  maxdiff = n;
+        case '<', sign = -1;
+        case '>', sign =  1;
       end
     end
+
   end
 end
+

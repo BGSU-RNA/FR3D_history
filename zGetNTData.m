@@ -60,7 +60,9 @@ for f=1:length(Filenames),
     File = zReadHandFile(File);
   end
 
-  if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | (ClassifyCode == 1) | (~isfield(File,'Edge')) | (max(max(File.Inter)) < 100),
+  if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
+    (ClassifyCode == 1) | (length(fieldnames(File)) < 11) | ...
+    (max(max(File.Inter)) < 100),
     File.Edge = sparse(File.NumNT,File.NumNT);
     File = zClassifyPairs(File);
     File = zUpdateDistanceToExemplars(File);
@@ -72,5 +74,6 @@ for f=1:length(Filenames),
     zSaveNTData(File);
   end
 
+  File     = orderfields(File);
   Files(f) = File;
 end

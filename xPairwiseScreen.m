@@ -67,19 +67,39 @@ d = nonzeros(D);         % distances below the large cutoff
 % --------- Screen according to maximum difference in nucleotide numbers
 
 if isfield(Model,'MaxDiffMat'),
-  k = find(abs(i-j) <= Model.MaxDiffMat(p,q)); %retain pairs close enough together
-  i = i(k);
-  j = j(k);
-  d = d(k);
+  if Model.MaxDiffMat(p,q) < Inf,
+    k = find(abs(i-j) <= Model.MaxDiffMat(p,q)); %retain pairs close enough together
+    i = i(k);
+    j = j(k);
+    d = d(k);
+  end
 end
 
-% --------- Screen according to maximum difference in nucleotide numbers
+% --------- Screen according to minimum difference in nucleotide numbers
 
 if isfield(Model,'MinDiffMat'),
-  k = find(abs(i-j) >= Model.MinDiffMat(p,q)); %retain pairs close enough together
-  i = i(k);
-  j = j(k);
-  d = d(k);
+  if Model.MinDiffMat(p,q) > 1,
+    k = find(abs(i-j) >= Model.MinDiffMat(p,q)); %retain pairs far enough apart
+    i = i(k);
+    j = j(k);
+    d = d(k);
+  end
+end
+
+% --------- Screen according to sign of nucleotide number difference
+
+if isfield(Model,'DifferenceSignMat'),
+  if Model.DifferenceSignMat(p,q) < 0,
+    k = find(j > i);                          % retain pairs with num2>num1
+    i = i(k);
+    j = j(k);
+    d = d(k);
+  elseif Model.DifferenceSignMat(p,q) > 0,
+    k = find(j < i);                          % retain pairs with num2<num1
+    i = i(k);
+    j = j(k);
+    d = d(k);
+  end
 end
 
 % --------- Screen according to the nucleotide mask

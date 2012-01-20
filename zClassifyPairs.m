@@ -41,8 +41,8 @@ pc = 1;                                         % index for pairs
 
 for k = 1:length(i),                            % loop through possible pairs
 
-  Ni = File.NT(i(k));
-  Nj = File.NT(j(k));
+  Ni = File.NT(i(k));                           % nucleotide i information
+  Nj = File.NT(j(k));                           % nucleotide j information
 
   [Pair,s] = zClassifyPair(Ni,Nj,CL,Exemplar);
 

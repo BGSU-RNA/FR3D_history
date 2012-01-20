@@ -26,19 +26,19 @@
 %     nucleotides different but much higher discrepancy.  Default is 1 when
 %     Query.NumNT > 6.
  
-function [Query] = xSpecifyQuery(QN);
+function [Query] = xSpecifyQuery(QName);
 
 if nargin > 0,
-  Query.Number = QN;
+  Query.Name = QName;
 else                        % change the following line to change the query!
-  Query.Number =61; 
+  Query.Name = 'StackedPair'; 
+%  Query.Name = 'Basepair';
 end
 
-switch Query.Number
+switch Query.Name
 
-case 4
+case 'GNRA4NonSeq'
   Query.Description    = 'GRNA hairpin without sequential constraint';
-  Query.Name           = 'GNRA4NonSeq';
   Query.Filename       = '1s72';
   Query.NTList         = {'804' '805' '808' '809'};
   Query.ChainList      = {'0' '0' '0' '0'}; 
@@ -47,9 +47,8 @@ case 4
   Query.DiscCutoff     = 1;      
   Query.ExcludeOverlap = 1;
 
-case 41
+case 'GNRA4Seq'
   Query.Description    = 'GRNA hairpin with sequential constraint';
-  Query.Name           = 'GNRA4Seq';
   Query.Filename       = '1s72';
   Query.NTList         = {'804' '805' '808' '809'};
   Query.ChainList      = {'0' '0' '0' '0'}; 
@@ -59,17 +58,15 @@ case 41
   Query.MaxDiff(1,4)   = 6;
   Query.ExcludeOverlap = 1;
 
-case 5
+case 'Sarcin5Geo'
   Query.Description    = 'Sarcin five nucleotide geometric';
-  Query.Name           = 'Sarcin5Geo';
   Query.Filename       = '1s72';
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.5;
 
-case 51
+case 'Sarcin5Symb'
   Query.Description    = 'Sarcin five nucleotide symbolic';
-  Query.Name           = 'Sarcin5Symb';
   Query.Edges{1,2}     = 'tHS';
   Query.Edges{3,5}     = 'cHS';
   Query.Edges{3,4}     = 'tWH';
@@ -77,9 +74,8 @@ case 51
   Query.MaxDiff(3,1)   = 2;
   Query.MaxDiff(4,2)   = 2;
 
-case 52
+case 'GNRA5'
   Query.Description    = 'GRNA hairpin 5 nucleotide';
-  Query.Name           = 'GNRA5';
   Query.Filename       = '1s72';
   Query.NTList         = {'804' '805' '807' '808' '809'};
   Query.ChainList      = {'0' '0' '0' '0' '0'}; 
@@ -91,9 +87,8 @@ case 52
   Query.MaxDiff(2,4)   = 4;
   Query.ExcludeOverlap = 1;
 
-case 6
+case 'KinkTurnCentral'
   Query.Description    = 'Kink-turn central base mixed';
-  Query.Name           = 'KinkTurnCentral';
   Query.Filename       = '1s72';
   Query.NTList         = {'80' '97' '81' '93' '94' '98'};
   Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
@@ -101,9 +96,8 @@ case 6
   Query.DiscCutoff     = 0.7;  
   Query.ExcludeOverlap = 1;
 
-case 61
+case 'KinkTurnClosing'
   Query.Description    = 'Kink-turn closing base pair mixed';
-  Query.Name           = 'KinkTurnClosing';
   Query.Filename       = '1s72';
   Query.NTList         = {'80' '97' '81' '93' '100' '77'};
   Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
@@ -111,9 +105,8 @@ case 61
   Query.DiscCutoff     = 0.9;    
   Query.ExcludeOverlap = 1;
 
-case 7
+case 'Sarcin7Mixed'
   Query.Description    = 'Sarcin seven nucleotide mixed';
-  Query.Name           = 'Sarcin7Mixed';
   Query.Filename       = '1s72';
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703'};
   Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0'};   % all in the 23S
@@ -121,9 +114,8 @@ case 7
   Query.DiscCutoff     = 0.5;       
   Query.ExcludeOverlap = 0;
 
-case 9
+case 'Sarcin9Mixed'
   Query.Description    = 'Sarcin nine nucleotide mixed';
-  Query.Name           = 'Sarcin9Mixed';
   Query.Filename       = '1s72';
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703' '2690' '2704'};
   Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0' '0' '0'};% all in the 23S
@@ -132,15 +124,13 @@ case 9
   Query.ExcludeOverlap = 1;
 
 
-case 2
-%  Query.Edges{1,2}  = 'ncWH ~cWH';                 % string
-  Query.MaxDiff = [5];
-  Query.MinDiff = [5];
+case 'Basepair'
+  Query.Edges{1,2}  = 'cWH';
+%  Query.MaxDiff = [5];
+%  Query.MinDiff = [5];
+  Query.Diff{1,2} = '> <1000';
 
-case 21
-  Query.ReqInter{1,2}  = [101];
-
-case 411
+case 'GNRA4NonSeq'
   Query.Description    = 'GRNA hairpin without sequential constraint';
   Query.Filename       = '1s72';
   Query.NTList         = {'804' '809' '805' '808'};
@@ -152,13 +142,15 @@ case 411
                                     % with discrepancy below this number
   Query.ExcludeOverlap = 1;
 
-case 42
-  Query.Description    = 'Non-geometric search';
-  Query.MaxDiff        = [4 Inf 4];
-  Query.Edges{1,4}     = 'tHS';
-  Query.Edges{2,3}     = 'tHS';
+case 'StackedPair'
+  Query.Description    = 'Stacked pairs';
+  Query.Diff{1,2}      = '> <5';
+  Query.Diff{4,3}      = '< <5';
+  Query.Edges{1,4}     = 'cWW';
+  Query.Edges{2,3}     = 'tSH';
+  Query.Edges{1,2}     = 'stack';
 
-case 43
+case 'StackedOncWW'
   Query.Description    = 'What stacks on a cWW?';
   Query.Edges{1,2}     = 'cWW';
   Query.Edges{3,4}     = 'Pair ~tSH ~tHS ~cWW';  % exclude categories we know
@@ -167,40 +159,14 @@ case 43
   Query.Diff{1,3}      = '=1';
   Query.Diff{2,4}      = '=1';
 
-case 44
-  Query.Edges{1,2} = 'tWH ~CA';
-  Query.Edges{3,4} = 'tHS';
-  Query.Edges{1,3} = 's35 s53 s55 s33';
-
-case 501
+case 'Sarcin5Quick'
   Query.Description    = 'Sarcin five nucleotide quick search';
   Query.Filename       = '1s72';
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.3;         % guaranteed to find all candidates
                                       % with discrepancy below this number
-
-case 52
-  Query.Description    = 'Sarcin five nucleotide non-geometric';
-  Query.Mask           = 'NNNNN';
-  Query.MaxDiff        = [2 2 Inf 2];
-  Query.ReqInter{3,4}  = [10];
-  Query.ReqInter{2,5}  = [-4];
-  Query.ReqInter{2,1}  = [-9];
-
-case 611
-  Query.Description    = 'Kink-turn closing base pair search with specified basepairs';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'80' '97' '81' '93' '100' '77'};
-  Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
-  Query.ReqInter{1,2}  = [10];
-  Query.ReqInter{3,4}  = [1];
-  Query.ReqInter{5,6}  = [1];
-  Query.DiscCutoff     = 0.9;         % guaranteed to find all candidates
-                                      % with discrepancy below this number
-  Query.ExcludeOverlap = 1;
-
-case 622
+case 'cWW-noncWW-cWW'
   Query.Description    = 'Noncanonical pair between canonical';
   Query.Edges{1,6}     = 'cWW';
   Query.Edges{2,5}     = '~cWW';
@@ -209,16 +175,6 @@ case 622
   Query.MaxDiff(2,3)   = 1;
   Query.MaxDiff(4,5)   = 1;
   Query.MaxDiff(5,6)   = 1;
-
-case 623
-  Query.Description    = 'Non-geometric search';
-  Query.MaxDiff(1,2)   = 1;
-  Query.MaxDiff(2,3)   = 1;
-  Query.MaxDiff(4,5)   = 1;
-  Query.MaxDiff(5,6)   = 1;
-  Query.Edges{1,6}     = 'cWW AU UA';
-  Query.Edges{2,5}     = 'cWW ~CG ~GC';
-  Query.Edges{3,4}     = 'cWW AU UA';
 
 
 

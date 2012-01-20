@@ -310,19 +310,21 @@ if isfield(Query,'Diff'),
     for i=1:s,
       for j=1:t,
         if ~isempty(Query.Diff{i,j}),
-          [md,MD] = xGetDiffSpec(Query.Diff{i,j});
+          [md,MD,sign] = xGetDiffSpec(Query.Diff{i,j});
           Query.MaxDiff(i,j) = MD;
           Query.MinDiff(i,j) = md;
+          Query.DifferenceSign(i,j) = sign;
         end
       end
     end
   end
 end
 
-% --------- implement maxdiff screening
+% --------- implement maxdiff screening and set difference signs
 
 if isfield(Query,'MaxDiff'),               % matrix of max differences
-  D = Inf*ones(Query.NumNT,Query.NumNT);
+  D  = Inf*ones(Query.NumNT,Query.NumNT);
+  DS = zeros(Query.NumNT,Query.NumNT);
 
   [s,t] = size(Query.MaxDiff);
 
@@ -332,6 +334,7 @@ if isfield(Query,'MaxDiff'),               % matrix of max differences
         if D(i,j) == 0,                    % if no value set, use infinity
           D(i,j) = Inf;
         end
+        DS(i,j) = Query.DifferenceSign(i,j);
      end
     end
 
@@ -340,6 +343,10 @@ if isfield(Query,'MaxDiff'),               % matrix of max differences
       for j=1:Query.NumNT,
         D(i,j) = min(D(i,j),D(j,i));       % symmetrize entries in D
         D(j,i) = D(i,j);
+
+        if DS(i,j) ~= 0,
+          DS(j,i) = -DS(i,j);
+        end
       end
     end
 
@@ -354,9 +361,10 @@ if isfield(Query,'MaxDiff'),               % matrix of max differences
    end
 
    Query.MaxDiffMat = D;
+   Query.DifferenceSignMat = DS;
 end
 
-% --------- implement mindiff screening regardless of specific order
+% --------- implement mindiff screening
 
 if isfield(Query,'MinDiff'),
   D = zeros(Query.NumNT,Query.NumNT);       % minimum distance 1
@@ -383,7 +391,7 @@ if isfield(Query,'MinDiff'),
     Query.MinDiffMat = D;
 end
 
-% --------- implement maxdiff screening regardless of specific order
+% --------- implement maxdiff screening for a maxdiff vector
 
 if isfield(Query,'MaxDiffVector'),
   D = Inf*ones(Query.NumNT,Query.NumNT);
@@ -417,7 +425,7 @@ if isfield(Query,'MaxDiffVector'),
   end    
 end
 
-% --------- implement mindiff screening regardless of specific order
+% --------- implement mindiff screening for a mindiff vector
 
 if isfield(Query,'MinDiffVector'),
   D = zeros(Query.NumNT,Query.NumNT);       % minimum distance 1

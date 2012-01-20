@@ -297,6 +297,7 @@ else
   File.Comment   = [];
   File.CI        = sparse(NumNT,NumNT);
   File.Inter     = sparse(NumNT,NumNT);
+  File.Edge      = sparse(NumNT,NumNT);
   File.Modified  = 0;
 
 end
