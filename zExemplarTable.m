@@ -4,7 +4,7 @@
 
 % Here are some ways to run the program:
 
-% zExemplarTable(1:3)
+% zExemplarTable(1,3.5)
 
 function [void] = zExemplarTable(Category,threshold)
 
@@ -116,6 +116,7 @@ for ca = 1:length(Category),
        rotate3d on
        plotted(pc2) = 1;
 
+      if (E.Count >= 4) && (fix(E.Class) == E.Class),
        B(m) = E;                                % store this exemplar
        Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' num2str(E.Pair.Class,'%3.1f') ' ' E.Filename ' ' num2str(E.Count)];
        m = m + 1;
@@ -128,7 +129,7 @@ for ca = 1:length(Category),
          Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Pair.Edge) ' ' num2str(B(m).Pair.Class,'%3.1f') ' ' B(m).Filename ' ' num2str(B(m).Count) ];
          m = m + 1;
        end
-
+      end
 
       end
     end
@@ -143,6 +144,7 @@ end
 
 % -------------------------------------- Compare basepairs against each other
 
+if exist('B'),
 D = [];
 G = zeros((length(B)^2-length(B))/2,7);
 j = 1;
@@ -175,9 +177,29 @@ end
 % ----------------------------------------- Cluster analysis and graph
 
 Y = squareform(full(D));                       % convert to a vector
+
+DD = full(D);
+
+%Z = linkage(Y,'average');                      % compute cluster tree
 Z = linkage(Y,'average');                      % compute cluster tree
 figure(fix(Category(ca))+13)
 [H,T,p] = dendrogram(Z,0,'colorthreshold',threshold,'orientation','left','labels',Lab);
+
+
+
+DDD = DD(p,p);
+[s,t] = size(DDD);
+fprintf('Table %d\n',Category(ca));
+for i=1:s,
+  fprintf('%24s ', Lab{p(i)});
+  for j= 1:t,
+    fprintf('%5.2f ', DDD(i,j));
+  end
+  fprintf('\n');
+end
+fprintf('\n');
+
+
 h = gcf;
 hh = gca;
 if length(Lab) > 80,
@@ -210,6 +232,8 @@ for i=2:g,
 end
 
 % ----------------------------------------- Display basepairs by IsoDisc
+
+end
 
 return
 

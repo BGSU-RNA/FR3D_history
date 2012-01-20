@@ -79,50 +79,52 @@ for f=1:length(Filenames),
 
   if length(File.NT) > 0,                    % if it has nucleotides,
 
-  c = cat(1,File.NT(1:File.NumNT).Center);
-  File.Distance = zMutualDistance(c,35); 
+    c = cat(1,File.NT(1:File.NumNT).Center);
+    File.Distance = zMutualDistance(c,35); 
 
-  if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
-    (ClassifyCode == 1) | (File.ClassVersion < 2),
-    File.Edge = sparse(File.NumNT,File.NumNT);
+    if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
+      (ClassifyCode == 1) | (File.ClassVersion < 2),
+      File.Edge = sparse(File.NumNT,File.NumNT);
 
-    d = sort(nonzeros(File.Distance));
-    if d(min(10,length(d))) < 1,
-      fprintf('%s has overlapping nucleotides and should be avoided as such\n',File.Filename);
-      Overlap = 1;
-    else
-      File = zClassifyPairs(File);
-      File = zUpdateDistanceToExemplars(File);
-      File.ClassVersion = 2;
+      d = sort(nonzeros(File.Distance));
+      if d(min(10,length(d))) < 1,
+        fprintf('%s has overlapping nucleotides and should be avoided as such\n',File.Filename);
+        Overlap = 1;
+      else
+        File = zClassifyPairs(File);
+        File = zUpdateDistanceToExemplars(File);
+        File.ClassVersion = 2;
+        ClassifyCode = 1;
+      end
+    end
+
+    if ~isfield(File.NT(1),'Syn'),
+      SynList = mSynList(File);
+      for k=1:length(File.NT),
+        File.NT(k).Syn = SynList(k);
+      end
       ClassifyCode = 1;
     end
-  end
-
-  if ~isfield(File.NT(1),'Syn'),
-    SynList = mSynList(File);
-    for k=1:length(File.NT),
-      File.NT(k).Syn = SynList(k);
-    end
-    ClassifyCode = 1;
-  end
 
 %File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
 
-  if ~isfield(File,'Header'),
-    File.Header.ModelStart = [];
-    File.Header.ExpData    = '';
-    File.Header.Resolution = '';
-    ClassifyCode = 1;
-  end
-
-  File = orderfields(File);
-
-  if Overlap == 0,
-    if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
-      zSaveNTData(File);
+    if ~isfield(File,'Header'),
+      File.Header.ModelStart = [];
+      File.Header.ExpData    = '';
+      File.Header.Resolution = '';
+      ClassifyCode = 1;
     end
 
+    File = orderfields(File);
+
+    if Overlap == 0,
+      if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
+        zSaveNTData(File);
+      end
+
+      Files(f) = File;
+    end
+  else
     Files(f) = File;
-  end
   end
 end

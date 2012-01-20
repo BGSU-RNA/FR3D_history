@@ -5,8 +5,8 @@ E = [];
 
 for i=1:length(e),
   switch fix(e(i))
-    case    1,    E = [E ' cWW'];
-    case    2,    E = [E ' tWW'];
+    case    1,    E = [E ' cWw'];
+    case    2,    E = [E ' tWw'];
     case    3,    E = [E ' cWH'];
     case    4,    E = [E ' tWH'];
     case    5,    E = [E ' cWS'];
@@ -18,8 +18,8 @@ for i=1:length(e),
     case   11,    E = [E ' cSs'];
     case   12,    E = [E ' tSs'];
     case   13,    E = [E ' bif'];
-    case   -1,    E = [E ' cWW'];
-    case   -2,    E = [E ' tWW'];
+    case   -1,    E = [E ' cwW'];
+    case   -2,    E = [E ' twW'];
     case   -3,    E = [E ' cHW'];
     case   -4,    E = [E ' tHW'];
     case   -5,    E = [E ' cSW'];
