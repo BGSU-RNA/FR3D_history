@@ -3,10 +3,18 @@
 % textoption = 0 - no text
 % textoption = 1 - label atoms
 
-function [void] = zPlotStandardBase(code,textoption)
+% centeroption controls where the base is centered
+% centeroption 0 - glycosidic atom at the origin (default)
+% centeroption 1 - geometric center at the origin
+
+function [void] = zPlotStandardBase(code,textoption,centeroption)
 
 if nargin < 2,
   textoption = 0;
+end
+
+if nargin < 3,
+  centeroption = 0;
 end
 
   zStandardBases
@@ -15,14 +23,10 @@ end
 
   BaseNames = 'ACGU';
 
-  if ~exist('Centered'),
-    Centered = 0;
-  end
-
   L = Lim(2,code);
   Q = StandardLoc(1:L,:,code);
 
-  if Centered == 1,
+  if centeroption == 1,
     M = Lim(1,code);
     Q = Q - ones(L,1)*mean(Q(1:M,:));
   end

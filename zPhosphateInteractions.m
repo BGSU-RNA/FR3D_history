@@ -7,6 +7,8 @@ PHG = [];
 PHU = [];
 count = [1 1 1 1];
 
+Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
+
 for f = 1:length(File),
 
 % -------- First screening of base pairs ------------------------------------ 
@@ -31,11 +33,16 @@ for k = 1:length(i),                            % loop through possible pairs
   c = N1.Code;
 
   if (ph*diag([1 1 6])*ph' < 60) && (abs(ph(3)) < 2),
+    if abs(j(k)-i(k)) <= 1,
+      col = 0;
+    else
+      col = min(zDistance(N1.Fit(1:Lim(2,N1.Code),:), N2.Sugar(10,:))); 
+    end
     switch c
-      case 1,     PHA(count(c),:) = [ph N2.Code];
-      case 2,     PHC(count(c),:) = [ph N2.Code];
-      case 3,     PHG(count(c),:) = [ph N2.Code];
-      case 4,     PHU(count(c),:) = [ph N2.Code];
+      case 1,     PHA(count(c),:) = [ph col];
+      case 2,     PHC(count(c),:) = [ph col];
+      case 3,     PHG(count(c),:) = [ph col];
+      case 4,     PHU(count(c),:) = [ph col];
     end
     count(c) = count(c) + 1;
   end
@@ -57,14 +64,19 @@ for v = 1:4,
                 scatter3(PHU(:,1), PHU(:,2), PHU(:,3),18,c,'filled')
   end
 
-  caxis([1 4]);
+  map = colormap;
+  map(1,:) = [0 0 1];
+  colormap(map);
+
+  caxis([0 4]);
 
   L = {'A','C','G','U'};
 
-  zPlotStandardBase(v);                % plot base at the origin
+  zPlotStandardBase(v,1,1);                % plot base at the origin
   rotate3d on
   axis equal
   view(2)
   saveas(gcf,['PhosphateInteractions' L{v} '.pdf'],'pdf')
+  saveas(gcf,['PhosphateInteractions' L{v} '.fig'],'fig')
 
 end

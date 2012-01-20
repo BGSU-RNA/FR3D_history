@@ -50,6 +50,13 @@ if isfield(Header,'Expdata') & (length(Header.ModelStart) > 1)
   end
 end
 
+% Read standard bases from Sponer QM calculations --------------------------
+
+zStandardBases                % read in QM locations of atoms in 4 bases
+
+Lim(1,:) = [10 8 11 8];       % number of base atoms, excluding hydrogen
+Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
+
 % Extract locations of base and sugar atoms ---------------------------------
 
 NT = [];                                    % nucleotide data structure
@@ -57,6 +64,7 @@ n  = 1;                                     % current NT index
 i  = 1;                                     % current atom/row number
 
 while i < length(NTNUMBER),                 % go through all atoms
+  Flag = 0;
   j = [];                                   % initialize rows of next nucleo.
   ntnum = NTNUMBER{i};                      % nucleotide number from pdb file
 
@@ -72,7 +80,7 @@ while i < length(NTNUMBER),                 % go through all atoms
   NT(n).Number  = NTNUMBER{j(1)};         % nucleotide number for this molecule
 
   Sugar = Inf * ones(12,3);
-  Loc   = [];
+  Loc   = Inf * ones(11,3);
 
   if (NT(n).Base == 'A') | (NT(n).Base == 'A'),
     for k = min(j):max(j),
@@ -214,28 +222,28 @@ while i < length(NTNUMBER),                 % go through all atoms
 %    fprintf('Unrecognized nucleotide: %s %s\n', NT(n).Base,NT(n).Number);
     n = n - 1;                                 % not a recognized
                                                % nucleotide, do nothing
+    Flag = 1;
   end                                         % end four if statements
 
-  if (length(Loc) > 0) & (max(max(Sugar)) == Inf), % one not assigned
-    for k = 1:12,
-      if Sugar(k,1) == Inf,
-        Sugar(k,:) = Loc(1,:);                 % glycosidic atom
+  if (Flag < 1),
+    if (max(max(Loc)) == Inf),                 % base atoms missing
+      fprintf('Base %s%s is missing an atom, so it will be skipped\n',NT(n).Base,NT(n).Number);
+      n = n - 1;
+    elseif (max(max(Sugar)) == Inf),          % sugar atom missing
+      for k = 1:12,
+        if Sugar(k,1) == Inf,
+          Sugar(k,:) = Loc(1,:);              % use glycosidic atom
+        end
       end
+      NT(n).Sugar = Sugar;
     end
-    NT(n).Sugar = Sugar;
   end
 
   n = n + 1;                                  % next nucleotide index
+
 end                                           % end while i < ... loop
 
 NumNT = n - 1;                                % total number of nucleotides
-
-% Read standard bases from Sponer QM calculations --------------------------
-
-zStandardBases                % read in QM locations of atoms in 4 bases
-
-Lim(1,:) = [10 8 11 8];       % number of base atoms, excluding hydrogen
-Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
 
 % Compute best shift and rotation matrices ---------------------------------
 
