@@ -7,22 +7,27 @@ Timeline = [];
 
 % function [ChosenNames] = zFileRedundancy(Filenames)
 
-if ~exist(Date)
-  Date = date;
+if ~exist('TodayDate')
+  TodayDate = date;
 end
 
+tt = cputime;
 
 p = 0.95;                         % cutoff base match fraction
 maxd = 0.5;                       % cutoff discrepancy between structures
 NTLimit = 7300;                   % above this limit, do not align sequences
 MaxRes  = 4;                      % maximum resolution value to use
-Criterion = 15;                   % 1-earliest release date 
+SL = 3000;                        % upper limit on # bases to align
+
+Criterion = 15;                   
+                                  % 1-earliest release date 
                                   % 2-resolution 
                                   % 3-number of nucleotides
                                   % 4-#pairs
                                   % 5-highest #BP / #nucleotides
-                                  %12-resolution, but use preferred list
-                                  %15-highest #BP / #nucleotides, or pref'd
+                                  % 6-most recent release date
+
+                                  % add 10, use preferred list to override
 
 Preferred = zReadPDBList('Preferred_list',1);
 
@@ -42,7 +47,7 @@ i = find(n(:,1) <= MaxRes);       % restrict to structures with res <= MaxRes
 t = t(i,:);
 n = n(i,:);           
 
-size(t)
+fprintf('Found %d structures with resolution better than %6.2f\n', length(t(:,1)), MaxRes);
 
 i = find(n(:,2) > 1);             % restrict to structures with nucleotides
 t = t(i,:);
@@ -60,7 +65,8 @@ size(t)
 t = t(i,:);
 n = n(i,:);
 
-%i = find(n(:,2) > 1300);       % ribosomes only, for now
+%i = find(n(:,2) > 2000);       % big ribosomes only, for now
+%i = find(n(:,2) < 40);       % big ribosomes only, for now
 %t = t(i,:);
 %n = n(i,:);
 
@@ -104,7 +110,7 @@ end
 
 RTimeline = Timeline;
 
-diary Redundancy_Report_2008_09_19.txt
+diary Redundancy_Report_2008_10_07.txt
 
 fprintf('Preparing a redundancy report on %d RNA 3D structures\n',F);
 [p maxd MaxRes]
@@ -138,7 +144,7 @@ for i = 1:(F-1),
     % simply comparing names doesn't work so well since they can be wrong!
 
     if n(i,2) > 9300 && length(ti) > 0 && length(tj) > 0,
-      [namematch,a,b,ss,tt] = dNeedlemanWunsch(ti, tj, 0.9999, 2);  % compare source organism instead of sequence
+      [namematch,a,b,ss,tt] = zNeedlemanWunsch(ti, tj);  % compare source organism instead of sequence
 
 
 
@@ -154,10 +160,10 @@ for i = 1:(F-1),
 
     if n(i,2) <= NTLimit || length(t{i,8}) == 0 || length(t{j,8}) == 0,
       ti = t{i,9};
-      ti = ti(1:min(length(ti),300));
+      ti = ti(1:min(length(ti),SL));         % only compare first SL bases
       tj = t{j,9};
-      tj = tj(1:min(length(tj),300));
-      [matches,a,b,ss,tt] = dNeedlemanWunsch(ti,tj, 0.9999, 2);
+      tj = tj(1:min(length(tj),SL));
+      [matches,a,b,ss,tt] = zNeedlemanWunsch(ti,tj);
       e = (t{i,9}(a) == t{j,9}(b));           % locations of agreement
       matches = sum(e);
       pro = matches/min(length(ti),length(tj));          % percent agreement
@@ -211,7 +217,7 @@ for i = 1:(F-1),
     if length(j) < 2,             % no file is close to i
       done(i) = 1;
     elseif n(i,2) < NTLimit,
-      File = zAddNTData(t(j,1),2);     % load nucleotide data
+      File = zAddNTData(t(j,1));     % load nucleotide data
       File = zOrderChains(File);
 
       for m = 1:length(j),
@@ -361,6 +367,25 @@ drawnow
 
 fprintf('Listing structures with more than %5.2f%% sequence similarity and less than %5.2f geometric discrepancy.\n',100*p,maxd);
 
+fprintf('Structures are sorted by ');
+switch mod(Criterion,10)
+  case 1, fprintf('release date, earliest first\n');
+  case 2, fprintf('resolution, best resolution first\n');
+  case 3, fprintf('number of nucleotides (decreasing)\n');
+  case 4, fprintf('number of basepairs (decreasing)\n');
+  case 5, fprintf('number of basepairs per nucleotide (decreasing)\n');
+  case 6, fprintf('release date, most recent first\n');
+end
+
+fprintf('The first structure listed will be chosen as the representative');
+if Criterion > 10,
+  fprintf(' unless one of these structures is found in the preferred list of structures.\n');
+else
+  fprintf('.\n');
+end
+
+fprintf('\n');
+
 done = zeros(1,F);                % whether each file has been considered
 c = 0;                            % counts the number of files selected so far
 
@@ -369,39 +394,40 @@ for i = 1:(F-1),
     j = find(Close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
       done(i) = 1;                % no need to display this one again
-      File = zAddNTData(t(i,1),2); % load this file
+      File = zAddNTData(t(i,1)); % load this file
       E  = abs(triu(File(1).Edge));
       np(1) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
     else
        
-      File = zAddNTData(t(j,1),2); % load these files
-      File = zOrderChains(File);
-
       crit = [];                   % criterion for sorting and choosing
       np   = [];
 
       for f = 1:length(j),
-        done(j(f)) = 1;
-        E  = abs(triu(File(f).Edge));
-        np(f) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
+        done(j(f)) = 1;            % no need to display this one again
+%        E  = abs(triu(File(f).Edge));
+%        np(f) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
+        np(f) = n(j(f),3);
         switch mod(Criterion,10)
-          case 1, crit(f) = datenum(File(f).Info.ReleaseDate, 'mm/dd/yyyy');
+          case 1, crit(f) = datenum(t{j(f),4}, 'mm/dd/yyyy');
           case 2, crit(f) = n(j(f),1);            % resolution
-          case 3, crit(f) = -length(File(f).NT);  % number of nucleotides
+          case 3, crit(f) = -n(j(f),2);           % number of nucleotides
           case 4, crit(f) = -np(f);               % number of pairs
-          case 5, crit(f) = -n(j(f),3)/n(j(f),2); % # bp / # nucleotides
+          case 5, crit(f) = -n(j(f),3)/n(j(f),2); % ratio # bp / # nucleotides
         end
       end
+
+      fprintf('\n');
+
+      File = zAddNTData(t(j,1)); % load these files
+      File = zOrderChains(File);
 
       [y,k] = sort(crit);
       j     = j(k);                         % order by the criterion
       File  = File(k);
       np    = np(k);
 
-      fprintf('\n');
-
       for m = 1:length(j),
-        fprintf('%4s has %4d nucleotides, %4d pairs, ', File(m).Filename, File(m).NumNT, np(m));
+        fprintf('%4s has %4d nucleotides, %4d pairs, ', t{j(m),1}, n(j(m),2), n(j(m),3));
        if isempty(File(m).Info.Resolution),
          fprintf('resolution  ---- ');
        else
@@ -458,7 +484,7 @@ for i = 1:(F-1),
             else
               malign = [];
               nalign = [];
-%              [matches,malign,nalign] = dNeedlemanWunsch(t{j(m),9},t{j(nn),9},0.9999,2);
+%              [matches,malign,nalign] = zNeedlemanWunsch(t{j(m),9},t{j(nn),9});
             end
 
             if isempty(malign),
@@ -500,22 +526,27 @@ for i = 1:(F-1),
       end
     end
 
-    c = c + 1;
-    ChosenNames{c} = File(1).Filename;
+    ff = 1;                               % default file to use
 
     if Criterion > 10,                    % replace with preferred name
-       pp = [];
-       for f = 1:length(File),
-         p = find(ismember(Preferred,File(f).Filename));
-         if ~isempty(p),
-           pp = p;
-           fprintf('Found %s in the list of preferred structures\n', File(f).Filename);
-           cn = File(f).Filename;
-         end
-       end
-       if ~isempty(pp),
-         ChosenNames{c} = cn;
-       end
+      pp = [];
+      for f = 1:length(j),
+        p = find(ismember(Preferred,File(f).Filename));
+        if ~isempty(p),
+          pp = p;
+          ff = f;
+          fprintf('Found %s in the list of preferred structures\n', File(f).Filename);
+          cn = File(f).Filename;
+        end
+      end
+    end
+
+    c = c + 1;
+    ChosenNames{c} = File(ff).Filename;
+
+    Equivalents{c,1} = ChosenNames{c};
+    for m = 1:length(j),
+      Equivalents{c,m+1} = t{j(m),1};
     end
 
     if length(File) == 1,
@@ -524,17 +555,14 @@ for i = 1:(F-1),
       Text{c} = sprintf('Chosen structure is %4s, which ', ChosenNames{c});
     end
 
-% THIS HAS TO BE MODIFIED TO PROPERLY ACCOUNT FOR THE PREFERRED LIST!
-
-
-    Text{c} = [Text{c} sprintf('has %4d nucleotides, %4d pairs, ', File(1).NumNT, np(1))];
-    if isempty(File(1).Info.Resolution),
+    Text{c} = [Text{c} sprintf('has %4d nucleotides, %4d pairs, ', File(ff).NumNT, np(ff))];
+    if isempty(File(ff).Info.Resolution),
       Text{c} = [Text{c} sprintf('resolution  ---- ')];
     else
-      Text{c} = [Text{c} sprintf('resolution %5.2f ', File(1).Info.Resolution)];
+      Text{c} = [Text{c} sprintf('resolution %5.2f ', File(ff).Info.Resolution)];
     end
 
-    Info = File(1).Info;
+    Info = File(ff).Info;
 
     Text{c} = [Text{c} sprintf(' %10s | %s | %s | %s', Info.ReleaseDate, Info.Source, Info.Descriptor, Info.Author)];
 
@@ -571,12 +599,12 @@ for c = 1:length(ChosenNames),
   fprintf('%4s\n', ChosenNames{c});
 end
 
-fid = fopen(['PDBFiles' filesep 'Nonredundant_' Date '_list.pdb'],'w');
+fid = fopen(['PDBFiles' filesep 'Nonredundant_' TodayDate '_list.pdb'],'w');
 for c = 1:length(ChosenNames),
   fprintf(fid,'%4s\n', ChosenNames{c});
 end
 fclose(fid);
-fprintf('\nChosen files were written to %s\n', ['PDBFiles' filesep 'Nonredundant_' Date '_list.pdb']);
+fprintf('\nChosen files were written to %s\n', ['PDBFiles' filesep 'Nonredundant_' TodayDate '_list.pdb']);
 
 fprintf('\nInformation about chosen files:\n');
 
@@ -616,6 +644,33 @@ if Criterion == 1,
   title('Number of basepairs in distinct structures');
   axis([1992 2009 0 1.05*sum(NumP)]);
 end
+
+% ----------------------------------------- Update PDBInfo with this list
+
+fprintf('Updating PDB Info with non-redundant list and equivalencies\n');
+
+load PDBInfo
+
+N = lower(t(:,1));
+
+for c = 1:length(ChosenNames),
+  j = 1;
+  while ~isempty(Equivalents{c,j}),
+    r = find(ismember(N,lower(Equivalents{c,j})));
+    if ~isempty(r),
+      t{r(1),10} = Equivalents{c,1};
+if length(r) > 1,
+  fprintf('%s %d %d %d\n', ChosenNames{c}, c, j, length(r));
+end
+    end
+    j = j + 1;
+  end
+end
+
+% save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
+
+
+fprintf('Elapsed time %8.6f\n', (cputime-tt)/60);
 
 diary off
 

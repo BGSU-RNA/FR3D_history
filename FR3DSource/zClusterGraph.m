@@ -80,7 +80,7 @@ if Table > 0,
   for i = 1:s,
     for j = 1:s,
       tt = sprintf('%3.1f',DDDD(i,j));
-      text(i+0.5,j+0.5,tt,'HorizontalAlignment','Center');
+      text(i+0.5,j+0.5,tt,'HorizontalAlignment','Center','Color','w');
     end
   end
 end

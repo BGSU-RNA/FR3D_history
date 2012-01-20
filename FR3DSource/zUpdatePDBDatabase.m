@@ -4,7 +4,7 @@
 % download a new report, save it as PDB_File_Information current-date.xls
 % and modify the following line:
 
-Date = '2008-07-01';
+Date = '2008-09-18';
 
 PDBInfoName = ['PDB_File_Information ' Date '.xls'];
 
@@ -65,7 +65,10 @@ save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 
 % ------------------------------------- Read each PDB file now, save data
 
+% load PDBInfo
+
 for i = 1:length(t(:,1)),
+% for i = length(t(:,1)):-1:1,
   File = zAddNTData(t{i,1},4,[],1);
   if ~isempty(File.NT),
     n(i,2) = length(File.NT);

@@ -1,6 +1,6 @@
 % xGetEdgeNums parses the entries in the GUI concerning base-base interactions
 
-function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range] = xGetEdgeNums(str)
+function [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2,Flank,Range,Coplanar] = xGetEdgeNums(str)
 
 ReqEdge = [];
 ExEdge  = [];
@@ -13,6 +13,7 @@ EBP2     = [];
 Flank    = [];
 Range    = [];
 RRange   = [];
+Coplanar = [];
 
 % ------------------------------ Define relevant strings and associated codes
 
@@ -289,6 +290,8 @@ for i=1:length(lim)-1                    % loop through tokens
 
     if strcmpi(Token,'flank') || strcmpi(Token,'f'),
       Flank = 1 - Reverse;
+    elseif strcmpi(Token,'coplanar') || strcmpi(Token,'cp'),
+      Coplanar = 1 - Reverse;
     elseif strcmpi(Token,'local') || strcmpi(Token,'L'),
       newRange = [1 10];
       newRRange = [11 Inf];

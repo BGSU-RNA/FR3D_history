@@ -1,6 +1,6 @@
 % zPhosDisplay displays base-phosphate interaction parameters in a variety of ways
 
-function [void] = zPhosDisplay(D)
+function [void] = zPhosComparisonDisplay(D)
 
 conv = [1 2 3 3];
 %D(:,7) = conv(D(:,7));                 % O1P and O2P are equivalent
@@ -43,15 +43,15 @@ for v = 1:4,
   r = find(DD(:,17) == 1);           % only display the best oxygen for each H
   DD = DD(r,:);
 
-  s = 6*ones(size(DD(:,1)));        % all have the same size
+  s = 25*DD(:,23)/56;                % size reflects number of such interacts
 %  s = 10*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
 %  s = 10*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
 %  s = 10*(DD(:,17) == 1) + 1*(DD(:,17) == 0);% best oxygen is large
 
-  scatter3(DD(:,13),DD(:,14),DD(:,15), 0.3*s, 0*DD(:,9), 'filled'); % phosphorus
+  scatter3(DD(:,13),DD(:,14),DD(:,15), 0.5*s, 0*DD(:,9), 'filled'); % phosphorus
   hold on
 
-  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   DD(:,9), 'filled'); % color by dist
+  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   DD(:,24), 'filled'); % color by dist
 %  scatter3(DD(:,10),DD(:,11),DD(:,12)-0.0001*DD(:,5), s,   DD(:,8), 'filled'); % color by angle
 %  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   DD(:,7), 'filled'); % color by oxygen atom
 %  scatter3(DD(:,10),DD(:,11),DD(:,12), s,   abs(DD(:,12)), 'filled'); % color oxygen by vertical displacement
@@ -62,11 +62,31 @@ for v = 1:4,
     end
   end
 
+  switch v,
+    case 1,     text(8,0,'2BP');
+                text(5,8,'6BP');
+                text(-3,7.2,'7BP');
+                text(-3.5,-4,'0BP');
+    case 2,     text(5,6.1,'6BP');
+                text(-2.3,8,'7BP');
+                text(-4.5,6.3,'8BP');
+                text(-5.8,4.7,'9BP');
+                text(-4,-4,'0BP');
+    case 3,     text(8,-2.4,'1BP');
+                text(8.5,3,'3BP');
+                text(7.3,4.8,'4BP');
+                text(6,6,'5BP');
+                text(-4.5,-4,'0BP');
+    case 4,     text(6.2,3,'5BP');
+                text(-3.9,6,'9BP');
+                text(-2.9,-4,'0BP');
+  end
+
   map = colormap;
   map(1,:) = [0 0 0];
   colormap(map);
 
-  caxis([2 4.5]);
+%  caxis([2 4.5]);
 %  caxis([80 180]);
 
   zPlotStandardBase(v,1,0);                % plot base at the origin
@@ -74,53 +94,20 @@ for v = 1:4,
   rotate3d on
   grid off
   axis equal
-
-  switch v,
-    case 1,     text(8,0,'2BPh');
-                text(5,8,'6BPh');
-                text(-4.4,7.2,'7BPh');
-                text(-3.5,-4,'0BPh');
-                axis([-6 9 -5 9]);
-    case 2,     text(5,6.1,'6BPh');
-                text(-3.9,8,'7BPh');
-                text(-5.7,6.6,'8BPh');
-                text(-7.5,4.7,'9BPh');
-                text(-4,-4,'0BPh');
-                axis([-8 7 -5 9]);
-    case 3,     text(7,-4,'1BPh');
-                text(8.5,3,'3BPh');
-                text(7.3,4.8,'4BPh');
-                text(6,6,'5BPh');
-                text(-4.5,-4,'0BPh');
-                axis([-6 9 -5 9]);
-    case 4,     text(6.2,3,'5BPh');
-                text(-6.9,5.5,'9BPh');
-                text(-2.9,-4,'0BPh');
-                axis([-8 7 -5 9]);
-
-  end
+  axis([-6 9 -5 9]);
   view(2)
-
-  if v == 2,
-%    colorbar('east')
-  end
-
-end
-
-
-
-%set(gcf,'Renderer','OpenGL');     % fast rotation
-%set(gcf,'Renderer','zbuffer')
-set(gcf,'Renderer','painters');    % makes nice PDF files
-
-saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.fig'],'fig');
-saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.png'],'png');
-saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.pdf'],'pdf');
+  saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.fig'],'fig');
+  saveas(gcf,['Phosphate Interactions\BaseOxygenPhosphorus.png'],'png');
 
 %  saveas(gcf,['Phosphate Interactions\PhosphateInteractions_' L{v} '.fig'],'fig')
 
 %  saveas(gcf,['Phosphate interactions' filesep 'Phosphate with ' L{v} '.png'],'png');
 
+set(gcf,'Renderer','OpenGL');     % fast rotation
+%set(gcf,'Renderer','zbuffer')
+%set(gcf,'Renderer','painters');    % makes nice PDF files
+
+end
 
 % ----------------- Distance between centers of bases
 figure(5)
@@ -154,7 +141,7 @@ end
 figure(7)
 clf
 
-MT = {'Carbon (excluding all self interactions)','Self interactions with C5/C6/C8','Ring Nitrogen','Amino Nitrogen'};
+MT = {'Carbon (excluding all self interactions)','all self interaction with C5/C6/C8','Ring Nitrogen','Amino Nitrogen'};
 
 ICode{1} = [1 8 16];                % ring carbons, but not C6/C8
 ICode{2} = [4 9 14 17];             % carbon C6/C8 
@@ -197,56 +184,28 @@ for v = 1:4,
   DD = D(r,:);                         % use only these lines of data
 
 %  s = 4*(DD(:,5) < 100) + 1*(DD(:,5) > 100);% true BP are large, near are small
-%  scatter3(DD(:,9),DD(:,8), DD(:,12), s,   DD(:,4), 'filled');
+  s = 4*(DD(:,17) == 1) + 1*(DD(:,17) == 0);% best oxygen is large
+  s = 25*DD(:,23)/56;                % size reflects number of such interacts
 
-  s = 4*(DD(:,17) == 1) + 0*(DD(:,17) == 0);% best oxygen is large
+%  scatter3(DD(:,9),DD(:,8), DD(:,12), s,   DD(:,4), 'filled');
 
 %  scatter(DD(:,9),DD(:,8), s, abs(DD(:,12)), 'filled'); % color by vert displ
 %  scatter(DD(:,9),DD(:,8), s,   DD(:,4), 'filled'); % color by base
-
-  i = find((DD(:,7) == 1) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'r', 'filled'); % color by oxygen atom
-hold on
-  i = find((DD(:,7) == 2) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'b', 'filled'); % color by oxygen atom
-  i = find((DD(:,7) >  2) .* (DD(:,17) == 1));
-  scatter3(DD(i,9),DD(i,8), rand(length(i),1), 4,   'g', 'filled'); % color by oxygen atom
-
-  view(2)
-  grid off
-
-CarbonDist    = 4.0;                           % max massive - oxygen distance
-nCarbonDist   = 4.5;                           % near category
-
-NitrogenDist  = 3.5;                           % max massive - oxygen distance
-nNitrogenDist = 4.0;                           % near category
+  scatter(DD(:,9),DD(:,8), s,   DD(:,24), 'filled'); % color by variance
 
   hold on
   if v <=2,
-    plot3([1 CarbonDist CarbonDist], [AL AL 180], [1 1 1], 'k');
-    plot3([1 nCarbonDist nCarbonDist], [nAL nAL 180], [1 1 1], 'k');
+    plot([1 CarbonDist CarbonDist], [AL AL 180], 'k');
+    plot([1 nCarbonDist nCarbonDist], [nAL nAL 180], 'k');
   else
-    plot3([1 NitrogenDist NitrogenDist], [AL AL 180], [1 1 1], 'k');
-    plot3([1 nNitrogenDist nNitrogenDist], [nAL nAL 180], [1 1 1], 'k');
+    plot([1 NitrogenDist NitrogenDist], [AL AL 180], 'k');
+    plot([1 nNitrogenDist nNitrogenDist], [nAL nAL 180], 'k');
   end
 
-  title([MT{v}]);
-  if any(v==[1 3]),
-    ylabel('Angle');
-  end
-  if any(v==[3 4]),
-    xlabel('Distance from massive atom');
-  end
+  title(['Oxygen location parameters for ', MT{v}]);
   axis([2 4.6 105 180]);
-  caxis([1 4]);
+%  caxis([1 4]);
 end
-
-set(gcf,'Renderer','painters');    % makes nice PDF files
-
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.fig'],'fig');
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.png'],'png');
-saveas(gcf,['Phosphate Interactions\BasePhosphateParameters.pdf'],'pdf');
-
 
 % -------------- Histogram of vertical displacement of phosphorus
 figure(8)
@@ -258,7 +217,6 @@ title('Vertical displacement of phosphorus for BP and near BP');
 figure(9)
 clf
 MT = {'Carbon (excluding C6/C8 self interactions)','self interaction with C6/C8','Ring Nitrogen','Amino Nitrogen'};
-
 
 ICode{1} = [1 8 16];                % ring carbon, not C6/C8
 ICode{2} = [4 9 14 17];             % carbon C6/C8 self interactions 
@@ -297,80 +255,6 @@ for v = 1:4,
   axis([3 6 100 180]);
   caxis([0 5]);
 end
-
-return
-
-u = unique(D(:,[1 2 3 6]),'rows');
-c = zeros(5,10);
-CarbonDist    = 4.0;                           % max massive - oxygen distance
-NitrogenDist  = 3.5;                           % max massive - oxygen distance
-DL([4 6 11]) = NitrogenDist;
-DL([7 8 9])  = CarbonDist;
-for h = 1:length(u(:,1)),
-  i = find( (D(:,1)==u(h,1)) .* (D(:,2)==u(h,2)) .* (D(:,3)==u(h,3)) .* (D(:,6)==u(h,4)));
-    switch D(i(1),4),
-      case 1,                         % Base A
-              m   = [ 9  7  6  6];    % rows of the corresponding massive atoms
-      case 2,                         % Base C
-              m   = [ 7  8  6  6];
-      case 3,                         % Base G
-              m   = [ 4  7 11 11];
-      case 4,                         % Base U
-              m   = [ 8  4  7];
-    end
-  a = sum(D(i,5) < 100);
-  b = sum((D(i,5) >= 100) .* (D(i,9) < DL(m(u(h,4)))));   % near but OK dist
-  d = sum((D(i,5) >= 100) .* (D(i,9) >= DL(m(u(h,4)))));  % near b/c large dist
-  c(a+1,b+1) = c(a+1,b+1) + 1;
-  c(a+1,5+d+1) = c(a+1,5+d+1) + 1;
-
-  if b == 2,
-    for y = 1:length(i),
-            f = D(i(y),1);
-            N1 = File(f).NT(D(i(y),2));
-            N2 = File(f).NT(D(i(y),3));
-
-            fprintf('%6s base %s%5s BPcode %3d %4s phosphate donor %s%5s length %6.2f angle %6.2f\n', File(f).Filename, N1.Base, N1.Number, D(i(y),5), zBasePhosphateText(D(i(y),5)), N2.Base, N2.Number, D(i(y),9), D(i(y),8));
-    end
-
-    j = find( (D(:,1)==u(h,1)) .* (D(:,2)==u(h,2)) .* (D(:,3)==u(h,3)) .* (D(:,6)~=u(h,4)));
-    if length(j) > 0,
-      fprintf('This pair also makes the following interaction:\n');
-      for y = 1:length(j),
-            f = D(j(y),1);
-            N1 = File(f).NT(D(j(y),2));
-            N2 = File(f).NT(D(j(y),3));
-
-            fprintf('%6s base %s%5s BPcode %3d %4s phosphate donor %s%5s length %6.2f angle %6.2f\n', File(f).Filename, N1.Base, N1.Number, D(j(y),5), zBasePhosphateText(D(j(y),5)), N2.Base, N2.Number, D(j(y),9), D(j(y),8));
-      end
-    end  
-    fprintf('\n');
-
-  end
-
-end
-
-fprintf('                                   Near inter w/ OK distance.   Near inter. w/ too large dist.\n');
-fprintf('                                     ');
-for b = 0:4,
-  fprintf(' %4d', b);
-end
-for b = 0:4,
-  fprintf(' %4d', b);
-end
-fprintf(' Total\n');
-for a = 0:4,
-  fprintf('%4d oxygens making true interaction ', a);
-  for b = 0:9,
-    fprintf(' %4d', c(a+1,b+1));
-  end
-  fprintf(' %4d\n', sum(c(a+1,:))/2);
-end
-fprintf('Total                                ');
-for b = 0:9,
-  fprintf(' %4d', sum(c(:,b+1)));
-end
-fprintf(' %4d\n', sum(sum(c))/2);
 
 return
 

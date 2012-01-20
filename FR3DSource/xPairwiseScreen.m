@@ -112,6 +112,55 @@ if isfield(Query,'Range'),               % screen by range restriction
   end
 end
 
+if isfield(Query,'Coplanar'),            % screen by coplanarity
+ if ~isempty(Query.Coplanar{p,q}),
+  y = 0.4;
+  [i,j] = find(D);                       % all remaining pairs near each other
+  CP = sparse(zeros(File.NumNT,File.NumNT));
+
+  for k = 1:length(i);
+    N1 = File.NT(i(k));
+    N2 = File.NT(j(k));
+    mind  = min(min(zDistance(N1.Fit,N2.Fit)));
+    if mind < 5,                         % only keep those within 5 Angstroms
+      v     = N1.Center - N2.Center;
+      v     = v / norm(v);                  % normalize
+
+      if (abs(v * N1.Rot(:,3)) < y) && (abs(v * N2.Rot(:,3)) < y), % angle > 45 degrees
+
+        Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
+
+        d = zDistance(N2.Fit(1:Lim(2,N2.Code),:), N1.Center); 
+                                           % distances to base 1 center
+        [y,m] = min(d);                          % identify the closest atom
+        m = m(1);                                % in case of a tie, use the first
+        Gap1 = N1.Rot(:,3)'*(N2.Fit(m,:)-N1.Center)';% height above plane of 1
+
+        if abs(Gap1) < 2,
+
+          d = zDistance(N1.Fit(1:Lim(2,N1.Code),:), N2.Center); 
+                                           % distances to base 1 center
+          [y,m] = min(d);                          % identify the closest atom
+          m = m(1);                                % in case of a tie, use the first
+          Gap2 = N2.Rot(:,3)'*(N1.Fit(m,:)-N2.Center)';% height above plane of 1
+
+          if abs(Gap2) < 2,
+
+            CP(i(k),j(k)) = 1;
+            CP(j(k),i(k)) = 1;
+          end
+        end
+      end
+    end
+  end
+
+  if Query.Coplanar{p,q} > 0,
+    D = D .* CP;
+  elseif Query.Coplanar{p,q} == 0,
+    D = D .* (CP == 0);
+  end
+ end
+end
     
 [i,j] = find(D);         % nucleotide pairs with OK distances and interactions
 d = nonzeros(D);         % distances below the large cutoff

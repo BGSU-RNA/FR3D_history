@@ -89,7 +89,7 @@ if (L == 2) && (length(LocationWeight == L)),     % two-nucleotide motif
   MM = (Model(1).Center+Model(2).Center)/2;
   CM = ( Cand(1).Center+ Cand(2).Center)/2;
 
-elseif (length(LocationWeight) == L),             % more than two nucleotides
+elseif (length(LocationWeight) == L), % more than two nucleotides, use bases
 
   ModelCenters = cat(1,Model.Center);
 
@@ -118,13 +118,13 @@ elseif (length(LocationWeight) == L),             % more than two nucleotides
   MM = ModelWeightedCenter;
   CM = CMean;
 
-else
+else                              % account for phosphorus location as well
 
   ModelCenters = cat(1,Model.Center);
   CandiCenters = cat(1,Cand.Center);
 
   for j = 1:length(Model),
-    ModelCenters = [ModelCenters; Model(j).Sugar(10,:)];
+    ModelCenters = [ModelCenters; Model(j).Sugar(10,:)];  % tack on phosphorus
     CandiCenters = [CandiCenters;  Cand(j).Sugar(10,:)];
   end
 

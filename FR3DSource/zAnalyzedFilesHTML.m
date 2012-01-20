@@ -56,7 +56,7 @@ for f = 1:length(File),
       elseif File(f).Range(i,j(k)) > 0,
         r = sprintf('Range %4d', File(f).Range(i,j(k)));
       end
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0),r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0,N1.Code,N2.Code),r);
 
       InterType(c) = abs(File(f).Edge(i,j(k)));
 

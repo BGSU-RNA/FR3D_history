@@ -10,7 +10,7 @@
 
 function [ClassLimits, CurrentVersion] = zClassLimits;
 
-CurrentVersion = 5.9;                       % version number of class limits
+CurrentVersion = 6.0;                       % version number of class limits
 
 ClassLimits = zeros(50,12,16);
 
@@ -295,7 +295,8 @@ ClassLimits(1:s(1),1:s(2),15) = B;
 % UU pairs (paircode 16) -----------------------------------------------------
 
 B =    [  1    3.4  5.7  4.1  6.8 -3.0  3.0 -1.1 -0.7   35   80];  % cWw
-B = [B;[  2    3.0  4.2  6.9  8.1 -3.4  3.0  0.7  1.1  170  200]]; % tWW
+B = [B;[  2    5.2  6.5  2.0  4.0 -3.0  3.0  0.7  1.1  160  200]]; % tWW 2008-10-23
+B = [B;[  2.1  3.0  4.2  6.9  8.1 -3.4  3.0  0.7  1.1  170  200]]; % tWW
 B = [B;[  3    6.6  7.6  0.8  3.2 -3.0  3.0  0.7  1.1   55  100]]; % cis WC-H - Jesse_7_4_08
 B = [B;[  4    3.8  5.3  6.2  7.1 -3.0  3.0 -1.1 -0.7  145  180]]; % tr  WC-H
 B = [B;[  5    5.0  6.5  1.2  5.0 -3.0  3.0 -1.1 -0.7  -80   45]]; % cis WC-S - Jesse_4_18_08

@@ -12,6 +12,18 @@ if strcmp(class(Search),'double'),
   S = Search;
   clear Search
   Search.Candidates = S;
+  Search.File = FullFile;
+  UsingFull = 1;                             % use what was passed in
+  File = FullFile;
+  Search.Query.Geometric = 0;
+  [L,N] = size(Search.Candidates);
+  N = N - 1;                                   % number of nucleotides
+  Search.Query.NumNT = N;
+  Search.Discrepancy = 1:L;
+  FIndex = 1:length(FullFile);
+  for f = 1:length(File),
+    Search.CandidateFilenames{f} = File(f).Filename;
+  end
 end
 
 if isempty(Search.Candidates)
@@ -333,9 +345,10 @@ q(p) = 1:L;                                  % inverse permutation
       Search = SearchSubset(Search,p);
       xWriteCandidatePDB(Search);
       if Level > 0,
-        SN = [Search.ActualFilename '_Subset_' datestr(now,31)];
+        SN = [Search.SaveName '_Subset_' datestr(now,31)];
         SN    = strrep(SN,' ','_');
         SN    = strrep(SN,':','_');
+        Search.SaveName = SN;
         save(['SearchSaveFiles' filesep SN], 'Search');
       end
       Search = SearchT;

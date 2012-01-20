@@ -236,6 +236,8 @@ if Subcat > 0,
 end
 title(Title,'FontSize',10);
 
+% Title = Title(2:end);
+
 saveas(gcf,['Isostericity' filesep Title '.pdf'],'pdf');
 saveas(gcf,['Isostericity' filesep Title '.png'],'png');
 
@@ -277,15 +279,15 @@ T{1,3} = 'LSW 2002 subfamily';
 T{1,4} = 'Structure';
 T{1,5} = 'Count';
 
-Cat  = [num2str(abs(Category(1))) '.'];
+Catt  = [num2str(abs(Category(1))) '.'];
 
 for i = 1:length(Lab),
   T{1,5+i} = Lab{p(i)}(1:2);
   T{i+1,1} = Lab{p(i)}(1:2);
   T{i+1,2} = Lab{p(i)}(3:5);
 
-  Cate = strrep(Lab{p(i)}(8:12),'I',Cat);
-  Cate = strrep(Cate,'i',['i' Cat]);
+  Cate = strrep(Lab{p(i)}(8:12),'I',Catt);
+  Cate = strrep(Cate,'i',['i' Catt]);
   Cate = strrep(Cate,'(','[');
   Cate = strrep(Cate,')',']');
   T{i+1,3} = Cate;                                % isosteric subgroup
@@ -396,6 +398,10 @@ for p = 1:12,
 end
 
 h = find(sum(MeanD) > 0);                 % which pairs are actually present
+
+size(Cat)
+size(h)
+size(MeanD)
 
 figure
 

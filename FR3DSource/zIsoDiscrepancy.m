@@ -42,7 +42,8 @@ function [d,ang,t1,t2,cp,angdiff1,angdiff2,od] = zIsoDiscrepancy(M1,M2,N1,N2)
     if sign(R1(3,3)) == sign(R2(3,3)),    % normals point in the same direction
       d = d + 4*(angdiff1^2+angdiff2^2)/2;   % use angle in the plane
     else
-      d = d + 9*(pi^2);                      % angle of a flip
+%      d = d + (3*pi)^2;                      % angle of a flip
+      d = d + (2*pi)^2;                      % angle of a flip
     end
 
     d = sqrt(d);

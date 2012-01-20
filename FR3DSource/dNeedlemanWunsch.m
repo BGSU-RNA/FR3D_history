@@ -88,3 +88,14 @@ d = 2;                         % gap penalty
 
 [m,a,b,s,t] = dNeedlemanWunsch(seq1,seq2,p,d)
 [s;t]
+
+seq1 = 'aacguuguggaa';
+seq2 = 'aacguaugugcaga';
+[Score, Alignment, Start] = swalign(seq1,seq2,'Alphabet','NT')
+
+[Score, Alignment, Start] = swalign('uuuuaacguuguggaa','aacguaugugcaga','Alphabet','NT')
+
+File = zAddNTData({'1s72','2aw4'});
+seq1 = cat(2,File(1).NT.Base);
+seq2 = cat(2,File(2).NT.Base);
+[Score, Alignment, Start] = nwalign(seq1,seq2,'Alphabet','NT')

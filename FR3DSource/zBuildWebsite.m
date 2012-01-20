@@ -7,7 +7,7 @@ Names = t(:,1);                        % names of files from PDB/NDB
 
 %1354
 
-for f = 1391:length(Names),  
+for f = 1:length(Names),  
  t = cputime;
 
  File = zAddNTData(Names{f},0,[],2);              % load RNA data

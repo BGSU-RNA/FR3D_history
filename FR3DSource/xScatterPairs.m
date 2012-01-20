@@ -185,8 +185,9 @@ clf
 figure(ViewParam.FigNum)
 clf
 
-%set(gcf,'Renderer','OpenGL');
+%set(gcf,'Renderer','OpenGL');     % fast rotation
 %set(gcf,'Renderer','zbuffer')
+%set(gcf,'Renderer','painters')
 
 for k = 1:length(Pair),                              % Loop through pairs
   p      = Pair(k);
