@@ -18,7 +18,7 @@ File(f).BasePhosphate = sparse(zeros(File(f).NumNT));
 
 % -------- First screening of base pairs ------------------------------------ 
 
-DistCutoff = 15;                                % max distance for interaction
+DistCutoff = 16;                                % max distance for interaction
 [i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance > 0)); 
                                                 % screen by C-C distance
 
@@ -48,28 +48,41 @@ for k = 1:length(i),                            % loop through possible pairs
       case 1, 
               h   = [11 12 14 15];
               m   = [ 9  7  6  6];
+              e   = [ 1  4  2  3];
       case 2, 
               h   = [10 11 12 13];
               m   = [ 7  8  6  6];
+              e   = [ 4  3  3  2];
       case 3, 
               h   = [12 13 15 16];
               m   = [ 4  7 11 11];
+              e   = [ 2  4  1  2];
       case 4, 
               h   = [ 9 11 12];
               m   = [ 8  4  7];
+              e   = [ 3  2  4];
     end
 
-    p   = [11 12];
+    p   = [9 11 12 13];
     dis = zDistance(N1.Fit(h,:), N2.Sugar(p,:)); 
 
-    [ii,jj] = find(dis < 3.3);
+    [ii,jj] = find(dis < 3.2);
+
+    g = 0;
 
     for kk = 1:length(ii),
       Angle=zAngle(N1.Fit(m(ii(kk)),:),N1.Fit(h(ii(kk)),:),N2.Sugar(p(jj(kk)),:));
-      if Angle > 140,
-        g = 1;
+      if Angle > 120,
 
-        File(f).BasePhosphate(i(k),j(k)) =  g;
+        if ((Angle < 150) || (dis(ii(kk),jj(kk)) > 2.6)) %near case
+          if (g == 0)
+            g = e(ii(kk)) + 100;
+          end
+        elseif (g < 10) && (g > 0),
+          g = g + e(ii(kk))/10;
+        else
+          g = e(ii(kk));
+        end
 
 %        fprintf('%6s base %s%5s %3s phosphate %s%5s %3s length %6.2f angle %6.2f interaction %s\n', File(f).Filename, N1.Base, N1.Number, AtomNames{h(ii(kk)),c}, N2.Base, N2.Number, Sugar{p(jj(kk))}, dis(ii(kk),jj(kk)), Angle, zEdgeText(File(f).Edge(i(k),j(k))));
 
@@ -85,11 +98,16 @@ for k = 1:length(i),                            % loop through possible pairs
         end
       end
     end
+
+    File(f).BasePhosphate(i(k),j(k)) =  g;
+
 %    fprintf('\n');
   end
   
 end   % loop over pairs
 end   % loop over files
+
+return
 
 for v = 1:4,
   figure(v)
@@ -150,3 +168,11 @@ for v = 1:4,
 end
 
 
+clf
+hist(nonzeros(File(1).BasePhosphate),30)
+pause
+hist(nonzeros(File(2).BasePhosphate),30)
+pause
+hist(nonzeros(File(3).BasePhosphate),30)
+pause
+hist(nonzeros(File(4).BasePhosphate),30)

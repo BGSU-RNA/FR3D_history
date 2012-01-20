@@ -57,7 +57,7 @@ hold on
 
 switch NT.Code
 case 1,
-  i = [13 1 7 10 8 5 6];
+  i = [1 7 10 8 5 6];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
   i = [5 4 9 3 2 8];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
@@ -71,7 +71,7 @@ case 1,
   i = [9 11];
   plot3(X(i,1),X(i,2),X(i,3),'Color',gray,'LineWidth',2,'LineStyle',LS);
 case 2,
-  i = [9 1 7 8 5 6];
+  i = [1 7 8 5 6];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
   i = [5 4 2 3];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
@@ -85,7 +85,7 @@ case 2,
   i = [12 6 13];
   plot3(X(i,1),X(i,2),X(i,3),'Color',gray,'LineWidth',2,'LineStyle',LS);
 case 3,
-  i = [14 1 7 10 8 5 6];
+  i = [1 7 10 8 5 6];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
   i = [5 4 9 11];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
@@ -101,7 +101,7 @@ case 3,
   i = [16 11 15];
   plot3(X(i,1),X(i,2),X(i,3),'Color',gray,'LineWidth',2,'LineStyle',LS);
 case 4,
-  i = [10 1 7 8 5 6];
+  i = [1 7 8 5 6];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
   i = [5 4 2 3];
   plot3(X(i,1),X(i,2),X(i,3),'Color',col,'LineWidth',2,'LineStyle',LS);
@@ -119,10 +119,10 @@ end
 scatter3(X(1,1),X(1,2),X(1,3),28,col,'filled');   % glycosidic atom
 
 if Sugar == 1,
- if length(NT.Sugar(:,1)) == 12,   % for some reason, some have 9
+ if length(NT.Sugar(:,1)) == 13,   % for some reason, some have 9
   Z = [NT.Sugar; NT.Fit(1,:)];
 
-  k = [13 1 7 6 8 9 10 12]; 
+  k = [14 1 7 6 8 9 10 12]; 
   plot3(Z(k,1),Z(k,2),Z(k,3),'k','LineWidth',2,'LineStyle',LS);
   hold on
   k = [11 10]; 
@@ -134,6 +134,10 @@ if Sugar == 1,
   k = [2 1]; 
   plot3(Z(k,1),Z(k,2),Z(k,3),'k','LineWidth',2,'LineStyle',LS);
 
+  if Z(13,1) < Inf,                % O3' from previous nucleotide is known
+    k = [10 13];
+    plot3(Z(k,1),Z(k,2),Z(k,3),'k','LineWidth',2,'LineStyle',LS);
+  end  
 
   if LSugar > 0,
     A = {'C1*','C2*','O2*','C3*','O3*','C4*','O4*','C5*','O5*','P','O1P','O2P'};

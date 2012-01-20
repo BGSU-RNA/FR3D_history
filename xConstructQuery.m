@@ -212,10 +212,12 @@ if isfield(Query,'Edges'),
   Query.ExcludeEdges{Query.NumNT,Query.NumNT} = 0;
   Query.OKPairs{Query.NumNT,Query.NumNT} = 0;
   Query.ExPairs{Query.NumNT,Query.NumNT} = 0;
+  Query.BasePhos{Query.NumNT,Query.NumNT} = 0;
+  Query.ExcludeBasePhos{Query.NumNT,Query.NumNT} = 0;
   for i=1:Query.NumNT,
     for j=(i+1):Query.NumNT,
       if ~isempty(Query.Edges{j,i}),
-        [ReqEdge,ExEdge,OKPairs,ExPairs] = xGetEdgeNums(Query.Edges{j,i});
+        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2] = xGetEdgeNums(Query.Edges{j,i});
         Query.EdgeNums{j,i}     =  ReqEdge;
         Query.EdgeNums{i,j}     = -ReqEdge;
         Query.ExcludeEdges{j,i} =  ExEdge;
@@ -224,8 +226,13 @@ if isfield(Query,'Edges'),
         Query.OKPairs{i,j}      = RevPair(OKPairs);
         Query.ExPairs{j,i}      = ExPairs;
         Query.ExPairs{i,j}      = RevPair(ExPairs);
+        Query.BasePhos{j,i}     = BP1;
+        Query.BasePhos{i,j}     = BP2;
+        Query.ExcludeBasePhos{j,i} = EBP1;
+        Query.ExcludeBasePhos{i,j} = EBP2;
+
       elseif ~isempty(Query.Edges{i,j}),
-        [ReqEdge,ExEdge,OKPairs,ExPairs] = xGetEdgeNums(Query.Edges{i,j});
+        [ReqEdge,ExEdge,OKPairs,ExPairs,BP1,BP2,EBP1,EBP2] = xGetEdgeNums(Query.Edges{i,j});
         Query.EdgeNums{j,i}     = -ReqEdge;
         Query.EdgeNums{i,j}     =  ReqEdge;
         Query.ExcludeEdges{j,i} = -ExEdge;
@@ -234,6 +241,10 @@ if isfield(Query,'Edges'),
         Query.OKPairs{i,j}      = OKPairs;
         Query.ExPairs{j,i}      = RevPair(ExPairs);
         Query.ExPairs{i,j}      = ExPairs;
+        Query.BasePhos{i,j}     = BP1;
+        Query.BasePhos{j,i}     = BP2;
+        Query.ExcludeBasePhos{i,j} = EBP1;
+        Query.ExcludeBasePhos{j,i} = EBP2;
       else
         Query.EdgeNums{i,j} = [];
         Query.EdgeNums{j,i} = [];

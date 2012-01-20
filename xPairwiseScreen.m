@@ -20,7 +20,7 @@ if isfield(Model,'EdgeNums'),                 % if screening by edges
   end
 end
     
-if isfield(Model,'ExcludeEdges'),                 % if screening by edges
+if isfield(Model,'ExcludeEdges'),                 % if excluding by edges
   if length(Model.ExcludeEdges{p,q} > 0),
     E = sparse(zeros(size(D)));
     for i=1:length(Model.ExcludeEdges{p,q}),
@@ -45,6 +45,40 @@ if isfield(Model,'ExPairs'),                 % if screening by paircode
     E = sparse(zeros(size(D)));
     for i=1:length(Model.ExPairs{p,q}),
       E = E + sparse(PC == Model.ExPairs{p,q}(i));
+    end
+    D = D .* (E == 0);
+  end
+end
+    
+if isfield(Model,'BasePhos'),                 % if screening by base-phosphate
+  if length(Model.BasePhos{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.BasePhos{p,q}),
+      E = E + (fix(File.BasePhosphate) == Model.BasePhos{p,q}(i));
+    end
+    D = D .* (E > 0);
+  end
+  if length(Model.BasePhos{q,p} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.BasePhos{q,p}),
+      E = E + (fix(File.BasePhosphate') == Model.BasePhos{q,p}(i));
+    end
+    D = D .* (E > 0);
+  end
+end
+    
+if isfield(Model,'ExcludeBasePhos'),                 % if excluding by edges
+  if length(Model.ExcludeBasePhos{p,q} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.ExcludeBasePhos{p,q}),
+      E = E + (fix(File.BasePhosphate) == Model.ExcludeBasePhos{p,q}(i));
+    end
+    D = D .* (E == 0);
+  end
+  if length(Model.ExcludeBasePhos{q,p} > 0),
+    E = sparse(zeros(size(D)));
+    for i=1:length(Model.ExcludeBasePhos{q,p}),
+      E = E + (fix(File.BasePhosphate') == Model.ExcludeBasePhos{q,p}(i));
     end
     D = D .* (E == 0);
   end

@@ -40,6 +40,7 @@ else                        % change the following line to change the query!
   Query.Name = 'Sarcin5Geo';
   Query.Name = 'StackedPair'; 
   Query.Name = 'Stack';
+  Query.Name = 'Basepair';
 end
 
 Query.SearchFiles = '1s72';        % default is to search 1s72
@@ -151,7 +152,8 @@ case 'BasepairGeometric2'
   Query.SearchFiles    = {'Nonredundant_list'};
 
 case 'Basepair'
-  Query.Edges{1,2}     = 'cWW AG';
+%  Query.Edges{1,2}     = 'nPB';
+  Query.Edges{1,2}      = 'B2P';
 %  Query.Diff{1,2}      = '> <1000';
  % Query.Config{1}      = 'syn';
  % Query.SearchFiles    = {'1s72', '1j5e'};

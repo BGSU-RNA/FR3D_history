@@ -16,7 +16,7 @@
 
 function [Files] = zGetNTData(Filenames,ReadCode,SizeCode)
 
-CurrentVersion = 3.6;                       % version number of class limits
+CurrentVersion = 3.7;                       % version number of class limits
 
 if nargin < 2,
   ReadCode = 0;
@@ -27,21 +27,6 @@ if nargin < 3,
 end
 
 path(path,pwd);
-
-if ~(exist('PDBFiles') == 7),        % if directory doesn't yet exist
-%  mkdir('PDBFiles');
-end
-%path(path,[pwd filesep 'PDBFiles']);
-
-if ~(exist('PrecomputedData') == 7),        % if directory doesn't yet exist
-%  mkdir('PrecomputedData');
-end
-%path(path,[pwd filesep 'PrecomputedData']);
-
-if ~(exist('SearchSaveFiles') == 7),        % if directory doesn't yet exist
-%  mkdir('SearchSaveFiles');
-end
-%path(path,[pwd filesep 'SearchSaveFiles']);
 
 if strcmp(class(Filenames),'char'),
   Filenames = {Filenames};
@@ -118,6 +103,10 @@ for f=1:length(Filenames),
     File = rmfield(File,'Inter');
   end
 
+  if length(File.NT(1).Sugar(:,1)) < 13,
+    File = zStoreO3(File);
+  end
+
   Overlap = 0;
 
   if length(File.NT) > 0,                    % if it has nucleotides,
@@ -136,6 +125,7 @@ for f=1:length(Filenames),
       else
         File = zClassifyPairs(File);
         File = zUpdateDistanceToExemplars(File);
+        File = zPhosphateInteractions(File);
         File.ClassVersion = CurrentVersion;
         ClassifyCode = 1;
       end

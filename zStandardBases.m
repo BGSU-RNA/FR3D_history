@@ -65,6 +65,7 @@ StandardLoc(1:12,:,4)= U_Stand-ones(size(U_Stand(:,1)))*U_Stand(1,:);
 
 Lim(1,:) = [10 8 11 8];       % number of base atoms, excluding hydrogen
 Lim(2,:) = [15 13 16 12];     % total number of atoms, including hydrogen
+Lim(3,:) = [13  9 14 10];     % locations of fictitious hydrogens
 
 AtomNames = cell(16,4);
 

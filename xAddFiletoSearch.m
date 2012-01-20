@@ -39,6 +39,7 @@ end
 if ~isempty(File),
   for f = 1:max(Candidates(:,N+1)),
     Search.File(f).Edge = sparse(zeros(1,1));
+    Search.File(f).BasePhosphate = sparse(zeros(1,1));
   end
 
   for i = 1:s,
@@ -56,10 +57,12 @@ if ~isempty(File),
       for k = Indices,
         Search.File(f).Edge(j,k) = File(f).Edge(j,k);
         Search.File(f).Edge(k,j) = File(f).Edge(k,j);
+        Search.File(f).BasePhosphate(j,k) = File(f).BasePhosphate(j,k);
+        Search.File(f).BasePhosphate(k,j) = File(f).BasePhosphate(k,j);
       end
     end
 
-    % include intervening nucleotides, if only a few
+    % include intervening nucleotides, if only a few, for alignments
 
     for n = 1:(N-1),                      
       if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
