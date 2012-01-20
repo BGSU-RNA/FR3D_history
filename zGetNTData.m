@@ -114,6 +114,10 @@ for f=1:length(Filenames),
     File.ClassVersion = 0;
   end
 
+  if isfield(File,'Inter'),
+    File = rmfield(File,'Inter');
+  end
+
   Overlap = 0;
 
   if length(File.NT) > 0,                    % if it has nucleotides,

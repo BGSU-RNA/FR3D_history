@@ -26,4 +26,4 @@ end
 figure(1)
 clf
 
-spy((abs(File.Inter(Indices,Indices)) > 0) .* (File.Inter(Indices,Indices)<30));
+spy((abs(File.Edge(Indices,Indices)) > 0) .* (File.Edge(Indices,Indices)<30));

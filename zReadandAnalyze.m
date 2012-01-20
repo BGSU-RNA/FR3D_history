@@ -272,7 +272,6 @@ File.Distance  = [];
 File.HandClass = [];
 File.Comment   = [];
 File.CI        = sparse(NumNT,NumNT);
-File.Inter     = sparse(NumNT,NumNT);
 File.Edge      = sparse(NumNT,NumNT);
 File.Modified  = 1;
 File.Header    = Header;
@@ -300,7 +299,6 @@ else
   File.HandClass = [];
   File.Comment   = [];
   File.CI        = sparse(NumNT,NumNT);
-  File.Inter     = sparse(NumNT,NumNT);
   File.Edge      = sparse(NumNT,NumNT);
   File.Modified  = 0;
   File.Pair      = [];

@@ -345,6 +345,39 @@ if ViewParam.Color > 1,
   end
 end
 
+%---------------------------------------------- Plot displacements again
+
+figure(ViewParam.FigNum+3)
+clf
+figure(ViewParam.FigNum+3)
+clf
+
+set(gcf,'Renderer','OpenGL');
+%set(gcf,'Renderer','zbuffer')
+
+for k = 1:length(Pair),                              % Loop through pairs
+  p = Pair(k);
+  c = Color(k);
+  e = p.Displ;
+
+  scatter3(e(1),e(2),e(3),18,c,'filled')
+  hold on
+
+  if ViewParam.Normal == 1,
+    v = p.Normal/3;                                      % add normal vector
+    plot3([e(1) e(1)+v(1)], [e(2) e(2)+v(2)], [e(3) e(3)+v(3)], 'b');
+  end
+end
+
+if max(modcode) == min(modcode),             % all have same first base
+  zPlotStandardBase(modcode);                % plot base at the origin
+  Lett = 'ACGU';  
+  Title =[Lett(modcode) ' shown at the origin, N1/N9 atom of second base shown by dots'];
+else
+  Title = ['N1/N9 atom of second base shown by dots'];
+end
+
+
 end
 % ---------------------------------------------------- Display the menu
 

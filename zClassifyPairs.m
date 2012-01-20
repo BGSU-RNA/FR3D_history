@@ -69,9 +69,6 @@ for k = 1:length(i),                            % loop through possible pairs
 
     % --------------------------- record interaction
 
-    File.Inter(i(k),j(k)) = Pair.Class;             % record this interaction
-    File.Inter(j(k),i(k)) = Pair.Class;
-
     File.Pair(pc) = Pair;                           % store in File data
 
     pc = pc + 1;                                    % increment pair counter

@@ -163,8 +163,6 @@ while (k <= length(SP)),
         RevPair.Base1Index = p;
         RevPair.Base2Index = q;
 
-        File(f).Inter(p,q)  = RevPair.Class;          % record this interaction
-        File(f).Inter(q,p)  = RevPair.Class;
         File(f).Edge(p,q)   =  RevPair.Edge;
         File(f).Edge(q,p)   = -RevPair.Edge;
 
@@ -187,8 +185,6 @@ while (k <= length(SP)),
         RevPair.Base1Index = q;
         RevPair.Base2Index = p;
 
-        File(f).Inter(p,q)  = RevPair.Class;         % record this interaction
-        File(f).Inter(q,p)  = RevPair.Class;
         File(f).Edge(p,q)   =  RevPair.Edge;
         File(f).Edge(q,p)   = -RevPair.Edge;
 

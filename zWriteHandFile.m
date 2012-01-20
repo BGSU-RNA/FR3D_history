@@ -20,7 +20,7 @@ if length(i) > 0,
       fprintf(fid,'%2s ', File.NT(q).Base);
       fprintf(fid,'%5s ', File.NT(q).Number);
       fprintf(fid,'%2s ', File.NT(q).Chain);
-      fprintf(fid,'%6.2f ', File.Inter(p,q));
+      fprintf(fid,'%6.2f ', File.Edge(p,q));
       fprintf(fid,'%6.2f ', File.HandClass(ci));
       if length(File.Comment{ci}) > 0,
         fprintf(fid,'%s',File.Comment{ci});
