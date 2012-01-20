@@ -1,7 +1,7 @@
 
 clear Message
 
-Message{1} = 'Nucleotide mask, location weight, and angle weight are specified  in the boxes on the diagonal';
+Message{1} = 'Nucleotide mask, location weight, and angle weight are specified  in the boxes on the diagonal.';
 
 Message{2} = 'For the mask, type A to allow only A''s, similarly with C, G, U. Type AC to allow only A or C, or AGU to allow only A, G, or U. Type ~G to exclude G (or type ACU). You may use one of these standard abbreviations:   M = AC;  R = AG;  W = AU;  S = CG;  Y = CU;  K = GU   V = ACG; H = ACU; D = AGU; B = CGU; N = ACGU Using no mask is the same as specifying ACGU or N. Self-contradictory specifications (such as A ~A) may give unpredictable results or empty searches.';
 
@@ -11,5 +11,5 @@ Message{4} = 'Specify the angle weight for the given nucleotide by typing someth
 
 Message{5} = 'Separate the mask, location weight, and angle weight by spaces. ';
 
-msgbox(Message,'Mask help');
+mEditBoxWrap(Message,'Mask help');
 

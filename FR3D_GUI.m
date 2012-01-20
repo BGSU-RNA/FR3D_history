@@ -30,6 +30,10 @@ function varargout = FR3D_GUI(varargin)   %By Ali Mokdad - March 2006
 
 % Last Modified by GUIDE v2.5 17-Jul-2006 19:31:53
 
+% Compiling:
+%   mbuild -setup
+%   mcc -m FR3D_GUI
+
 if ~(exist('PDBFiles') == 7),        % if directory doesn't yet exist
   mkdir('PDBFiles');
 end
@@ -77,7 +81,7 @@ else
 end
 set(handles.LOAD,'String',savedff);
 
-[s,snolist] = mGetPDBFilenames;                          % defines s
+[s,snolist] = mGetPDBFilenames;                          % defines PDB lists
 
 if length(s) == 0,
     set(handles.Status,'String','ALERT: there are no PDB files or saved PDB data in the folders "PDBFiles" and "PrecomputedData". Please put some PDB files in these locations and try again!');
@@ -86,8 +90,24 @@ else
   set(handles.SearchPDBs,'String',s);
   set(handles.SearchPDBs,'Min',1);
   set(handles.SearchPDBs,'Max',length(s)+1);
+  
+  p = find(ismember(s,'Starter_list'));
+  if ~isempty(p),
+    set(handles.SearchPDBs,'Value',p);
+  end
+
   set(handles.QueryPDB,'String',snolist);
+
+  p = find(ismember(snolist,'1s72'));
+  if ~isempty(p),
+    set(handles.QueryNTs,'String','2692:2694, 2701:2702');
+    set(handles.QueryPDB,'Value',p);
+  else
+    set(handles.QueryNTs,'String','List query nucleotides and chains here');
+  end
+
 end
+
 
 handles.output = hObject;
 guidata(hObject, handles);

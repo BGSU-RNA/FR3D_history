@@ -21,5 +21,5 @@ Message{9} = 'Type s35 for stacking in which the first base uses its 3 face, and
 
 Message{10} = 'To specify that the nucleotides must match a certain pattern, type, for example, "cWW CG GC" to get only CG or GC cWW pairs.';
 
-msgbox(Message,'Interaction help');
+mEditBoxWrap(Message,'Interaction help');
 

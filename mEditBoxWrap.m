@@ -1,14 +1,10 @@
 % mEditbox(text,title,button) creates a text window
 %Ali Mokdad, Aug 2006
 
-function editbox(text,title,fontsize,button) 
-
-if nargin < 3,
-  fontsize = 10;
-end
+function editbox(text,title,button) 
 
 % title may be missing, so assign it second;
-%if there is a fourth variable (no matter what it is) a pushbutton will be created to close the window
+%if there is a third variable (no matter what it is) a pushbutton will be created to close the window
 
 if ~exist('title','var')
     title='';
@@ -26,16 +22,17 @@ else
   e=0;
 end
 
-edith = uicontrol('Style','edit','Units','normalized','Position',[0 e 1 1-e],'BackgroundColor',[1 1 1],...
-    'Max',length(text),'String',text);
+edith = uicontrol('Style','edit','Units','normalized','Position',[0 e 1 1-e],'BackgroundColor',[1 1 1]);
 
-set(edith, 'FontName', 'FixedWidth')
-set(edith, 'FontSize', fontsize)
-set(edith, 'HorizontalAlignment','Left')
+set(edith, 'FontSize', 10);
+set(edith, 'HorizontalAlignment','Left');
 
-%Max insures multiple lines when needed, so that scroll bar is created
-% set(edith,'Max',length(text),'String',text); 
+%[outstring,newpos] = textwrap(edith,text);
+%outstring
 
-drawnow %drawnow is only necessary on R14SP2
+set(edith,'Max',length(text));
+set(edith,'String',text);
+
+drawnow                       %drawnow is only necessary on R14SP2
 set(fig,'Visible','on')
 

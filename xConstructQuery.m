@@ -95,6 +95,10 @@ if ~isfield(Query,'Name'),
   Query.Name = num2str(Query.Number);
 end
 
+if ~isfield(Query,'Description'),
+  Query.Description = Query.Name;
+end
+
 if ~isfield(Query,'Config'),
   for i=1:Query.NumNT,
     Query.Config{i} = '';
