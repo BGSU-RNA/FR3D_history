@@ -13,7 +13,7 @@
 function [S] = pIsoScore(Class,Code1,Code2,method,ExemplarIDI,ExemplarFreq)
 
 if nargin < 4,
-  method = 1;
+  method = 2;
 end
 
 if nargin < 5 && method > 1,

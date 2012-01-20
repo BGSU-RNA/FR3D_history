@@ -474,6 +474,9 @@ while stop == 0,
       Order = 4;
 
     case 13                                     % group candidates
+%      Search = xGroupCandidates(File(FIndex),Search,Level,UsingFull);
+%      Search = xOrderCandidates(File(FIndex),Search,Level,UsingFull);
+
       p(1:Limit) = zOrderbySimilarity(Search.Disc(1:Limit,1:Limit));
       p((Limit+1):L) = (Limit+1):L;
       q(p) = 1:L;
@@ -737,12 +740,10 @@ function  PlotMotif(File,Search,Query,Display,i)
         VPP.LabelBases = 0;
         VPP.Sugar = 0;
         VPP.LineStyle = '-.';
-        VPP.Title = 0;
         zDisplayNT(FFF,1:3,VPP)
         view(2)
 
-        fprintf('Geometric discrepancy from model: %7.4f\n',xDiscrepancy(File(f),Indices(1:3),FFF,1:3));
-        fprintf('Triple IsoDiscrepancy from model: %7.4f\n',xDiscrepancyForTriples(File(f),Indices(1:3),FFF,1:3));
+        fprintf('Discrepancy from model: %7.4f\n',xDiscrepancy(File(f),Indices(1:3),FFF,1:3));
 
       end
     elseif BP31 ~= 0,
@@ -754,7 +755,6 @@ function  PlotMotif(File,Search,Query,Display,i)
         VPP.LabelBases = 0;
         VPP.Sugar = 0;
         VPP.LineStyle = '-.';
-        VPP.Title = 0;
         zDisplayNT(FFF,1:3,VPP)
         view(2)
 

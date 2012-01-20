@@ -262,7 +262,9 @@ end
 
   % reverse classification for GC and CG pairs, but why, exactly????
 
-  if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (abs(Pair.Class) < 14),
+  
+
+  if ((Pair.Paircode == 7) || (Pair.Paircode == 10)) && (mod(abs(Pair.Class),100) < 14),
     Pair.Edge = -Pair.Class;
   else
     Pair.Edge = Pair.Class;

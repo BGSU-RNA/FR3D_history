@@ -167,9 +167,7 @@ end
 
 Title = strcat(Title,[' ' strrep(FN,'_','\_')]);
 
-if VP.Title > 0,
-  title(Title);
-end
+title(Title);
 axis equal
 view(VP.az,VP.el);
 
@@ -268,6 +266,7 @@ if VP.Animate == 1,
   
     Title = strcat(Title,[' ' strrep(FN,'_','\_')]);
   
+%    title(Title);
     axis equal
     axis([-maxradius maxradius -maxradius maxradius minheight maxheight]);
     set(gca,'TickLength',[0 0]);

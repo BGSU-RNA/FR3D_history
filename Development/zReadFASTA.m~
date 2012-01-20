@@ -4,7 +4,6 @@
 % Data(n).Sequence is the sequence with all gaps stripped out
 
 % FASTA = zReadFASTA('Alignments\16S_Bacterial_Stombaugh_et_al_Sup_Mat_S2.fasta');
-% FASTA = zReadFASTA('Alignments\Greengenes_Ecoli_Tth_16S_2_sequences.fasta');
 
 function [Data] = zReadFASTA(Filename)
 
@@ -32,8 +31,7 @@ if fid > 0
 
   for n = 1:length(Data),
     le(n) = length(Data(n).Aligned);
-    Data(n).Aligned = strrep(Data(n).Aligned,'.','-'); % dots to hyphens
-    Data(n).Aligned = strrep(Data(n).Aligned,'T','U'); % dots to hyphens
+    Data(n).Aligned = strrep(Data(n).Aligned,'.','-');
     Data(n).Aligned  = [Data(n).Aligned '-'];  % extra column for NT in struct
                                                % with nothing in FASTA
     Data(n).Sequence = strrep(Data(n).Aligned,'-','');
