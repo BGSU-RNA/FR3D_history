@@ -34,9 +34,9 @@ for k = 1:length(i),                            % loop through possible pairs
 
   ph = (N2.Sugar(10,:)-N1.Center) * N1.Rot; % phosphate displacement  
   %P = 'O1P'; S = N2.Sugar(11,:);
-  %P = 'O2P'; S = N2.Sugar(12,:);
+  P = 'O2P'; S = N2.Sugar(12,:);
   %P = 'O5'; S = N2.Sugar( 9,:);
-  P = 'O3'; S = N3.Sugar( 5,:);
+  %P = 'O3'; S = N3.Sugar( 5,:);
 
   o = (S - N1.Center) * N1.Rot;
 
@@ -82,7 +82,16 @@ for v = 1:4,
   rotate3d on
   axis equal
   view(2)
-  saveas(gcf,['PhosphateInteractions_' P '_' L{v} '.pdf'],'pdf')
-  saveas(gcf,['PhosphateInteractions_' P '_' L{v} '.fig'],'fig')
 
+end
+
+for v = 1:4,
+  figure(v+4)
+  clf
+  switch v,
+    case 1,     hist(PHA(:,4),30);
+    case 2,     hist(PHC(:,4),30);
+    case 3,     hist(PHG(:,4),30);
+    case 4,     hist(PHU(:,4),30);
+  end
 end

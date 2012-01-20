@@ -44,7 +44,7 @@ SugarReorder = [10 11 12 9 8 6 7 4 5 2 3 1];
     fprintf(fid, '%6.2f\n', 99.99);
     a = a + 1;
   end
-  for j = 1:Lim(1,NT.Code),                    % loop through base atoms and H
+  for j = 1:Lim(2,NT.Code),                    % loop through base atoms and H
     fprintf(fid, 'ATOM  %5d', a);
     switch NT.Code,
       case 1, fprintf(fid,'  %-3s', A{j});
