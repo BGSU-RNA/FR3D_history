@@ -3,67 +3,101 @@
 method = 2;                                  % pIsoScore method to use
 Verbose = 1;
 
-for motif = 5:5,
+if ~exist('Stacks'),
+  load 2010-05-30_10_07_51-s35_NR_4A.mat
+  Stacks{1} = Search;
+  load 2010-05-29_10_24_40-s33_NR_4A_exclude_redundant.mat
+  Stacks{2} = Search;
+  load 2010-05-29_10_39_07-s55_NR_4A.mat
+  Stacks{3} = Search;
+end
+
+for motif = 1:1,
 
 switch motif
 case 0,                                      % don't load a new motif
 
 case 1,
-  load 2010-05-22_23_22_34-Sarcin_7_mixed_2aw4_2avy.mat
-  clear stacks
+  load 2010-06-07_16_14_35-Sarcin_7_mixed_2qan_2qbe.mat
   MotifName = 'Sarcin 7-nucleotide';
 case 2,
   load 2010-05-22_23_06_50-Sarcin_9_mixed_2aw4_2avy.mat
-  clear stacks
   MotifName = 'Sarcin 9-nucleotide';
 case 3,
 %  load 2010-05-22_23_38_17-C_loop_core_with_flanking_cWW_centroid_tuned_2aw4_2avy.mat
   load 2010-05-23_10_17_08-C_loop_core_with_flanking_cWW_2aw4_2avy_ACAUAU.mat
-  clear stacks
   MotifName = 'C-loop';
 case 4,
   load 2010-05-22_23_54_01-Kink_turn_highly_constrained.mat
-  clear stacks
   MotifName = 'Kink-turn';
 case 5,
   load 2010-05-25_12_25_48-IL_tSH_tWH_tHS_2aw4_2avy
   Cand = Search.Candidates
   Cand = Cand(:,[2 3 4 7 8 9 11]);      % remove flanking cWW pairs
   Search.Candidates = Cand;
-  clear stacks
   MotifName = 'tSH-tWH-tHS IL';
 case 6,
   load 2010-05-23_00_28_00-Helix_10_nucleotides_2avy_2aw4.mat
-  clear stacks
   MotifName = '8-nucleotide helix';
 end
 
-Filenames = Search.Filenames;
 
-if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData(Filenames,0,[],Verbose);   % load PDB data
-  File = zAttachAlignment(File);              % attach alignment data
-else
-  [File,SIndex] = zAddNTData(Filenames,0,File,Verbose); %add PDB data if needed
-end                       % SIndex tells which elements of File to search
 
-File = File(SIndex);
 
 Cand = Search.Candidates;
 
 [L,N] = size(Cand);        % number of candidates
 N = N - 1;                 % number of nucleotides
 
+Filenames = Search.Filenames;
+
+if ~exist('File'),                           % if no molecule data is loaded,
+  [File,SIndex] = zAddNTData(Filenames,0,[],Verbose);   % load PDB data
+else
+  [File,SIndex] = zAddNTData(Filenames,0,File,Verbose); %add PDB data if needed
+end                       % SIndex tells which elements of File to search
+
+File = File(SIndex);
+
+if ~isfield(File(1).NT(1),'FASTA')
+  File = zAttachAlignment(File);              % attach alignment data
+end
+
 % ------------------------------------------- collect all sequence variants
 
 AllLett = [];
-for c = 1:L,
+clear Lett
+for c = 1:L,                                % loop through candidates
   f = Cand(c,N+1);                          % file number
-  Lett = [];
+  Let = [];
   for n = 1:N,
-    Lett = [Lett File(f).NT(Cand(c,n)).FASTA];
+    Let = [Let File(f).NT(Cand(c,n)).FASTA];
   end
-  AllLett = [AllLett; Lett];
+
+  AllLett = [AllLett; Let];
+
+  [seqs,counts] = zUnique(Let);
+
+  codes = 1*(seqs=='A') + 2*(seqs=='C') + 3*(seqs=='G') + 4*(seqs=='U');
+  i = find(min(codes,[],2) > 0);
+
+  Let = seqs(i,:);
+
+  Counts{c} = counts(i);
+  Lett{c} = Let;
+
+  if Verbose > 0,
+    fprintf('File %s instance ', File(f).Filename);
+    for n = 1:N,
+      fprintf('%s%s ', File(f).NT(Cand(c,n)).Base, File(f).NT(Cand(c,n)).Number);
+    end
+    fprintf('\n');
+
+    for i = 1:length(Counts{c}),
+      fprintf('  %s occurs %4d times\n', Lett{c}(i,:), Counts{c}(i));
+    end
+
+  end
 end
 
 % ------------------------------------------- find unique sequences
@@ -101,7 +135,7 @@ while a > 0,
     r = r + 1;
   else
     while a >= 1 && c(a) == 4,
-      c(a) = 1;                                % roll this one over
+      c(a) = 1;                              % roll this one over
       a = a - 1;
     end
     if a > 0,
@@ -115,12 +149,14 @@ end
 
 % ------------------------------------------ score all sequences
 
-NRList = 'Nonredundant_2009-05-14_list';
-if ~exist('AllFile'),                           % if no molecule data is loaded,
-  [AllFile,SIndex] = zAddNTData(NRList,0,[],Verbose);   % load PDB data
-else
-  [AllFile,SIndex] = zAddNTData(NRList,0,AllFile,Verbose); %add PDB data if needed
-end                       % SIndex tells which elements of File to search
+if 0 > 1,
+  NRList = 'Nonredundant_2009-05-14_list';
+  if ~exist('AllFile'),                           % if no molecule data is loaded,
+    [AllFile,SIndex] = zAddNTData(NRList,0,[],Verbose);   % load PDB data
+  else
+    [AllFile,SIndex] = zAddNTData(NRList,0,AllFile,Verbose); %add PDB data if needed
+  end                       % SIndex tells which elements of File to search
+end
 
 f = Search.Candidates(1,N+1);
 clear Motif
@@ -130,13 +166,9 @@ end
 
 best = codes(1,:);                      % most common sequence
 
-if exist('stacks'),
-  [allscores,ScoringMethodName,stacks] = zScoreMotifSequences(allcodes,best,Edge,BPh,method,AllFile,Motif,stacks);
-else
-  [allscores,ScoringMethodName,stacks] = zScoreMotifSequences(allcodes,best,Edge,BPh,method,AllFile,Motif);
-end
+[allscores,ScoringMethodName] = zScoreMotifSequences(allcodes,Search,Edge,BPh,method,Stacks);
 
-[score,ScoringMethodName] = zScoreMotifSequences(codes,best,Edge,BPh,method,AllFile,Motif,stacks);
+[score,ScoringMethodName] = zScoreMotifSequences(codes,Search,Edge,BPh,method,Stacks);
 
 % ------------------------------------------ display scores and sequences
 

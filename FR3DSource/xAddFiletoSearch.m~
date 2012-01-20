@@ -70,10 +70,6 @@ else
           Search.File(f).Backbone(k,j) = File(f).Backbone(k,j);
         end
       end
-
-      % include neighborhoods around nucleotides, for xDisplayCandidates
-
-
   
       % include intervening nucleotides, if only a few, for alignments
   

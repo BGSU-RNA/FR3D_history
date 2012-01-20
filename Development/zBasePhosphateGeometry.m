@@ -1,6 +1,8 @@
 
 function [Distance, Score] = zBasePhosphateGeometry(BPh)
 
+if 1 <= BPh && BPh <= 19,
+
 zStandardBases
 
 for Code = 1:4,
@@ -49,7 +51,7 @@ for c = 1:4,
 end
 
 Score = 1./(1+2*Distance.^2);                  % convert to probabilities
-Score = Score / sum(Score);                  % normalize
+Score = Score / sum(Score);                    % normalize
 
 Lett = 'ACGU';
 
@@ -69,4 +71,11 @@ if 0 > 1,
     D
     S
   end
+end
+
+else
+
+Distance = [];
+Score = [];
+
 end

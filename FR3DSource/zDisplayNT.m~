@@ -25,7 +25,6 @@ VP.FontSize  = 10;               % will use Matlab's default unless overridden
 VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
 VP.LabelBases = 10;              % font size; use 0 to not label bases at all
-VP.GlycoAtomSize = 28;           % size to mark the glycosidic atom
 VP.WritePDB      = 0;
 VP.Animate   = 0;
 VP.AnimationFilename = '';
@@ -95,10 +94,6 @@ end
 
 if isfield(ViewParam,'LabelBases'),
   VP.LabelBases = ViewParam.LabelBases;
-end
-
-if isfield(ViewParam,'GlycoAtomSize'),
-  VP.GlycoAtomSize = ViewParam.GlycoAtomSize;
 end
 
 if isfield(ViewParam,'WritePDB'),

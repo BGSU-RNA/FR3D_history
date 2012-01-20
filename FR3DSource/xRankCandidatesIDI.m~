@@ -1,7 +1,7 @@
 % xRankCandidatesIDI(File,Model,Candidates) calculates the discrepancy for
 % each candidate; it is only for two nucleotide candidates right now!
 
-function [Discrepancy, Candidates, i] = xRankCandidatesIDI(File,Model,Cand,Verbose)
+function [Discrepancy, Candidates] = xRankCandidatesIDI(File,Model,Cand,Verbose)
 
 if nargin < 4,
   Verbose = 0;
@@ -11,11 +11,11 @@ if Verbose > 0,
   fprintf('Calculating discrepancy\n');
 end
 
-N = length(Model.NT);
+N = Model.NumNT;
 s = length(Cand(:,1));
 
-Discrepancy = zeros(s,1);
-Candidates  = uint16(zeros(s,length(Cand(1,:))));
+Discrepancy = zeros(65000,1);
+Candidates  = uint16(zeros(65000,length(Cand(1,:))));
 
 count = 0;
 
@@ -28,8 +28,8 @@ end
 
 for i=1:s,
 %  A = xDiscrepancyFast(Model,File(Cand(i,N+1)).NT(Cand(i,[1:N])));
-  f = Cand(i,N+1);
-  A = zIsoDiscrepancy(Model.NT(1),Model.NT(2),File(f).NT(Cand(i,1)),File(f).NT(Cand(i,2)));
+
+  A = zIsoDiscrepancy(Model.NT(1),Model.NT(2),File(Cand(i,N+1)).NT(Cand(i,1)),File(Cand(i,N+1)).NT(Cand(i,2)));
 
   if A >= 0,
     count = count + 1;
@@ -48,6 +48,7 @@ if Verbose > 0,
 end
 
 Candidates  = Candidates(1:count,:);
+Discrepancy = sqrt(Discrepancy(1:count,1))/Model.NumNT;
 
 [y,i]       = sort(Discrepancy);                    % sort by discrepancy
 Candidates  = Candidates(i,:);

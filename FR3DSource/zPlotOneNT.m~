@@ -2,12 +2,6 @@ function [void] = zPlotOneNT(NT,ViewParam)
 
 X  = NT.Fit;
 
-if isfield(ViewParam,'GlycoAtomSize'),
-  GlycoAtomSize = ViewParam.GlycoAtomSize;
-else
-  GlycoAtomSize = 28;
-end
-
 if isfield(ViewParam,'Sugar'),
   Sugar = ViewParam.Sugar;
 else
@@ -130,9 +124,7 @@ case 4,
   plot3(X(i,1),X(i,2),X(i,3),'Color',gray,'LineWidth',2,'LineStyle',LS);
 end
 
-if GlycoAtomSize > 0,
-  scatter3(X(1,1),X(1,2),X(1,3),GlycoAtomSize,col,'filled');   % glycosidic atom
-end
+scatter3(X(1,1),X(1,2),X(1,3),28,col,'filled');   % glycosidic atom
 
 if Sugar == 1,
  if length(NT.Sugar(:,1)) == 13,   % for some reason, some have 9

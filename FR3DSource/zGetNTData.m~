@@ -136,10 +136,6 @@ for f=1:length(Filenames),
     File = rmfield(File,'Header');
   end
 
-  if ~isfield(File,'LongestChain'),
-    File = zMarkRedundantNucleotides(File,Verbose);
-  end
-
   Overlap = 0;
 
   File.Distance = [];                        % only compute this if needed
