@@ -41,11 +41,8 @@ LastNTNumber = double(Search.Candidates(1,N)); % index of last NT
 
 % --------------------------------------- Find locations of truncations
 
-Direction = 1;                          % which order to put nucleotides
-[y,p] = sort(Direction*double(Search.Candidates(1,1:N))); % 
-
 if isfield(Search.Query,'MaxDiffMat'),
-  MaxDiff = diag(Search.Query.MaxDiffMat(p,p),1);
+  MaxDiff = diag(Search.Query.MaxDiffMat,1);
 else
   MaxDiff = Inf*ones(1,N-1);
 end
@@ -63,6 +60,7 @@ for n = 1:(N-1),
   end
 end
 
+Truncate
 % ------------------------------------------- Find consensus interaction list
 
 for a = 1:N,                                    % first NT of possible pair
@@ -106,7 +104,28 @@ end
 F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
 F.Crossing = zeros(N,N);                    % small enough, pretend none
 
-Node = pMakeNodes(F,Param,1,N,Truncate);          % make the SCFG/MRF model
+if length(Truncate) > 0,                    % at least two strands
+  b = 1:N;
+  for t = 1:N,
+    b(t) = b(t) + 100*sum(t >= Truncate);
+  end
+end
+
+binv = 1:max(b);                                  % invert the spreading
+binv(b) = 1:N;
+
+FF.Edge(b,b)     = F.Edge;                        % spread the strands out
+FF.NT(b)         = F.NT;
+FF.Crossing(b,b) = F.Crossing;
+
+Node = pMakeNodes(FF,Param,1,b(N),Truncate);          % make the SCFG/MRF model
+
+for n = 1:length(Node),
+  Node(n).LeftIndex    = binv(Node(n).LeftIndex);
+  Node(n).RightIndex   = binv(Node(n).RightIndex);
+  Node(n).MiddleIndex  = binv(Node(n).MiddleIndex);
+  Node(n).InterIndices = binv(Node(n).InterIndices);
+end
 
 % ---------------------------- Set parameters for the nodes from instances
 

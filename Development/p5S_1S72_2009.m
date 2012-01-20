@@ -1,94 +1,82 @@
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
-AlignmentList = 1:4;
+AlignmentList = 1:1;
 
 MF = ['5S_1S72_JAR3D'];
 SeqFile = '5S_Rfam_Archaea_seed_Jesse_2_20_05.fasta';
 ModelStart = '1_9';
-NumSeq = 2;
+NumSeq = 50;
+Verbose = 0;
 
 if ~exist('File')
-  File = zAddNTData({'2avy','1j5e'});
+  File = zAddNTData('1s72');
 end
 
 clc
 
-Verbose = 0;
+Verbose = 1;
 
 JAR3D_path                                % tell where JAR3D class files are 
 
-% ----------------------------------------------- Fix up the file first
-
-File(1) = pModifyEdge(File(1),'454','478',0);      % remove a cWW-cWW triple
-File(1) = pModifyEdge(File(1),'113','353',-11);    % crystallographer fix
-File(1) = pModifyEdge(File(1),'415','428',8);      % crystallographer fix
-
 F = File(1);
 
-% remove interactions which would necessitate a junction cluster
+Shift = zIndexLookup(File(1),ModelStart);
 
-F = pModifyEdge(F,'959','984',0);
-F = pModifyEdge(F,'959','1221',0);
-F = pModifyEdge(F,'197','220',0);
-F = pModifyEdge(F,'939','1375',0);
-
-% remove an interaction on the left strand of a junction
-% to restore this, allow for interactions within an initial node or
-% allow a cluster to have zero length on one strand or another
-
-F = pModifyEdge(F,'959','957',0);
 
 % ----------------------------------------------- JAR3D 1 alignment
-%       2002 IM and simple scoring, no extension of stems, no adjustment
+%       NIH BISTI Method 1 scoring, no clusters, 
+%       no extension of stems, no adjustment
 %       of basepairing probabilities due to LR interactions
 
 jj = 1;
 
 if any(jj == AlignmentList),
-  Node = pMakeNodes(F,[1 2 0 0]);           % use method 2 for basepairs
 
-Node1 = Node
+  F = pModifyEdge(F,'30_9','52_9',0);       % remove nested triple
+  F = pModifyEdge(F,'51_9','52_9',0);       % remove nested triple
+  F = pModifyEdge(F,'36_9','47_9',0);
+  F = pModifyEdge(F,'43_9','46_9',0);
+  F = pModifyEdge(F,'78_9','79_9',0);
 
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
+
+  JNode = pMakeNodes(F,[Verbose 4 0 0 0],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
+
+  Node1 = JNode;
+
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
   Alig = Alignment.getAlignment(A,NumSeq);
 
-  fprintf('JAR3D %d\n',jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
+  pDisplayAlignment
 
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  F = File(1);
+
 end
 
 % ----------------------------------------------- JAR3D 2 alignment
-%       NIH BISTI Method 1 scoring, no extension of stems, no adjustment
+%       NIH BISTI Method 1 scoring, clusters, no extension of stems, 
+%       no adjustment
 %       of basepairing probabilities due to LR interactions
 
 jj = 2;
 
 if any(jj == AlignmentList),
-  Node = pMakeNodes(F,[1 4 0 0]);                 % use method 4 for basepairs
+  JNode = pMakeNodes(F,[Verbose 4 0 0],ModelStart); 
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-Node2 = Node
+  Node2 = JNode;
 
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
-
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 % ----------------------------------------------- JAR3D 3 alignment
@@ -98,23 +86,18 @@ end
 jj = 3;
 
 if any(jj == AlignmentList),
-  Node = pMakeNodes(F,[1 4 1 0]);                 % use method 4 for basepairs
+  JNode = pMakeNodes(F,[Verbose 4 1 0],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-Node3 = Node;
+  Node3 = JNode;
 
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
-
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 % ----------------------------------------------- JAR3D 4 alignment
@@ -124,20 +107,16 @@ end
 jj = 4;
 
 if any(jj == AlignmentList),
-  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  JNode = pMakeNodes(F,[Verbose 4 1 1],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 % ----------------------------------------------- JAR3D 5 alignment
@@ -149,20 +128,16 @@ jj = 5;
 if any(jj == AlignmentList),
   F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
 
-  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  JNode = pMakeNodes(F,[Verbose 4 1 1],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 % ----------------------------------------------- JAR3D 6 alignment
@@ -175,20 +150,16 @@ jj = 6;
 if any(jj == AlignmentList),
   F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
 
-  Node = pMakeNodes(F,[1 4 2 1]);                 % use method 4 for basepairs
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  JNode = pMakeNodes(F,[Verbose 4 2 1],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 % ----------------------------------------------- JAR3D 7 alignment
@@ -200,36 +171,20 @@ jj = 7;
 
 if any(jj == AlignmentList),
   F = File(1);
-  % remove interactions which would necessitate a junction cluster
-
-  F = pModifyEdge(F,'959','984',0);
-  F = pModifyEdge(F,'959','1221',0);
-  F = pModifyEdge(F,'197','220',0);
-  F = pModifyEdge(F,'939','1375',0);
-
-  % remove an interaction on the left strand of a junction
-  % to restore this, allow for interactions within an initial node or
-  % allow a cluster to have zero length on one strand or another
-
-  F = pModifyEdge(F,'959','957',0);
-
-  F = xAnnotateWithKnownMotifs(File(1),1);
+  F = zAddNTData('1s72_annotated');
+%  F = xAnnotateWithKnownMotifs(File(1),1);
   F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
 
-  Node = pMakeNodes(F,[1 4 1 1]);                 % use method 4 for basepairs
-  pMakeNodesDiagnostics
-  ModelFile = ['16S_JAR3D' num2str(jj) '.txt'];
-  pWriteJavaNodeFile(File(1),Node,4,ModelFile);
-  A = JAR3DMatlab.Align(pwd,'16S_sequence_from_2avy_1j5e.fasta',ModelFile,2,0,15);
-  Alig = Alignment.getAlignment(A);
+  JNode = pMakeNodes(F,[Verbose 4 0 1],ModelStart);
+  T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);
+  JNode = pShiftNodeIndices(JNode,Shift);
 
-  fprintf('JAR3D %d\n', jj);
-  for i = 0:4,
-    fprintf('%s\n', Alig.get(i));
-  end
+  ModelFile = [MF num2str(jj) '.txt'];
+  pWriteJavaNodeFile(File(1),JNode,4,ModelFile);
+  A = JAR3DMatlab.Align(pwd,SeqFile,ModelFile,NumSeq,0,15);
+  Alig = Alignment.getAlignment(A,NumSeq);
 
-  [i1,i2] = pGetAlignedIndices(Alig.get(2),Alig.get(4));
-  save(['JAR3D' num2str(jj) '_Alignment'],'i1','i2');
+  pDisplayAlignment
 end
 
 
@@ -243,11 +198,11 @@ break
 
 F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
 
-Node = pMakeNodes(F,1);
+JNode = pMakeNodes(F,1);
 
 pMakeNodesDiagnostics
 
-pWriteJavaNodeFile(File(1),Node,4,'16S_from_2avy.txt');
+pWriteJavaNodeFile(File(1),JNode,4,'16S_from_2avy.txt');
 
 figure(8)
 clf
@@ -255,7 +210,7 @@ zCircularDiagram(FF,0.2,[1 1 1 1 0 0 1]);
 saveas(gcf,'2avy_circular_SCFG_basepairs.pdf','pdf');
 
 fprintf('Running JAR3D\n');
-JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY.txt',2,0,18);
+JAR3D(SeqFile,'16S_from_2AVY.txt',2,0,18);
 
 break
 
@@ -263,11 +218,11 @@ F = xAnnotateWithKnownMotifs(File(1),1);
 NodeM = pMakeNodes(F);
 pWriteJavaNodeFile(F,NodeM,4,'16S_from_2avy_with_motifs.txt');
 fprintf('Running JAR3D\n');
-JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY_with_motifs.txt',2,0,20);
+JAR3D(SeqFile,'16S_from_2AVY_with_motifs.txt',2,0,20);
 
 % ------------------------------------------------ Start diagnostics
 
-S = pTheoreticalAlignment(Node,1);
+S = pTheoreticalAlignment(JNode,1);
 
 M = strrep(S{2},'-','');
 M = strrep(M,'(','');
@@ -308,9 +263,9 @@ for i = 1:length(S),
   end
 end
         
-pWriteFASTA(Sequence,['sequences' filesep '16S_sequence_from_2avy_1j5e.fasta']);
+pWriteFASTA(Sequence,['sequences' filesep SeqFile]);
 
-JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY.txt');
+JAR3D(SeqFile,'16S_from_2AVY.txt');
 
 % The following diagnostic was lifted from pInferVsActual3DStructure.m
 

@@ -18,6 +18,16 @@ b = B;                                 % current base on right
 amax = min(a+cdepth,floor((a+b)/2));   % how far to look on left
 bmin = max(b-cdepth,floor((a+b)/2)+1); % how far to look on right
 
+z = find((a < Truncate) .* (Truncate < amax));
+if ~isempty(z),
+  amax = Truncate(z)-1;                % don't look beyond truncation point
+end
+
+z = find((bmin < Truncate) .* (Truncate < b));
+if ~isempty(z),
+  bmin = Truncate(z)-1;                % don't look beyond truncation point
+end
+
 X = full(triu(G(a:amax,a:amax)));      % interactions on left strand
 Y = full(triu(G(bmin:b,bmin:b)));      % interactions on right strand
 Z = full(G(a:amax,bmin:b));            % interactions between left + right

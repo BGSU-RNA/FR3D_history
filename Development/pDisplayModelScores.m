@@ -78,6 +78,8 @@ caxis([-8 0]);
 colormap('default')
 map = colormap;
 map = map(8:56,:);
+%map = [1 1 1; map];
+map = [map; 1 1 1];
 colormap(map);
 colorbar('eastoutside');
 set(gca,'YTick',(1:s)+0.5)

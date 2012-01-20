@@ -1,7 +1,21 @@
 % zAnalyzedFilesHTML produces an .html file listing basepairing and base
 % stacking interactions for each molecule in File
 
-function [void] = zAnalyzedFilesHTML(File)
+% To run from the command line, matlab -r zAnalyzedFilesHTML('1s72',path)
+% At least I think that will work
+% It infers the extension .pdb
+
+
+function [void] = zAnalyzedFilesHTML(File,datapath)
+
+path(path,[pwd filesep 'FR3DSource']);
+
+% if File is a text string (filename), load the file and display
+
+if strcmp(class(File),'char') || strcmp(class(File),'cell'),
+  Filename = File;
+  File = zAddNTData(Filename,0,[],1);
+end
 
 zBackboneCodes;                           % load conformation codes
 
@@ -57,27 +71,37 @@ for f = 1:length(File),
 
   warning off
 
-  mypath = [pwd filesep 'Web' filesep 'AnalyzedStructures'];
+  if nargin > 1,
 
-  mkdir(mypath, FN);
-  warning on
+    mypath = [datapath];
+    datapath = [datapath filesep];
 
-  mypath = [mypath filesep FN filesep];
+  else
 
-  datapath = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep 'All' filesep];
+    mypath = [pwd filesep 'Web' filesep 'AnalyzedStructures'];
+
+    mkdir(mypath, FN);
+    warning on
+
+    mypath = [mypath filesep FN filesep];
+
+    datapath = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep 'All' filesep];
+
+  end
+
+
   % ------------------------------------------- Write chains and sequences
 
-  fid = fopen([datapath FN '_chain_sequence_FR3D.txt'],'w'); % open for writing
-  fprintf(fid,'%s\n',DataHeader1);
-  fprintf(fid,'Chain\tNucleotide_sequence_in_chain\n');
+%  fid = fopen([datapath FN '_chain_sequence_FR3D.txt'],'w'); % open for writing
+%  fprintf(fid,'%s\n',DataHeader1);
+%  fclose(fid);
+
   Chain = cat(2,File(f).NT.Chain);
   U     = unique(Chain);
   for u = 1:length(U),
-    k = find(Chain == U(u));                    % NTs in chain U(u)
-    fprintf(fid,'%s\t%s\n',U(u),cat(2,File(f).NT(k).Base));
-    chainoffset(u) = min(k);                    % first index in this chain
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    chainoffset(u) = min(i);                    % first index in this chain
   end
-  fclose(fid);
 
   % ------------------------------------------- Produce interaction list
 
@@ -261,13 +285,18 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_interactions_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
   end
   fclose(fid);
 
-  % --------------------------------------------- Write FN_interactions file  
+  % ----------------------------------------- Write FN_near_interactions file  
 
   fid = fopen([mypath FN '_near_interactions.html'],'w'); % open for writing
 
@@ -296,6 +325,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_near_interactions_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
@@ -331,6 +365,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_basepairs_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
@@ -366,6 +405,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_stacking_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
@@ -417,6 +461,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_base_phosphate_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   k = find(fix(InterType) == 200);               % all BPh interactions
   for i = 1:length(k),
@@ -453,6 +502,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_backbone_connectivity_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));
@@ -489,6 +543,11 @@ for f = 1:length(File),
 
   fid = fopen([datapath FN '_backbone_conformation_FR3D.txt'],'w'); % open for writing
   fprintf(fid,'%s\n',DataHeader1);
+  fprintf(fid,'# Chain\tNucleotide_sequence_in_chain\n');
+  for u = 1:length(U),
+    i = find(Chain == U(u));                    % NTs in chain U(u)
+    fprintf(fid,'# %s\t%s\n',U(u),cat(2,File(f).NT(i).Base));
+  end
   fprintf(fid,'%s\n',DataHeader2);
   for i = 1:length(k),
     fprintf(fid,'%s',strrep(DText{k(i)},' ',''));

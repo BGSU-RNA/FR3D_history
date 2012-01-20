@@ -97,11 +97,12 @@ end
 
         NL = length(junc(:,1));             % number of loops
 
+        id = fix(10000*rand);
+
         if Verbose > 0,
 
 %[File.NT(a).Number ' ' File.NT(b).Number ' ' File.NT(B).Number]
 
-          id = fix(10000*rand);
           fprintf('\nJunction with %d loops, call it J%d\n', NL,id);
           for ln = 1:NL,
             fprintf('Actual loop %d of junction J%d - Nucleotides %5s to %5s, length %3d\n',ln,id,File.NT(junc(ln,1)).Number,File.NT(junc(ln,2)).Number,junc(ln,2)+1-junc(ln,1));
@@ -130,7 +131,7 @@ end
           end
           nn = length(Node) + 1;
           Node(jn).nextnode(ln) =  length(Node)+1;
-          Node = pMakeNodes(File,Param,junc(ln,1),junc(ln,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(ln,1),junc(ln,2),Truncate,Data,Node,n);
           Node(nn).id         = ['J' num2str(id)];
           n = length(Node);
          end
@@ -147,7 +148,7 @@ end
 
           nn = length(Node) + 1;
           Node(jn).nextnode(1) = length(Node) + 1;
-          Node = pMakeNodes(File,Param,junc(1,1),junc(NN,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(1,1),junc(NN,2),Truncate,Data,Node,n);
           Node(nn).id         = ['J' num2str(id)];
           n = length(Node);
 
@@ -158,7 +159,7 @@ end
 
           nn = length(Node) + 1;
           Node(jn).nextnode(2) = length(Node) + 1;
-          Node = pMakeNodes(File,Param,junc(NN+1,1),junc(NL,2),Truncate,Interact,Node,n);
+          Node = pMakeNodes(File,Param,junc(NN+1,1),junc(NL,2),Truncate,Data,Node,n);
           Node(nn).id         = ['J' num2str(id)];
 
         end
@@ -241,10 +242,10 @@ end
         u = uuu;
 
         Node(n).nextnode(1) =  n+1;          % index of next node in tree
-        Node = pMakeNodes(File,Param,r,s,Truncate,Interact,Node,n);
+        Node = pMakeNodes(File,Param,r,s,Truncate,Data,Node,n);
 
         Node(n).nextnode(2)  = length(Node)+1;
-        Node = pMakeNodes(File,Param,t,u,Truncate,Interact,Node,length(Node));
+        Node = pMakeNodes(File,Param,t,u,Truncate,Data,Node,length(Node));
       end                                  % junction cluster
 
       Node(n).P    = [0.05*ones(17,1) 0.95*ones(17,1)];

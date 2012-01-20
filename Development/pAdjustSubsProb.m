@@ -23,7 +23,7 @@ for a = 1:length(j),
   if Verbose > 1,
     fprintf('Long-range basepair %s%4s %s%4s %s\n', NT1.Base, NT1.Number, File.NT(j(a)).Base, File.NT(j(a)).Number, zEdgeText(File.Edge(i1,j(a))));
 
-    R
+%    R
   end
 
   Q = pIsoScore(File.Edge(i1,j(a)),NT1.Code,File.NT(j(a)).Code,method);
@@ -83,7 +83,7 @@ for a = 1:length(j),                         % loop through BPh inter
   q = Q * ones(1,4);
   R = R .* q;                                % adjust base 1 probabilities
 
-  if Verbose > 0,
+  if Verbose > 1,
     Q
     q
     R = R / sum(sum(R))
@@ -108,7 +108,7 @@ for a = 1:length(j),                         % loop through BPh inter
   R = R .* q';                               % adjust base 2 probabilities
 
 
-  if Verbose > 0,
+  if Verbose > 1,
     Q
     q
     R = R / sum(sum(R))

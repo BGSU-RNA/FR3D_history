@@ -15,7 +15,9 @@ Node(n).LeftLetter = '';
 Node(n).RightLetter = '';
 Node(n).Comment = '';
 Node(n).NumLoops = [];
-Node(n).Edge = [];
+if n == 1,
+  Node(n).Edge = sparse(zeros(length(File.NT)));
+end
 Node(n).Delete = [];
 Node(n).SubsProb = [];
 Node(n).Z = [];

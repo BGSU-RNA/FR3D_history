@@ -108,10 +108,13 @@ for m = 1:length(Filenames),
 end
 
 % ----------------------------------------- Run JAR3D on these models
+break
 
 %clear java; JAR3D_path;  loopType = 'IL'; clc; S = JAR3DMatlab.MotifTest(pwd,loopType);
 
-clc; JAR3D_path;  loopType = 'IL'; S = JAR3DMatlab.MotifTest(pwd,loopType);
+%clc; JAR3D_path;  loopType = 'IL'; S = JAR3DMatlab.MotifTest(pwd,loopType);
+
+JAR3D_path;  loopType = 'IL'; S = JAR3DMatlab.MotifTest(pwd,loopType);
 
 [s,t] = size(S);
 switch loopType,
