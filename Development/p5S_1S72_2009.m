@@ -1,7 +1,7 @@
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
-AlignmentList = 1:1;
+AlignmentList = 7:7;
 
 MF = ['5S_1S72_JAR3D'];
 SeqFile = '5S_Rfam_Archaea_seed_Jesse_2_20_05.fasta';
@@ -170,10 +170,10 @@ end
 jj = 7;
 
 if any(jj == AlignmentList),
-  F = File(1);
-  F = zAddNTData('1s72_annotated');
+%  F = File(1);
+  F = zAddNTData('1s72_annot');
 %  F = xAnnotateWithKnownMotifs(File(1),1);
-  F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
+%  F = xAnnotateWithKnownMotifs(F,1,0,{'2009-07-31_17_40_25-GU_packing_interaction_2avy.mat'});
 
   JNode = pMakeNodes(F,[Verbose 4 0 1],ModelStart);
   T([1 jj+1],:) = pMakeNodesDiagnostics(F,JNode);

@@ -32,9 +32,18 @@ if strcmp(class(Code2),'char'),
   Code2 = pLtoN(Code2);
 end
 
-switch method
-  case 1,  S = pIsoScore1(Class,Code1,Code2);
-  case 2,  S = pIsoScore2(Class,Code1,Code2,ExemplarIDI);
-  case 3,  S = pIsoScore3(Class,Code1,Code2,ExemplarIDI,ExemplarFreq);
-  case 4,  S = pIsoScore4(Class,Code1,Code2,ExemplarIDI);
+
+S = ones(4,4)/16;
+
+
+if abs(Class) > 13,
+  fprintf('Class %8.2f is too large for pIsoScore.  Returning a uniform matrix.\n',Class);
+else
+  switch method
+    case 1,  S = pIsoScore1(Class,Code1,Code2);
+    case 2,  S = pIsoScore2(Class,Code1,Code2,ExemplarIDI);
+    case 3,  S = pIsoScore3(Class,Code1,Code2,ExemplarIDI,ExemplarFreq);
+    case 4,  S = pIsoScore4(Class,Code1,Code2,ExemplarIDI);
+    otherwise, fprintf('Invalid method passed to pIsoScore');
+  end
 end

@@ -9,6 +9,9 @@ if Verbose > 1,
   File.Nucl(a).Motif(1)
 end
 
+
+File.Nucl(a).Motif(1)
+
 ModelIndex = File.Nucl(a).Motif(1).Index;
 Indices    = File.Nucl(a).Motif(1).Indices;
 
@@ -19,7 +22,10 @@ if any(diff(Indices) < 0)
   fprintf('Indices in %s are different than in %s.\n', File.Filename, File.Motifs(ModelIndex).Name);
 end
 
-[MotifNode,Trunc] = pMakeModelFromSearchSaveFile(File.Motifs(ModelIndex).Name,Verbose-1);
+NewParam = Param;
+NewParam(1) = NewParam(1)-1;         % be one step less verbose
+
+[MotifNode,Trunc] = pMakeModelFromSearchSaveFile(File.Motifs(ModelIndex).Name,NewParam);
 
 MotifNode = MotifNode(2:end);        % omit Initial node; awkward solution
 if strcmp(MotifNode(end).LeftLetter,'*'),

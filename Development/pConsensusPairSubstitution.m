@@ -10,6 +10,8 @@ end
 
 Verbose = Param(1);
 
+Verbose = 1;
+
 load PairExemplars
 
 Score = zeros(4,4);              % ready to sum IsoScores for this pair 

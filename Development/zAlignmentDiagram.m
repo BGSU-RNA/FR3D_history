@@ -78,22 +78,24 @@ NewFile(2).Covalent(R2,R2)      = File(2).Covalent;
 
 % ------------------------------------ Decide what to display
 
+thickness = 0.1;                     % thickness of arcs in basepair diagram
+
 if Verbose > 0,
-  ViewList = [1 1 1 1 1 1 1 0 1];
+  ViewList = [1 1 1 1 1 1 0 0 1 0 0];
 
   % ------------------------------------ Show interactions in File(1)
 
   figure(1)
   clf
-  zCircularDiagram(NewFile(1),0.5,ViewList);
-  saveas(gcf,[NewFile(1).Filename '_alignment.pdf'],'pdf');
+  zCircularDiagram(NewFile(1),thickness,ViewList);
+  saveas(gcf,[NewFile(1).Filename '_diagram.pdf'],'pdf');
 
   % ------------------------------------ Show interactions in File(1)
 
   figure(2)
   clf
-  zCircularDiagram(NewFile(2),0.5,ViewList);
-  saveas(gcf,[NewFile(2).Filename '_alignment.pdf'],'pdf');
+  zCircularDiagram(NewFile(2),thickness,ViewList);
+  saveas(gcf,[NewFile(2).Filename '_diagram.pdf'],'pdf');
 
   % ------------------------------------ Look for pairs that agree
 
@@ -111,13 +113,14 @@ if Verbose > 0,
   figure(3)
   clf
   Comp = NewFile(1);
-  Comp.Filename = [Comp.Filename ' inferred from ' NewFile(2).Filename];
+%  Comp.Filename = [Comp.Filename ' inferred from ' NewFile(2).Filename];
+  Comp.Filename = [Comp.Filename ' conserved'];
 
   Comp.Edge  = Comp.Edge .* (E1 == E2);
 
   Comp.BasePhosphate  = Comp.BasePhosphate .* (BP1 == BP2);
 
-  zCircularDiagram(Comp,0.5,ViewList);
+  zCircularDiagram(Comp,thickness,ViewList);
   saveas(gcf,[NewFile(1).Filename '-' NewFile(2).Filename '_alignment_conserved.pdf'],'pdf');
 
   % ------------------------------------ Show interactions in File(2) also in 1
@@ -125,13 +128,14 @@ if Verbose > 0,
   figure(4)
   clf
   Comp = NewFile(2);
-  Comp.Filename = [Comp.Filename ' inferred from ' NewFile(1).Filename];
+%  Comp.Filename = [Comp.Filename ' inferred from ' NewFile(1).Filename];
+  Comp.Filename = [Comp.Filename ' conserved'];
 
   Comp.Edge  = Comp.Edge .* (E1 == E2);
 
   Comp.BasePhosphate  = Comp.BasePhosphate .* (BP1 == BP2);
 
-  Tally = zCircularDiagram(Comp,0.5,ViewList);
+  Tally = zCircularDiagram(Comp,thickness,ViewList);
   saveas(gcf,[NewFile(2).Filename '-' NewFile(1).Filename '_alignment_conserved.pdf'],'pdf');
 
   % ------------------------------------ Show interactions in File(1) also in 2
@@ -139,10 +143,10 @@ if Verbose > 0,
   figure(5)
   clf
   Comp = NewFile(1);
-  Comp.Filename = [Comp.Filename ' not inferred'];
+  Comp.Filename = [Comp.Filename ' not conserved'];
   Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) ~= fix(abs(NewFile(2).Edge)));
   Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) ~= fix(abs(NewFile(2).BasePhosphate/100)));
-  zCircularDiagram(Comp,0.5,ViewList);
+  zCircularDiagram(Comp,thickness,ViewList);
   saveas(gcf,[NewFile(1).Filename '-' NewFile(2).Filename '_alignment_not_conserved.pdf'],'pdf');
 
   % ------------------------------------ Show interactions in File(2) also in 1
@@ -150,10 +154,10 @@ if Verbose > 0,
   figure(6)
   clf
   Comp = NewFile(2);
-  Comp.Filename = [Comp.Filename ' not inferred'];
+  Comp.Filename = [Comp.Filename ' not conserved'];
   Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) ~= fix(abs(NewFile(2).Edge)));
   Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) ~= fix(abs(NewFile(2).BasePhosphate/100)));
-  zCircularDiagram(Comp,0.5,ViewList);
+  zCircularDiagram(Comp,thickness,ViewList);
   saveas(gcf,[NewFile(2).Filename '-' NewFile(1).Filename '_alignment_not_conserved.pdf'],'pdf');
 
 
@@ -165,7 +169,7 @@ else
   Comp.Filename = [Comp.Filename ' inferred from ' NewFile(1).Filename];
   Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) == fix(abs(NewFile(2).Edge)));
   Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) == fix(abs(NewFile(2).BasePhosphate/100)));
-  Tally = zCircularDiagram(Comp,0.5,ViewList);
+  Tally = zCircularDiagram(Comp,thickness,ViewList);
 
 end
 

@@ -109,14 +109,24 @@ if length(Truncate) > 0,                    % at least two strands
   for t = 1:N,
     b(t) = b(t) + 100*sum(t >= Truncate);
   end
+  binv = 1:max(b);                                  % invert the spreading
+
+size(binv)
+size(b)
+N
+
+  binv(b) = 1:N;
+else
+  b = 1:N;
+  binv = 1:N;
 end
 
-binv = 1:max(b);                                  % invert the spreading
-binv(b) = 1:N;
 
 FF.Edge(b,b)     = F.Edge;                        % spread the strands out
 FF.NT(b)         = F.NT;
 FF.Crossing(b,b) = F.Crossing;
+
+Param(1) = 1;
 
 Node = pMakeNodes(FF,Param,1,b(N),Truncate);          % make the SCFG/MRF model
 
@@ -138,6 +148,10 @@ for n = 1:length(Node),
   case 'Basepair'
     a = Node(n).LeftIndex;                   % which NT of the query motif
     b = Node(n).RightIndex;                  % right NT of the query motif
+
+
+disp('Getting consensus for a basepair');
+
     Score = pConsensusPairSubstitution(a,b,f,Search.File,F,L,Search,Verbose);
 
     if Verbose > 0,

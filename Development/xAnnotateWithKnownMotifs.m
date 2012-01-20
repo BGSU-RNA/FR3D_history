@@ -29,7 +29,11 @@ UsingLibrary = 1;                                % so FR3D just searches
 for ff = 1:length(File),
   FN        = upper(File(ff).Filename);
   Filenames = {File(ff).Filename};
-
+  if isfield(File(ff),'Motifs'),
+    MotNum = length(File(ff).Motifs);              % original number of motifs
+  else
+    MotNum = 0;
+  end
   File(ff).Nucl(File(ff).NumNT+1).Motif = [];
 
   if WriteHTML > 0,
@@ -103,8 +107,8 @@ for ff = 1:length(File),
       t = 3;                                          % skip last nucleotide
     end
 
-    File(ff).Motifs(m).Name  = Motif(m).name;
-    File(ff).Motifs(m).Count = s;
+    File(ff).Motifs(m+MotNum).Name  = Motif(m).name;
+    File(ff).Motifs(m+MotNum).Count = s;
 
     if s > 0,                                    % at least one candidate
       for c = 1:s,                               % go through candidates
@@ -112,7 +116,7 @@ for ff = 1:length(File),
        for n = 1:(t-1),                          % go through indices of cands
         clear Mot
         Mot.Name = strrep(MotifName,'.mat','');
-        Mot.Index = m;
+        Mot.Index = m+MotNum;
         Mot.Number = MotifNumber;
         Mot.Indices = Candidates(c,1:(t-1));
         if isempty(File(ff).Nucl(Candidates(c,n)).Motif),

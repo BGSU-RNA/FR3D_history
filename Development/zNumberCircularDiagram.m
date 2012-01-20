@@ -141,7 +141,9 @@ for k = 1:N,
     rr = rd / 1.01;
   end
 
-  text(rr*cos(theta), rr*sin(theta), File.NT(k).Base,'FontSize',0.5, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','g');
+  if View() > 0,
+    text(rr*cos(theta), rr*sin(theta), File.NT(k).Base,'FontSize',0.5, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','g');
+  end
 
 
   if (mod(kk,sstep) == 0) && (mod(kk,step) ~= 0) && (Thickness < 1) && (flag == 0),

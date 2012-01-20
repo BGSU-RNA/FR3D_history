@@ -28,6 +28,8 @@
 %  7 = explanatory text
 %  8 = leave gaps in diagram for breaks in nucleotide chain
 %  9 = display nucleotide numbers in the diagram
+% 10 = display nucleotide letters in the diagram
+% 11 = display B for BPh interactions in the diagram
 
 function [Tally] = zCircularDiagram(File,Thickness,View)
 
@@ -38,7 +40,7 @@ if nargin < 2,
 end
 
 if nargin < 3,
-  View = [1 1 1 1 1 1 1 1 1];
+  View = [1 1 1 1 1 1 1 1 1 1 1];
 end
 
 while length(View) < 9,
@@ -119,7 +121,7 @@ for k = 1:length(i),
         ha    = 'right';
       end
 
-      if File.BasePhosphate(i(k),j(k)) > 0,
+      if File.BasePhosphate(i(k),j(k)) > 0 && View(11) > 0,
         text(1.03*cos(thetai), 1.03*sin(thetai), 'B','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle','Color','m');
 %        text(1.03*cos(thetaj), 1.03*sin(thetaj), 'Ph','FontSize',1, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
       else
@@ -134,11 +136,14 @@ axis equal
 axis([-1.2 1.2 -2 1.2]);
 axis off
 
+
+text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
+
+
 if View(7) > 0,
 
 % Color = (B==1).*(C==0) + 2*(B>1).*(B<13).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 13) .*(C>0) + 5*(B > 20) .* (B < 25);
 
-  text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 
   cww = length(find(c == 1));
   Tally(1,1) = cww;

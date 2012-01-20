@@ -179,6 +179,7 @@ saveas(gcf,'Histogram of IDI values in 16S Alignments.pdf','pdf')
 % --------------------------------------- Compare to Alignment 1
 
 for a = AnalyzeList,
+for a = 1:1,
   Agree  = sum(sum(Al(a).Matrix .* Al(1).Matrix == 1));  % where they agree
   Missed = sum(sum(Al(1).Matrix > Al(a).Matrix));
   Extra  = sum(sum(Al(a).Matrix > Al(1).Matrix));
@@ -203,7 +204,7 @@ for a = AnalyzeList,
 
 %  Tally = zSummarizeInteractions(FF,0);
 
-  Tally = zAlignmentDiagram(File,i',j',0);
+  Tally = zAlignmentDiagram(File,i',j',Verbose);
 
   T{ 1,a+1} = Al(a).Name;
   T{ 2,a+1} = length(Al(a).ModelStructure);
