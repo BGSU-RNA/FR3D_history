@@ -220,8 +220,8 @@ for f=1:length(Filenames),
     File = xFlankingPairs(File);
   end
 
-  if ~isfield(File,'Redundant'),
-    File = zMarkRedundantChains(File,Verbose);
+  if ~isfield(File,'Redundant') || ClassifyCode > 0,
+    File = zMarkRedundantNucleotides(File,Verbose);
     SaveCode = 1;
   end
 

@@ -6,6 +6,8 @@ if nargin < 2,
   Verbose = 1;
 end
 
+DiscCutoff = 0.4;
+
 for f = 1:length(File),
  File(f).Redundant = sparse(zeros(length(File(f).NT)));
  
@@ -23,9 +25,9 @@ for f = 1:length(File),
     end
 
     if Verbose > 0,
-      fprintf('%s chains: ', File(f).Filename);
+      fprintf('%s chains:\n', File(f).Filename);
       for u = 1:length(U),
-        fprintf('%s ', bases{u});
+        fprintf('Chain %s:  %s\n', U(u), bases{u});
       end
       fprintf('\n');
     end
@@ -59,12 +61,21 @@ for f = 1:length(File),
 
         % --------------------------------------- superimpose geometrically
         if pro(u,v) > 0,
-          d(u,v) = xDiscrepancy(File(f),indic{u}(a),File(f),indic{v}(b));
+          [Disc,R,MM,CM,A] = xDiscrepancy(File(f),indic{u}(a),File(f),indic{v}(b));
+
+          if Disc > DiscCutoff,                 % not such good superposition
+            c = find(abs(A) <= 0.8);              % reasonably similar bases
+            [Disc,R,MM,CM,A] = xDiscrepancy(File(f),indic{u}(a(c)),File(f),indic{v}(b(c)));
+          end
+
+          d(u,v) = Disc;
           d(v,u) = d(u,v);
         end
 
       end
     end
+
+d
 
     redundant = (pro >= 0.95) .* (d < 0.4);           % redundant chains
     redundant = redundant + eye(size(redundant));     % reflexivity
