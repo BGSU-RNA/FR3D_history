@@ -7,9 +7,9 @@ if nargin < 2,
 end
 
 for f = 1:length(File),
-
-  File(f).Redundant = sparse(zeros(length(File.NT)));
-
+ File(f).Redundant = sparse(zeros(length(File(f).NT)));
+ 
+ if length(File(f).NT) > 0,
   Chain = cat(2,File(f).NT.Chain);              % all chain identifiers
   U = unique(Chain);                            % unique chain identifiers
 
@@ -31,7 +31,7 @@ for f = 1:length(File),
     end
 
     [y,i] = max(leng);
-    LongestChain(f) = U(i);                     % chain with greatest length
+    LongestChain{f} = U(i);                     % chain with greatest length
 
     % ------------------------------------------- compare chains
 
@@ -109,61 +109,8 @@ for f = 1:length(File),
     end
 
   else
-    LongestChain(f) = U(1);                     % chain with greatest length
+    LongestChain{f} = U(1);                     % chain with greatest length
   end
-
+ end
 end
-
-
-
-
-
-
-
-
-return
-
-%  pro
-%  d
-%  inter
-
-%  figure(1)
-%  subplot(3,2,f)
-%  spy(File(f).Edge)
-
-  % distinct is a relationship between two chains
-
-    keeptogether = full((inter > 0) + (pro <= 0.95));
-
-    k = keeptogether^20;
-
-    if Verbose > 0,
-      fprintf('zUniqueChains: File %4s has chains %10s.  Keeping ', File(f).Filename, U);
-    end
-
-    Indices{f} = [];
-    for i = 1:length(U),
-      if k(1,i) > 0,
-        Indices{f} = [Indices{f} indic{i}];
-        if Verbose > 0,
-          fprintf('%c', U(i));
-        end
-      end
-    end
-
-    if Verbose > 0,
-      fprintf('\n');
-    end
-
-
-%  clf
-%  VP.Sugar = 1;
-%  zDisplayNT(File(f),Indices{f},VP);
-
-%  pause
-
-        % --------------------------------------- interactions betwen chains?
-        e = abs(File(f).Edge(indic{u},indic{v}));
-        inter(u,v) = sum(sum((e>0).*(e<30)));
-        inter(v,u) = inter(u,v);
 

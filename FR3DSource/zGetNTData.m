@@ -135,8 +135,8 @@ for f=1:length(Filenames),
       File = zStoreO3(File);
     end
 
-    if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
-      (ClassifyCode == 1) | (File.ClassVersion < CurrentVersion),
+    if (ReadCode == 1) || (ReadCode == 3) || (ReadCode == 4) || ... 
+      (ClassifyCode == 1) || (File.ClassVersion < CurrentVersion),
 
       File.Edge = sparse(File.NumNT,File.NumNT);
       File.Coplanar = sparse(File.NumNT,File.NumNT);
@@ -211,13 +211,18 @@ for f=1:length(Filenames),
     SaveCode = 1;
   end
 
-  if ~isfield(File,'Range') || ~isfield(File,'Crossing'),
+  if ~isfield(File,'Range') || ~isfield(File,'Crossing') || ClassifyCode > 0,
     File = zInteractionRange(File,Verbose);
     ClassifyCode = 1;
   end
 
-  if ~isfield(File,'Flank'),
+  if ~isfield(File,'Flank') || ClassifyCode > 0,
     File = xFlankingPairs(File);
+  end
+
+  if ~isfield(File,'Redundant'),
+    File = zMarkRedundantChains(File,Verbose);
+    SaveCode = 1;
   end
 
   if ~isfield(File,'Info'),

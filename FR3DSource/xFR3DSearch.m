@@ -118,10 +118,31 @@ if ~isempty(Candidates),                         % some candidate(s) found
 
    if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0) ...
      & (Query.NumNT > 2),
-     [Candidates, Discrepancy] = xReduceOverlap(Candidates,Discrepancy); 
+
+     tt = cputime;
+
+%     [C, D] = xReduceRedundantCandidates(Candidates,Discrepancy); 
+
+%     fprintf('%d candidates after xReduceRedundantCandidates, time %8.6f\n', length(D),(cputime-tt));
+
+     tt = cputime;
+
+     [C, D] = xReduceOverlap(Candidates,Discrepancy); 
                                                  % quick reduction in number
-     [Candidates, Discrepancy] = xExcludeOverlap(Candidates,Discrepancy,400); 
+%     fprintf('%d candidates after xReduceOverlap, time %8.6f\n', length(D), (cputime-tt));
+
+     [Candidates, Discrepancy] = xExcludeOverlap(C,D,400); 
                                                 % find top 400 distinct ones
+     tt = cputime;
+
+%     fprintf('%d candidates after xExcludeOverlap, time %8.6f\n', length(Discrepancy),(cputime-tt));
+
+     [Candidates, Discrepancy] = xExcludeRedundantCandidates(File(SIndex),Candidates,Discrepancy); 
+
+     tt = cputime;
+
+%     fprintf('%d candidates after xExcludeRedundantCandidates, time %8.6f\n', length(Discrepancy),(cputime-tt));
+
      if Verbose > 0,
        fprintf('Removed highly overlapping candidates, kept %d\n', length(Candidates(:,1)));
      end

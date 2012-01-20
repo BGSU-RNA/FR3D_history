@@ -197,6 +197,7 @@ T
 if Verbose > 1,
 
 for a = 2:length(Al),
+  clf
   zCompareAlignment(File,Al(1).ModelStructure,Al(1).InferStructure,Al(a).ModelStructure,Al(a).InferStructure,Al(1).Name,Al(a).Name);
   Titl = ['Agreement between ' Al(a).Name ' and ' Al(1).Name];
 %  title(Titl);

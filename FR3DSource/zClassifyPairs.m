@@ -86,4 +86,9 @@ if Verbose > 1,
   fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
 end
 
+
+
+
+
+
 end
