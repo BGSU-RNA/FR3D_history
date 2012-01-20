@@ -1,12 +1,12 @@
 % zListNonredundantSet lists PDB ID's and chains that are meant to be non-redundant
 
-Verbose = 1;
+Verbose = 0;
 
-NRList = 'Nonredundant_2010-05-19_list';
+NRList = 'Nonredundant_2009-05-14_list';
 
-Filenames = zReadPDBList(NRList,1);
+% Filenames = zReadPDBList(NRList,1);
 
-File = zAddNTData(NRList,0,[],1);
+% File = zAddNTData(NRList,0,[],1);
 
 fid = fopen([pwd filesep 'Web' filesep 'AnalyzedStructures' filesep 'NonredundantList.txt'],'w');
 

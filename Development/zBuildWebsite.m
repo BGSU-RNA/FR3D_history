@@ -20,7 +20,10 @@ Names = t(:,1);                        % names of files from PDB/NDB
 
 WTW = WhatToWrite;
 
-for f = 903:length(Names),  
+current = 1;
+
+for f = current:length(Names),  
+  current = f;
   t = cputime;
 
   if exist(['Web/AnalyzedStructures/' Names{f}]) == 7,
@@ -31,10 +34,10 @@ for f = 903:length(Names),
 
   if New > 0 || WTW(5) == 0,
 
-    if New == 1,
+%    if New == 1,
       ND = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep File.Filename];
       mkdir(ND);
-    end
+%    end
 
     File = zAddNTData(Names{f},0,[],2);              % load RNA data
 
@@ -110,3 +113,11 @@ for i = 1:length(t(:,1)),
 end
 
 fclose(fid);
+
+% ------------------------------------------------- Other programs to run
+
+zListNonRedundantSet               % seems to work!
+
+zFindExemplars                     % does not work 2010-05-20
+
+zWriteHTMLFileList

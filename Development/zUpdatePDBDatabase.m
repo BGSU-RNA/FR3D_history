@@ -6,29 +6,33 @@ Verbose = 1;
 % download a new report, save it as PDB_File_Information current-date.xls
 % and modify the following line:
 
-Date = '2010-02-12';
+Date = '2010-05-19';
 
 PDBInfoName = ['PDB_File_Information ' Date '.xls'];
 
 % Columns should correspond to this list:
-% A	Structure ID
-% B	Descriptor
-% C	Experimental Technique
-% D	Release Date
-% E	Authors
-% F	Keywords
-% G	Resolution (Å)
-% H	Source
+% 1 A	Structure ID
+% 2 B	Descriptor / Structure title
+% 3 C	Experimental Technique / Exp. method
+% 4 D	Release Date
+% 5 E	Authors
+% 6 F	Keywords
+% 7 G	Resolution (Å)
+% 8 H	Source
 
 % We should add an additional column for NDB ID
 
+% Later in this program, other columns are set in t and in n:
+
+% 11    Sequence of longest chain
+
 % -------------------------------- Create PDBInfo.mat
 
-[n,t,r] = xlsread(PDBInfoName);  % read Excel report on PDB files
+[n,t] = xlsread(PDBInfoName);  % read Excel report on PDB files
 
 t = t(2:end,:);                  % remove the header row
-t{1,9} = '';                     % make space to save base sequence
-n(1,3) = 0;                      % make space to save number of nucleotides
+t{1,11} = '';                     % make space to save base sequence
+n(1,5) = 0;                      % make space to save numeric values
 
 for i = 1:length(t(:,7)),
   a = str2num(t{i,7});
@@ -41,26 +45,31 @@ end
 
 % save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 
-% -------------------------------- Remove duplicate and/or misleading entries
+% -------------------------------- Fix a few entries
 
-i = find(ismember(t(:,1),'2QOX'));
-t{i(1),8} = 'Escherichia coli';                 % change source organism
+if 0 > 1,
+  i = find(ismember(t(:,1),'2QOX'));
+  t{i(1),8} = 'Escherichia coli';                 % change source organism
 
-i = find(ismember(t(:,1),'2QOW'));
-t{i(1),8} = 'Escherichia coli';
+  i = find(ismember(t(:,1),'2QOW'));
+  t{i(1),8} = 'Escherichia coli';
 
-% Lorena Nasalean says that 2B90 is T.th, not E. coli.
+  % Lorena Nasalean says that 2B90 is T.th, not E. coli.
+ 
+  i = find(ismember(t(:,1),'2B9O'));
+  t{i(1),8} = 'Thermus thermophilus HB8';         % change source organism
 
-i = find(ismember(t(:,1),'2B9O'));
-t{i(1),8} = 'Thermus thermophilus HB8';         % change source organism
+  i = find(ismember(t(:,1),'1W2B'));
+  t{i(1),8} = 'HALOARCULA MARISMORTUI';
+end
 
-i = find(ismember(t(:,1),'1W2B'));
-t{i(1),8} = 'HALOARCULA MARISMORTUI';
 
+if 0 > 1,
+% --------------------------------- Remove duplicate entries - before 2010
 Keep = zeros(length(t(:,1)));                   % which entries to keep
 
 i = 1;
-while i < length(t(:,1))-1,
+while i < length(t(:,1))-1,                     % go through entries
   if strcmp(lower(t{i,1}),lower(t{i+1,1})),     % i, i+1 are duplicate entries
     first = i;
     KeptOne = 0;
@@ -95,53 +104,49 @@ j = find(Keep);
 t = t(j,:);
 n = n(j,:);
 
+end
+
+% --------------------------------- Remove duplicate entries - May 2010
+Keep = zeros(length(t(:,1)),1);                   % which entries to keep
+
+Keep(1) = 1;
+first = 1;
+i = 2;
+
+while i < length(t(:,1)),
+  while (i < length(t(:,1))) && strcmp(lower(t{first,1}),lower(t{i,1})),
+                                            % first, i are duplicate entries
+    if ~strcmp(t{first,2},t{i,2}),
+      fprintf('Different descriptors for %s\n', t{first,1});
+      fprintf('%s\n', t{first,2});
+      fprintf('%s\n', t{i,2});
+    end
+
+    i = i + 1;
+
+  end
+
+%  fprintf('Kept %s\n', t{i,1});
+
+  Keep(i) = 1;
+  first = i;
+  i = i + 1;
+
+end
+
+j = find(Keep);
+t = t(j,:);
+n = n(j,:);
+
 save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 
 % ------------------------------------- Read each PDB file now, save data
 
 % load PDBInfo
 
-coun = 0;
+current = 1;
 
-for i = 1:length(t(:,1)),
-%for i = 319:length(t(:,1)),
-  File = zAddNTData(t{i,1},0,[],1);          % load file
-  if ~isempty(File.NT),                      % if it has nucleotides,
-    n(i,2) = length(File.NT);                % store the number of NT
-
-    E  = abs(triu(File.Edge));
-    n(i,3) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
-
-    if length(File.NT) > 0,
-     Chain = cat(2,File.NT.Chain);              % all chain identifiers
-     U = unique(Chain);                            % unique chain identifiers
-
-     if length(U) > 1,                             % more than one chain
-
-       maxleng = 0;                                % current max chain length
-
-       for u = 1:length(U),                        % loop through chains
-        j = find(Chain == U(u));                  % indices of this chain
-        if length(j) > maxleng,
-          jj = j;
-          maxleng = length(j);
-        end
-       end
-
-     else
-        jj = 1:length(File.NT);
-     end
-    end
-
-    t{i,11} = cat(2,File.NT(jj).Base);           % bases in largest chain
-
-    if Verbose > 0,
-      fprintf('All      %s\n',cat(2,File.NT.Base));
-      fprintf('Longest  %s\n',t{i,11});
-    end
-
-  end
-end
+zUpdatePDBDatabaseLoop
 
 save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 

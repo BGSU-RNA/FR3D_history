@@ -1,6 +1,8 @@
 
-Filenames = zReadPDBList('Nonredundant_2009-05-14_list',1);
+Filenames = zReadPDBList('Nonredundant_2010-05-19_list',1);
+
+mkdir('NRData');
 
 for f = 1:length(Filenames),
-  copyfile(['PrecomputedData\' Filenames{f} '.mat'],['NRData\' Filenames{f} '.mat'])
+  copyfile(['PrecomputedData\' Filenames{f} '.mat'],['NonRedundantMatFiles\' Filenames{f} '.mat'])
 end

@@ -1,4 +1,4 @@
-% zOrderChains re-orders the nucleotides in File to put the largest chain first
+% zOrderChains re-orders the nucleotides in File to put the longest chain first
 
 function [File] = zOrderChains(File)
 

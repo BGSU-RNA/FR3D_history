@@ -4,11 +4,9 @@
 % It uses PDBInfo.mat, which needs to be updated whenver new PDB data is
 % downloaded from NDB/PDB
 
-function [File] = zGetPDBInfo(File,n,t)
+function [File] = zGetPDBInfo(File)
 
-if nargin < 2,
-  load(['FR3DSource' filesep 'PDBInfo.mat'],'n','t','-mat');
-end
+load(['FR3DSource' filesep 'PDBInfo.mat'],'n','t','-mat');
 
 PDBNames = lower(t(:,1));              % convert PDB filenames to lowercase
 

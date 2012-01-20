@@ -1,8 +1,6 @@
 % zFindExemplars finds the best representative for each category of pairs.
 % For basepairing, 
 
-NRList = 'Nonredundant_2010-05-19_list';
-
 Verbose = 1;              % Verbose = 1 tells it to show distance graphs
 LMax    = 500;             % maximum number of pairs to consider in each class
 
@@ -34,10 +32,10 @@ Pairs{16} = 'UU';
 % ------------------------------------------ Load non-redundant dataset
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData(NRList,0,[],1);   % load PDB data
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,[],1);   % load PDB data
   File = File(SIndex);
 else
-  [File,SIndex] = zAddNTData(NRList,0,File,1); % add PDB data if needed
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,File,1); % add PDB data if needed
   File = File(SIndex);
 end                       
 
@@ -51,7 +49,7 @@ for f = 1:length(File),
   S(f) = length(File(f).NT);
 end
 
-[y,i] = sort(Res);                             % sort files by resolution
+[y,i] = sort(Res);
 File = File(i);
 S = S(i);
 
