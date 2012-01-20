@@ -75,22 +75,36 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   % ---------- Eliminate out of plane interactions and bad hydrogen bonds
 
-  if ((abs(a) < 11) | (abs(a) == 13)) & (abs(Pair.Gap) > 1.0),
+  if abs(Pair.Gap) > 1.0,
     if length(Pair.Hydrogen) > 0,
-      if (min(cat(1,Pair.Hydrogen(:).Angle)) < 110) | (abs(Pair.Gap) > 2.0),
-        a = 30.1;
+      if (abs(a) < 11) || (abs(a) >= 13),        % avoid cSS, tSS cases
+        if abs(Pair.Gap) > 2.0,
+          a = 30.05;
+        end
+      end
+      for ii = 1:length(Pair.Hydrogen),
+        if ~isempty(Pair.Hydrogen(ii).Angle),
+          if Pair.Hydrogen(ii).Angle < 110,
+            a = 30.1;
+          end
+        end
       end
     elseif abs(Pair.Gap) > 1.6,
       a = 30.2;
     end
-  elseif ((abs(a) == 11) | (abs(a) == 12)) & (abs(Pair.Gap) > 3.0),
-                            % disallow immense gaps in cases 11 and 12
-    a = 30.3;
   end
 
   if (abs(a) < 14) & (length(Pair.Hydrogen) > 0),
-    if min(cat(1,Pair.Hydrogen(:).Distance)) > 4,
-      a = 30.4;
+    for ii = 1:length(Pair.Hydrogen),
+      if isempty(Pair.Hydrogen(ii).Angle),
+        if Pair.Hydrogen(ii).Distance > 4.5,
+          a = 30.5;
+        end
+      else 
+        if Pair.Hydrogen(ii).Distance > 4,
+          a = 30.4;
+        end
+      end
     end
   end
 

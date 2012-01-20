@@ -3,7 +3,7 @@
 
 LMax = 500;                % maximum number of pairs to consider in each class
 
-%load('PairExemplars','Exemplar');
+load('PairExemplars','Exemplar');
 
 CL = zClassLimits;
 
@@ -18,7 +18,7 @@ pcodes = [6 7 13 14 15];
 
 pcodes = [7 16];
 
-pcodes = [1];
+pcodes = [11];
 pcodes = [1 5 6 7 9 11 13 14 15 16];
 
 % load data ----------------------------------------------------------------
@@ -144,7 +144,7 @@ for j = 1:length(pcodes),
   
   end
 
- save('PairExemplarsNew','Exemplar');
+ save('PairExemplars','Exemplar');
 
  end
 end

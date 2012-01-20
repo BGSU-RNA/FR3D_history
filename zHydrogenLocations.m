@@ -48,6 +48,8 @@ elseif (Class == -1) & (Paircode == 5),
 elseif (Class == 1) & (Paircode == 6),
   X(1,:) = N1.Fit(4,:);
   Y(1,:) = N2.Fit(13,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Fit(4,:);
 elseif (Class == 1) & (Paircode == 7),
   X(1,:) = N1.Fit(6,:);
   Y(1,:) = N2.Fit(13,:);
@@ -189,6 +191,8 @@ elseif (Class == 3) & (Paircode == 6),
 elseif (Class == 3) & (Paircode == 7),
   X(1,:) = N1.Fit(6,:);
   Y(1,:) = N2.Fit(13,:);
+  X(2,:) = N1.Fit(10,:);
+  Y(2,:) = N2.Fit(4,:);
 elseif (Class == 3) & (Paircode == 14),
   X(1,:) = N1.Fit(13,:);
   Y(1,:) = N2.Fit(6,:);
@@ -244,6 +248,8 @@ elseif (Class == 4) & (Paircode == 6),
 elseif (Class == 4) & (Paircode == 7),
   X(1,:) = N1.Fit(10,:);
   Y(1,:) = N2.Fit(13,:);
+  X(2,:) = N1.Fit(6,:);
+  Y(2,:) = N2.Fit(4,:);
 elseif (Class == 4) & (Paircode == 11),
   X(1,:) = N1.Fit(12,:);
   Y(1,:) = N2.Fit(10,:);
@@ -272,27 +278,43 @@ elseif (Class == 4) & (Paircode == 16),
 elseif (Class == 5) & (Paircode == 1),
   X(1,:) = N1.Fit(14,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 5) & (Paircode == 5),
   X(1,:) = N1.Fit(14,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 5) & (Paircode == 9),
   X(1,:) = N1.Fit(14,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 5) & (Paircode == 13),
   X(1,:) = N1.Fit(14,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == -5) & (Paircode == 5),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(13,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(4,:);
 elseif (Class == 5) & (Paircode == 6),
   X(1,:) = N1.Fit(13,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 5) & (Paircode == 7),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(13,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(4,:);
 elseif (Class == 5) & (Paircode == 14),
   X(1,:) = N1.Fit(13,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == -5) & (Paircode == 9),
   X(1,:) = N1.Fit(11,:);
   Y(1,:) = N2.Fit(6,:);
@@ -320,9 +342,13 @@ elseif (Class == -5) & (Paircode == 13),
   Y(1,:) = N2.Fit(6,:);
   X(2,:) = N1.Fit(3,:);
   Y(2,:) = N2.Fit(11,:);
+  X(3,:) = N1.Sugar(3,:);
+  Y(3,:) = N2.Fit(3,:);
 elseif (Class == -5) & (Paircode == 14),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(11,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
 elseif (Class == -5) & (Paircode == 15),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(6,:);
@@ -331,6 +357,8 @@ elseif (Class == -5) & (Paircode == 15),
 elseif (Class == 5) & (Paircode == 16),
   X(1,:) = N1.Fit(11,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 6) & (Paircode == 1),
   X(1,:) = N1.Fit(14,:);
   Y(1,:) = N2.Fit(3,:);
@@ -376,25 +404,33 @@ elseif (Class == 6) & (Paircode == 14),
   X(2,:) = N1.Fit(13,:);
   Y(2,:) = N2.Fit(3,:);
 elseif (Class == -6) & (Paircode == 7),
-  X(1,:) = N1.Fit(12,:);
-  Y(1,:) = N2.Fit(3,:);
+  X(1,:) = N1.Fit(6,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(12,:);
+  Y(2,:) = N2.Fit(3,:);
 elseif (Class == 6) & (Paircode == 15),
-  X(1,:) = N1.Fit(12,:);
-  Y(1,:) = N2.Fit(3,:);
+  X(1,:) = N1.Fit(6,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(12,:);
+  Y(2,:) = N2.Fit(3,:);
 elseif (Class == -6) & (Paircode == 13),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(11,:);
   X(2,:) = N1.Fit(11,:);
   Y(2,:) = N2.Fit(3,:);
 elseif (Class == -6) & (Paircode == 14),
-  X(1,:) = N1.Fit(3,:);
-  Y(1,:) = N2.Fit(11,:);
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Fit(6,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Fit(11,:);
 elseif (Class == -6) & (Paircode == 15),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(3,:);
 elseif (Class == 6) & (Paircode == 16),
-  X(1,:) = N1.Fit(3,:);
-  Y(1,:) = N2.Fit(11,:);
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Fit(6,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Fit(11,:);
 elseif (Class == 7) & (Paircode == 9),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(6,:);
@@ -541,42 +577,125 @@ elseif (Class == -10) & (Paircode == 15),
   X(1,:) = N1.Fit(15,:);
   Y(1,:) = N2.Fit(6,:);
 elseif (Class == 11) & (Paircode == 1),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+  X(3,:) = N1.Fit(3,:);
+  Y(3,:) = N2.Fit(11,:);
+elseif (Class == 11) & (Paircode == 5),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == 11) & (Paircode == 9),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+  X(3,:) = N1.Fit(3,:);
+  Y(3,:) = N2.Fit(15,:);
+elseif (Class == 11) & (Paircode == 13),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == -11) & (Paircode == 5),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+elseif (Class == 11) & (Paircode == 6),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == 11) & (Paircode == 7),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+  X(3,:) = N1.Fit(15,:);
+  Y(3,:) = N2.Fit(3,:);
+elseif (Class == 11) & (Paircode == 14),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == -11) & (Paircode == 9),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+  X(3,:) = N1.Fit(11,:);
+  Y(3,:) = N2.Fit(3,:);
+  X(4,:) = N1.Fit(4,:);
+  Y(4,:) = N2.Fit(15,:);
+elseif (Class == -11) & (Paircode == 7),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == 11) & (Paircode == 11),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+  X(3,:) = N1.Fit(3,:);
+  Y(3,:) = N2.Fit(15,:);
+elseif (Class == 11) & (Paircode == 15),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == -11) & (Paircode == 13),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+  X(3,:) = N1.Fit(11,:);
+  Y(3,:) = N2.Fit(3,:);
+elseif (Class == -11) & (Paircode == 14),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+elseif (Class == -11) & (Paircode == 15),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(3,:);
+  Y(2,:) = N2.Sugar(3,:);
+  X(3,:) = N1.Fit(15,:);
+  Y(3,:) = N2.Fit(3,:);
+elseif (Class == 11) & (Paircode == 16),
+  X(1,:) = N1.Sugar(3,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Sugar(3,:);
+  Y(2,:) = N2.Fit(3,:);
+elseif (Class == 12) & (Paircode == 1),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(11,:);
-elseif (Class == 11) & (Paircode == 9),
-  X(1,:) = N1.Fit(3,:);
-  Y(1,:) = N2.Fit(15,:);
-elseif (Class == 11) & (Paircode == 7),
-  X(1,:) = N1.Fit(15,:);
-  Y(1,:) = N2.Fit(3,:);
-elseif (Class == -11) & (Paircode == 9),
-  X(1,:) = N1.Fit(11,:);
-  Y(1,:) = N2.Fit(3,:);
-  X(2,:) = N1.Fit(4,:);
-  Y(2,:) = N2.Fit(15,:);
-elseif (Class == 11) & (Paircode == 11),
-  X(1,:) = N1.Fit(3,:);
-  Y(1,:) = N2.Fit(15,:);
-elseif (Class == -11) & (Paircode == 13),
-  X(1,:) = N1.Fit(11,:);
-  Y(1,:) = N2.Fit(3,:);
-elseif (Class == -11) & (Paircode == 15),
-  X(1,:) = N1.Fit(15,:);
-  Y(1,:) = N2.Fit(3,:);
-elseif (Class == 12) & (Paircode == 1),
-  X(1,:) = N1.Fit(11,:);
-  Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(9,:);
+  Y(2,:) = N2.Fit(3,:);
+  X(3,:) = N1.Fit(4,:);
+  Y(3,:) = N2.Sugar(3,:);
 elseif (Class == 12) & (Paircode == 5),
   X(1,:) = N1.Fit(11,:);
   Y(1,:) = N2.Fit(3,:);
+  X(2,:) = N1.Fit(4,:);
+  Y(2,:) = N2.Sugar(3,:);
 elseif (Class == 12) & (Paircode == 9),
   X(1,:) = N1.Fit(3,:);
   Y(1,:) = N2.Fit(15,:);
   X(2,:) = N1.Fit(11,:);
   Y(2,:) = N2.Fit(3,:);
+  X(3,:) = N1.Fit(4,:);
+  Y(3,:) = N2.Sugar(3,:);
 elseif (Class == 12) & (Paircode == 13),
-  X(1,:) = N1.Fit(11,:);
-  Y(1,:) = N2.Fit(3,:);
+  X(1,:) = N1.Fit(4,:);
+  Y(1,:) = N2.Sugar(3,:);
+  X(2,:) = N1.Fit(11,:);
+  Y(2,:) = N2.Fit(3,:);
 elseif (Class == -12) & (Paircode == 9),
   X(1,:) = N1.Fit(11,:);
   Y(1,:) = N2.Fit(3,:);

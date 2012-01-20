@@ -83,7 +83,7 @@ for f=1:length(Filenames),
   File.Distance = zMutualDistance(c,35); 
 
   if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
-    (ClassifyCode == 1) | (File.ClassVersion < 1.2),
+    (ClassifyCode == 1) | (File.ClassVersion < 2),
     File.Edge = sparse(File.NumNT,File.NumNT);
 
     d = sort(nonzeros(File.Distance));
@@ -93,7 +93,7 @@ for f=1:length(Filenames),
     else
       File = zClassifyPairs(File);
       File = zUpdateDistanceToExemplars(File);
-      File.ClassVersion = 1.2;
+      File.ClassVersion = 2;
       ClassifyCode = 1;
     end
   end

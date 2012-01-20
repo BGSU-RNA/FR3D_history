@@ -118,7 +118,11 @@ while (k <= length(SP)),
     if length(Pair.Hydrogen) > 0,
       fprintf('Hydrogen bonds: ');
       for i=1:length(Pair.Hydrogen),
-        fprintf(' %5.1fdeg %5.2fA |',Pair.Hydrogen(i).Angle,Pair.Hydrogen(i).Distance);
+        if isempty(Pair.Hydrogen(i).Angle),
+          fprintf(' %5.2fA |',Pair.Hydrogen(i).Distance);
+        else
+          fprintf(' %5.1fdeg %5.2fA |',Pair.Hydrogen(i).Angle,Pair.Hydrogen(i).Distance);
+        end
       end
       fprintf('\n');
     end
