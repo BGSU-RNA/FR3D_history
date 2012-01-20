@@ -5,8 +5,8 @@
 function [File] = PairViewer(File,Param,ViewParam)
 
 if nargin == 0,                  % If files haven't already been loaded
-  Filenames = zFileNameList;        % The master list
-  File = zGetNTData(Filenames,0);
+  Filenames = {'1s72'};
+  File = zAddNTData(Filenames,0);
 end
 
 if exist('ViewParam'),
@@ -51,7 +51,7 @@ while ViewParam.FigNum > 0,
                     ViewParam.FigNum = ViewParam.FigNum + FigsDone;
             case 2, zListPairs(File,SP,2,ViewParam);
             case 3, zListPairs(File,SP,3,ViewParam);
-            case 4, [File,SP,ViewParam]= zHandClassifyPairs(File,SP,ViewParam);
+            case 4, [File,SP,ViewParam]= zDisplayPairs(File,SP,ViewParam);
                     for f=1:length(File),
                       if File(f).Modified == 1,
                         zWriteHandFile(File(f));

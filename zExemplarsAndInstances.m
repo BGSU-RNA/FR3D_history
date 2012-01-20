@@ -1,6 +1,6 @@
 % zExamplarsAndInstances(File,Paircode,Cateogry) displays the best known
 % representatives for interactions involving pairs with the given Paircode
-% and interaction Category
+% and interaction Category, together will all instances of that category
 
 % Paircode and Category can be
 % vectors.  It will loop through all possible Paircode, Category pairs from the
@@ -9,11 +9,11 @@
 
 % Here are some ways to run the program:
 
-% zDisplayExemplars(7,21:23) paircode 7, categories 21 to 23 (stacking)
-% zDisplayExemplars(1:16,1)   all paircodes, category 1
-% zDisplayExemplars(1:16,-12:23) all paircodes, all categories
+% zExemplarsAndInstances(File,7,21:23) paircode 7, cat's 21 to 23 (stacking)
+% zExemplarsAndInstances(File,1:16,1)   all paircodes, category 1
+% zExemplarsAndInstances(File,1:16,-12:23) all paircodes, all categories
 
-% 1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
+% Pair codes:  1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
 
 function [void] = zExemplarsAndInstances(File,Paircode,Category)
 
@@ -105,7 +105,7 @@ for pc = 1:length(Paircode),
        VP.SortKeys  = [20];
        VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
-       PairViewer(File,P,VP);
+       FR3D_PairViewer(File,P,VP);
 
 % scatterplot of pairs with the same interaction --------------------------
 
@@ -138,7 +138,7 @@ for pc = 1:length(Paircode),
        VP.SortKeys  = [20];
        VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
-       PairViewer(File,P,VP);
+       FR3D_PairViewer(File,P,VP);
 
        fprintf('This is the total number of matches over all subcategories.\n');
 
@@ -180,7 +180,7 @@ for pc = 1:length(Paircode),
        VP.ClassLimits = 2;
        VP.FigNum    = 4;
 
-       PairViewer(File,P,VP);
+       FR3D_PairViewer(File,P,VP);
 
        fprintf('This is the total number of near matches over all subcategories.\n');
        figure(4)
@@ -221,7 +221,7 @@ pause
        VP.SortKeys  = [20];
        VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
-       PairViewer(File,P,VP);
+       FR3D_PairViewer(File,P,VP);
 
 % view individual pairs that have the same classification ------------------
 disp('Press a key to start examining matches to this (sub)category, furthest from exemplar first')
@@ -255,7 +255,7 @@ pause
        VP.SortKeys  = [-20];
        VP.ListItems = [1 22 2 3 4 5 6 9 10 11 12 14 16 17];
 
-       PairViewer(File,P,VP);
+       FR3D_PairViewer(File,P,VP);
 
 
        fprintf('Press a key to go on to the next exemplar\n');

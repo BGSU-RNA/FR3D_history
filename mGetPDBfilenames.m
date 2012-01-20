@@ -20,6 +20,7 @@ end
 if ~isempty(a)
     for i=1:length(a)
       temp{i} = regexprep(a(i).name,'.pdb|.mat|.MAT|.PDB| ','');   % strip extensions and spaces
+      temp{i} = regexprep(temp{i},'_small','');     % don't list small's too
       if ~isempty(strfind(temp{i},'_list')),
         temp{i} = [' ' temp{i}];                    % lists appear first
       end

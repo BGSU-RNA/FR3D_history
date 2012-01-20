@@ -11,12 +11,19 @@
 % If ReadCode = 4, it reads Filename.pdb, analyzes each nucleotide, reads the
 %    hand classification file, and classifies interacting pairs
 
-function [Files] = zGetNTData(Filenames,ReadCode)
+% If SizeCode = 1, it returns a full version of the file(s)
+% If SizeCode = 2, it returns a small version, suitable for motif searching
+
+function [Files] = zGetNTData(Filenames,ReadCode,SizeCode)
 
 CurrentVersion = 3.4;                       % version number of class limits
 
 if nargin < 2,
   ReadCode = 0;
+end
+
+if nargin < 3,
+  SizeCode = 1;
 end
 
 path(path,pwd);
@@ -44,45 +51,73 @@ for f=1:length(Filenames),
   Filename = Filenames{f};
   FILENAME = upper(Filename);
   filename = lower(Filename);
-  if (ReadCode < 4) & (exist(strcat(Filename,'.mat'),'file') > 0),
+
+  ClassifyCode = 0;
+
+  if (SizeCode == 1) || (ReadCode > 0),
+    ReadFull = 1;
+  else
+    ReadFull = 0;
+  end
+
+  if ReadCode == 4,                     % re-read the PDB file
+    File = zReadandAnalyze(Filename);   % might not work on a Mac!
+    ClassifyCode = 1;
+  elseif SizeCode == 2,                 % try to load a small version
+    if (exist(strcat(Filename,'_small.mat'),'file') > 0),
+      load(strcat(Filename,'_small.mat'),'File','-mat');
+      fprintf('Loaded %s\n', [Filename '_small.mat']);
+    elseif (exist(strcat(FILENAME,'_SMALL.MAT'),'file') > 0),  % helps on a Mac
+      load(strcat(FILENAME,'_SMALL.MAT'),'File','-mat');
+      fprintf('Loaded  %s\n', [FILENAME '_SMALL.MAT']);
+    elseif (exist(strcat(filename,'_small.mat'),'file') > 0),  % helps on a Mac
+      load(strcat(filename,'_small.mat'),'File','-mat');
+      fprintf('Loaded   %s\n', [filename '_small.MAT']);
+    else
+      ReadFull = 1;
+    end
+
+    if (ReadFull == 0),
+      if File.ClassVersion < CurrentVersion,
+         ReadFull = 1;                    % read the full version to classify
+      end
+    end
+  end
+
+  if (ReadFull == 1),                     % try to load the full version
+    if (exist(strcat(Filename,'.mat'),'file') > 0),
       load(strcat(Filename,'.mat'),'File','-mat');
       fprintf('Loaded %s\n', [Filename '.mat']);
-      ClassifyCode = 0;
-  elseif (ReadCode < 4) & (exist(strcat(FILENAME,'.MAT'),'file') > 0),  % helps on a Mac
+    elseif (exist(strcat(FILENAME,'.MAT'),'file') > 0),  % helps on a Mac
       load(strcat(FILENAME,'.MAT'),'File','-mat');
-      fprintf('Loaded %s\n', [FILENAME '.MAT']);
-      ClassifyCode = 0;
-  elseif (ReadCode < 4) & (exist(strcat(filename,'.mat'),'file') > 0),  % helps on a Mac
+      fprintf('Loaded  %s\n', [FILENAME '.MAT']);
+    elseif (exist(strcat(filename,'.mat'),'file') > 0),  % helps on a Mac
       load(strcat(filename,'.mat'),'File','-mat');
-      fprintf('Loaded %s\n', [FILENAME '.MAT']);
-      ClassifyCode = 0;
-  else
+      fprintf('Loaded   %s\n', [filename '.mat']);
+    else
       File = zReadandAnalyze(Filename);
       ClassifyCode = 1;
+    end
   end
 
-  if isfield(File,'BI'),
-    File = rmfield(File,'BI');
+  if ReadFull == 1,
+    File.SizeCode = 1;
+    if (ReadCode == 2) | (ReadCode == 3) | (ReadCode == 4),
+      File = zReadHandFile(File);
+    end
+  else
+    File.SizeCode = 2;
   end
-
-  if isfield(File,'BermanClass'),
-    File = rmfield(File,'BermanClass');
-  end
-
-  if (ReadCode == 2) | (ReadCode == 3) | (ReadCode == 4),
-    File = zReadHandFile(File);
-  end
-
-  Overlap = 0;
 
   if ~isfield(File,'ClassVersion'),
     File.ClassVersion = 0;
   end
 
-  if length(File.NT) > 0,                    % if it has nucleotides,
+  Overlap = 0;
 
-    c = cat(1,File.NT(1:File.NumNT).Center);
-    File.Distance = zMutualDistance(c,35); 
+  if length(File.NT) > 0,                    % if it has nucleotides,
+    c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+    File.Distance = zMutualDistance(c,35);   % compute distances < 35 Angstroms
 
     if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
       (ClassifyCode == 1) | (File.ClassVersion < CurrentVersion),
@@ -92,6 +127,7 @@ for f=1:length(Filenames),
       if d(min(10,length(d))) < 1,
         fprintf('%s has overlapping nucleotides and should be avoided as such\n',File.Filename);
         Overlap = 1;
+        File.Pair = [];
       else
         File = zClassifyPairs(File);
         File = zUpdateDistanceToExemplars(File);
@@ -107,28 +143,38 @@ for f=1:length(Filenames),
       end
       ClassifyCode = 1;
     end
-
-%File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
-
-    if ~isfield(File,'Header'),
-      File.Header.ModelStart = [];
-      File.Header.ExpData    = '';
-      File.Header.Resolution = '';
-      ClassifyCode = 1;
-    end
-
-    File = zGetPDBInfo(File);          % get resolution and other info
-
-    File = orderfields(File);
-
-    if Overlap == 0,
-      if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
-        zSaveNTData(File);
-      end
-
-      Files(f) = File;
-    end
   else
-    Files(f) = File;
+    File.Distance = [];
+    File.Pair     = [];
   end
+
+  % File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
+
+  if ~isfield(File,'Header'),
+    File.Header.ModelStart = [];
+    File.Header.ExpData    = '';
+    File.Header.Resolution = '';
+    ClassifyCode = 1;
+  end
+
+  File = zGetPDBInfo(File);          % get resolution and other info
+
+  File = orderfields(File);
+
+  Saved = 0;
+
+  if (ReadCode > 0) || (ClassifyCode > 0),
+    zSaveNTData(File);
+    Saved = 1;
+  end
+
+  if SizeCode == 2,
+    File = zSmallVersion(File);
+    if (ReadFull == 1) && (Saved == 0),
+      zSaveNTData(File);
+    end
+  end
+
+  Files(f) = File;
+
 end

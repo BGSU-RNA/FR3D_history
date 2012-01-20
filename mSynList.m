@@ -10,7 +10,7 @@
 % [File,SIndex]=zAddNTData(Filenames,0);
 % [synlist chi_degree]= mSynList(File);
 
-function [synlist chi_degree]= mSynList(File)
+function [synlist, chi_degree]= mSynList(File)
 
 %Declare the main variables:
 synlist(1,length(File.NT))=0;

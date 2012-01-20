@@ -1,4 +1,4 @@
-% zUpdateExemplars should be used after zClassLimits has
+% zUpdateExemplars should be used only after zClassLimits has
 % been modified.  It redoes the classifications, finds new exemplars, and
 % then updates the distance from each pair to the nearest exemplars.
 

@@ -15,6 +15,14 @@
 
 function [void] = zDisplayExemplars(Paircode,Category)
 
+if nargin < 2
+  Category = [-12:-1 1:23];
+end
+
+if nargin < 1
+  Paircode = [1:16];
+end
+
 % load exemplars -------------------------------------
 
   load('PairExemplars','Exemplar');
@@ -45,7 +53,7 @@ for pc = 1:length(Paircode),
 
        [Pair,s] = zClassifyPair(E.NT1,E.NT2);
 
-fprintf('%5s %s %5s   ',[E.NT1.Base E.NT1.Number],Pair.EdgeText,[E.NT2.Base E.NT2.Number]);
+fprintf('%10s %5s %s %5s   ',E.Filename, [E.NT1.Base E.NT1.Number],Pair.EdgeText,[E.NT2.Base E.NT2.Number]);
 
        figure(1)
        clf

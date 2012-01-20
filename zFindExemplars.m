@@ -1,4 +1,4 @@
-% zFindExamplars finds/updates the best representative for each category of
+% zFindExemplars finds/updates the best representative for each category of
 % pairs.  The user specifies the paircodes to update.
 
 LMax = 500;                % maximum number of pairs to consider in each class
@@ -7,28 +7,16 @@ load('PairExemplars','Exemplar');
 
 CL = zClassLimits;
 
-                    % 1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
-pcodes = [1 5 6];
-                    % 1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
-pcodes = [1 5 6 7];
-
-pcodes = [9 11 13 14];
+% Pair codes:  1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
 
 pcodes = [6 7 13 14 15];
-
-pcodes = [7 16];
-
-pcodes = [11];
-pcodes = [1];
 pcodes = [1 5 6 7 9 11 13 14 15 16];
 
 % load data ----------------------------------------------------------------
 
 if ~exist('File'),
-  Filenames = zFileNameList;
-  for f=1:length(Filenames),
-    File(f) = zGetNTData(Filenames{f},0);
-  end
+  Filenames = {'1s72'};             % modify to use more PDB files
+  File = zAddNTData(Filenames);
 end
 
 % specify parameters for viewing -------------------------------------------

@@ -1,7 +1,11 @@
 % xSpecifyQuery returns the description of a model motif
+%
 % The variable Query has several fields, most of which are optional:
 %   Query.Description    a useful string, can be long
 %   Query.Name           a short string, which will become part of a filename
+%
+% For all searches, these are required:
+%   Query.SearchFiles    a cell array of PDB filenames or PDB lists
 %
 % For geometric searches, these are required:
 %   Query.Filename       a string like 1s72, where the query motif is found
@@ -32,9 +36,12 @@ if nargin > 0,
   Query.Name = QName;
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
-  Query.Name = 'Sarcin5Geo';
   Query.Name = 'BasepairGeometric2';
+  Query.Name = 'Sarcin5Geo';
+  Query.Name = 'Sarcin9Mixed';
 end
+
+Query.SearchFiles = '1s72';        % default is to search 1s72
 
 switch Query.Name
 
@@ -47,6 +54,7 @@ case 'Sarcin5Geo'
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.5;
   Query.SearchFiles    = {'1s72' 'HighResolution_list'};
+  Query.SearchFiles    = {'1s72' 'Nonredundant_list'};
 
 case 'Sarcin5Symb'
   Query.Description    = 'Sarcin five nucleotide symbolic';
@@ -74,6 +82,7 @@ case 'Sarcin9Mixed'
   Query.Edges{3,4}     = 'tWH';
   Query.DiscCutoff     = 0.5;
   Query.ExcludeOverlap = 1;
+  Query.SearchFiles    = {'1s72' 'Nonredundant_list'};
 
 case 'KinkTurnCentral'
   Query.Description    = 'Kink-turn central base mixed';

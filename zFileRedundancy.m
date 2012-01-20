@@ -1,3 +1,4 @@
+% zFileRedundancy(File) explores possible redundancy between PDB files
 
 function [void] = zFileRedundancy(File)
 

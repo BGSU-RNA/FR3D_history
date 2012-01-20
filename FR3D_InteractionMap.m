@@ -1,15 +1,26 @@
-% zMoleculeMap(File) puts at dot at the center of each nucleotide
+% FR3D_InteractionMap(File) puts a dot at the center of each nucleotide
 % in File, colored by the number of interactions the nucleotide has (blue
 % means zero, red is the most).  The C1' atom of each nucleotide is
 % connected to the C1' atom of the next nucleotide by a black line.
 % Interactions are shown between centers of nucleotides.  WC-WC
 % interactions (category 1) are shown by red lines, non-canonical planar
-% interactions by green, typical sequential stacking (categories 15, 17) by
-% dark blue, and typical cross-strand stacking (categories 16, 18) by light
+% interactions by green, typical sequential stacking (category 21) by
+% dark blue, and typical cross-strand stacking (categories 22, 23) by light
 % blue.
-% File can either be, for example, 'rr0033_5S' or File(3).
+% File can be, for example, '1s72' or File(3).
+% The vector DL, if specified, controls what is displayed:
+%  DL(1) = 1;                                 % plot geometric center
+%  DL(2) = 1;                                 % show cWW bonds
+%  DL(3) = 1;                                 % show other planar bonds
+%  DL(4) = 1;                                 % show 35 and 53 stacking
+%  DL(5) = 1;                                 % show 33 and 55 stacking
+%  DL(6) = 1;                                 % connect glycosidic atoms
 
-function [void] = zInteractionMap(File,NTList,DL)
+function [void] = FR3D_InteractionMap(File,DL,NTList)
+
+if nargin < 1
+  fprintf('Please specify a filename, e.g. FR3D_InteractionMap(''1s72'')\n');
+end
 
 % if File is a text string (filename), load the file and display
 
@@ -20,7 +31,7 @@ end
 
 % if NTList is a cell array of numbers, look up the indices
 
-if nargin > 1,
+if nargin > 2,
 
   if strcmp(class(NTList),'char'),
     NTList = {NTList};
@@ -38,12 +49,14 @@ else
 
 end
 
-DL(1) = 1;                                 % plot geometric center
-DL(2) = 1;                                 % show cWW bonds
-DL(3) = 1;                                 % show other planar bonds
-DL(4) = 1;                                 % show 35 and 53 stacking
-DL(5) = 1;                                 % show 33 and 55 stacking
-DL(6) = 1;                                 % connect glycosidic atoms
+if nargin < 2
+  DL(1) = 1;                                 % plot geometric center
+  DL(2) = 1;                                 % show cWW bonds
+  DL(3) = 1;                                 % show other planar bonds
+  DL(4) = 1;                                 % show 35 and 53 stacking
+  DL(5) = 1;                                 % show 33 and 55 stacking
+  DL(6) = 1;                                 % connect glycosidic atoms
+end
 
 %-----------------------------------------------------------------------
 figure(1)
@@ -96,11 +109,6 @@ for a = 1:length(Indices),                          % Loop through nucleotides
     end
   end
 
-if c < ni(k)
-%  [c ni(k) k iii]
-%  File.Inter(k,iii)
-end
-
   if DL(6) > 0,
     g = File.NT(k).Loc(1,:);                         
     h = File.NT(max(1,k-1)).Loc(1,:);
@@ -114,12 +122,4 @@ end
 set(gcf,'Renderer','painters');
 axis off
 
-return
-
-scatter3(0,0,0,16,1,'filled');     % plot geometric center
-scatter3(1,0,0,16,2,'filled');     % plot geometric center
-scatter3(2,0,0,16,3,'filled');     % plot geometric center
-scatter3(3,0,0,16,4,'filled');     % plot geometric center
-scatter3(4,0,0,16,5,'filled');     % plot geometric center
-scatter3(5,0,0,16,6,'filled');     % plot geometric center
-scatter3(6,0,0,16,7,'filled');     % plot geometric center
+rotate3d on

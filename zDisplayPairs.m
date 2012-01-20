@@ -1,6 +1,6 @@
-% zHandClassifyPairs displays pairs and allows a reclassification
+% zDisplayPairs displays pairs and allows a reclassification
 
-function [File,SP,ViewParam] = zHandClassifyPairs(File,SP,ViewParam)
+function [File,SP,ViewParam] = zDisplayPairs(File,SP,ViewParam)
 
 load('PairExemplars','Exemplar');
 
@@ -99,10 +99,10 @@ while (k <= length(SP)),
   rotate3d on
 
   if (ViewParam.Nearby == 0),
-    switch File(f).Pair(SP(k).PairIndex).Class,
-      case {1, 2},  axis([-2 10 -2 12 -5 5]);
-      case 15,      axis([-5 3 -3 5 -6 2]);
-      case 16,      axis([-4 4 -3 5 -3 5]);
+    switch abs(fix(File(f).Pair(SP(k).PairIndex).Class)),
+      case {1, 2, 101, 102},  axis([-2 10 -2 12 -5 5]);
+      case 21,      axis([-5 3 -3 5 -6 2]);
+      case 22,      axis([-4 4 -3 5 -3 5]);
       otherwise,    axis([-6 10 -6 10 -6 10]);
     end
   end

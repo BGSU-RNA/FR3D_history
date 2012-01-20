@@ -1,5 +1,5 @@
 % zShowInteractionTable(File,NTList) displays a table of interactions
-% among the bases listed in Indices
+% among the nucleotides NTList.  If passed, it displays the number Disc
 
 function [void] = zShowInteractionTable(File,NTList,Disc)
 

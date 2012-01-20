@@ -1,5 +1,8 @@
+% FR3D_GUI is the graphical user interface to FR3D, Find RNA 3D
+
 %<div class="moz-text-flowed" style="font-family: -moz-fixed">
 function varargout = FR3D_GUI(varargin)   %By Ali Mokdad - March 2006
+
 % FR3D_GUI M-file for FR3D_GUI.fig
 %      FR3D_GUI, by itself, creates a new FR3D_GUI or raises the existing
 %      singleton*.
@@ -161,15 +164,11 @@ if length(NT)<=12 %this is a limitation by the size of the GUI
     drawnow
     %%handles.File.Filename 
 
-    %%%%%%%%%%%%%%%ALERT: CRAIG'S HELP NEEDED: I need to use File(SIndex), but how to set SIndex???????
-
-% response: use Qindex here, Sindex for the list of search files
-    
     if isfield(handles,'File')
         File = handles.File;
-        [File,QIndex]=zAddNTData(Query.Filename,0,File);
+        [File,QIndex]=zAddNTData(Query.Filename,2,File);
     else
-        [File,QIndex]=zAddNTData(Query.Filename,0);
+        [File,QIndex]=zAddNTData(Query.Filename,2);
     end
     %%%
 
@@ -404,12 +403,9 @@ function DisplayCandidates_Callback(hObject, eventdata, handles)
 Search=handles.Search;
 if isfield(handles,'File')
     File=handles.File;
-    [File,SIndex]=zAddNTData(Search.Filenames,0,File);
-[1 SIndex]
-Search.Filenames
+    [File,SIndex]=zAddNTData(Search.Filenames,2,File);
 else
-    [File,SIndex]=zAddNTData(Search.Filenames,0);
-[2 SIndex]
+    [File,SIndex]=zAddNTData(Search.Filenames,2);
 Search.Filenames
 end
 
@@ -431,7 +427,7 @@ Search.Filenames
   %winopen(OUT) %%OUT is not outputted by the above function
   %winopen('Query_51_Results.txt')
 else %If data is loaded from saved search results
-  [File,SIndex]=zAddNTData(Search.Filenames,0);
+  [File,SIndex]=zAddNTData(Search.Filenames,2);
 [4 SIndex]
 Search.Filenames
   handles.File=File;

@@ -61,7 +61,8 @@ if isfield(ViewParam,'ClassLimits'),
      hold on
      if (abs(B(row,1)) < 14) & (abs(B(row,1)) > 0),
        zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
-       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+%       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+       text(B(row,2)+0.2,B(row,4)+0.35,0,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
      end
    end
  elseif ViewParam.ClassLimits == 2,              % just show one box
@@ -72,7 +73,8 @@ if isfield(ViewParam,'ClassLimits'),
      hold on
      if any(fix(B(row,1)) == fix(Param.Category)),
        zSquare([B(row,[2 4]) 0],[B(row,[3 5]) 0],'k');
-       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+%       text(B(row,2)+0.2,B(row,4)+0.35,B(row,7)+0.2,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
+       text(B(row,2)+0.2,B(row,4)+0.35,0,num2str(B(row,1)),'horizontalalignment','left','fontweight','bold','FontSize',15);
      end
    end
  end

@@ -1,6 +1,6 @@
 % xListCandidates prints a candidate list to the screen
 
-function [] = xListCandidates(File,Search,NumToOutput)
+function [void] = xListCandidates(File,Search,NumToOutput)
 
 Model       = Search.Query;
 Candidates  = Search.Candidates;

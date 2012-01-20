@@ -9,18 +9,16 @@ if ~exist('GUIactive'),                      % if the GUI is not being used
   if isfield(Query,'SearchFiles'),           % if query specifies files
     Filenames = Query.SearchFiles;
   else
-    Filenames = zFileNameList;               % specify PDB Filenames to search
+    Filenames = {'1s72'};                    % default
   end
 end
-
-%Query
 
 % ----------------------------------------- Load PDB files if needed --------
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData(Filenames,0);   % load PDB data
+  [File,SIndex] = zAddNTData(Filenames,2);   % load PDB data
 else
-  [File,SIndex] = zAddNTData(Filenames,0,File); % add PDB data if needed
+  [File,SIndex] = zAddNTData(Filenames,2,File); % add PDB data if needed
 end                           % SIndex tells which elements of File to search
 
 % ------------------------------------------- Store actual filenames
@@ -136,11 +134,11 @@ if ~isempty(Candidates),                         % some candidate(s) found
 
  fprintf('Entire search took %8.4f seconds, or %8.4f minutes\n', (cputime-starttime), (cputime-starttime)/60);
 
-if (~exist('GUIactive')) & (~isempty(Candidates)),
-  xListCandidates(File(SIndex),Search,Inf);
-  Search = xDisplayCandidates(File(SIndex),Search);
-  save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
-end
+ if (~exist('GUIactive')) && (~isempty(Candidates)),
+   xListCandidates(File(SIndex),Search,Inf);
+   Search = xDisplayCandidates(File(SIndex),Search);
+   save(['SearchSaveFiles' filesep Search.SaveName], 'Search');
+ end
 
 end
 

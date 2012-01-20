@@ -3,6 +3,7 @@
 Query=Search.Query;
 
 s=get(handles.SearchPDBs,'String');
+ss=get(handles.QueryPDB,'String');
 v=[];
 for i=1:length(Search.Filenames)
     v=[v find(strcmp(s,Search.Filenames{i}))];
@@ -16,7 +17,7 @@ if Search.Query.Geometric == 1
     set(handles.ReadQuery,'Visible','on');
     set(handles.GenerateMatrix,'Visible','off');
 
-    v=find(strcmp(s,Search.Query.Filename));
+    v=find(strcmp(ss,Search.Query.Filename));
     set(handles.QueryPDB,'Value',v);
     set(handles.QueryPDB,'Visible','on');
     set(handles.QueryPDBTitle,'Visible','on');

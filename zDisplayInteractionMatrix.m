@@ -1,8 +1,8 @@
-% zDisplayInteractionsGraphically(File,NTList) displays a simple graph of
-% the interactions among bases in NTList
+% zDisplayInteractionMatrix(File,NTList) displays a simple graph of
+% the matrix of interactions among bases in NTList
 % File and NTList may be specified as in zDisplayNT
 
-function [void] = zDisplayInteractionsGraphically(File,NTList)
+function [void] = zDisplayInteractionMatrix(File,NTList)
 
 % if File is a text string (filename), load the file and display
 
