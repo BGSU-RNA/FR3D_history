@@ -1,5 +1,5 @@
 
-function [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P,OCC,TEMP] = zReadPDBTextRead(Filename)
+function [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P,OCC,TEMP,Readable] = zReadPDBTextRead(Filename)
 
 Readable = 1;
 
@@ -18,7 +18,6 @@ catch
     end
   catch
 
-    fprintf('Unable to read the PDB file %s\n',Filename);
     Readable = 0;
 
   end
@@ -73,5 +72,6 @@ ATOMNAME = [];
 VERSION  = [];
 OCC      = [];
 TEMP     = [];
+CHAIN    = [];
 
 end

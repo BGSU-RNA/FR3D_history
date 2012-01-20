@@ -2,32 +2,56 @@
 
 % ----------------------------------------- Read file names from the library
 
+Focus = 'H';                              % hairpins only
+Focus = 'I';                              % internal loops only
+
+Types = {'HL','IL','JL'};                 % types of models we have
+
 Filenames = dir(['SearchSaveFiles' filesep 'LIB*']);
+keep = [];                               % of all models, which to keep
 
-keep = [];
+switch Focus,
 
-for m = 1:length(Filenames),
-  if strcmp(Filenames(m).name(1:3),'LIB') && (Filenames(m).name(9) == '_') && (Filenames(m).name(10) == 'I'),             % internal loops only for now
-    keep(m) = 1;
-    Filenames(m).name = strrep(Filenames(m).name,'.mat','');
+case 'H',
+  typ = 1;
+  for m = 1:length(Filenames),
+    if strcmp(Filenames(m).name(1:4),'LIB7') && (Filenames(m).name(9) == '_') && (Filenames(m).name(10) == 'H'),
+      keep(m) = 1;
+      Filenames(m).name = strrep(Filenames(m).name,'.mat','');
+    end 
   end
+
+case 'I',
+  typ = 2;
+  for m = 1:length(Filenames),
+    if strcmp(Filenames(m).name(1:3),'LIB') && (Filenames(m).name(9) == '_') && (Filenames(m).name(10) == 'I'), 
+      keep(m) = 1;
+      Filenames(m).name = strrep(Filenames(m).name,'.mat','');
+    end 
+  end
+
+case 'J',
+  typ = 3;
+  for m = 1:length(Filenames),
+    if strcmp(Filenames(m).name(1:3),'LIB') && (Filenames(m).name(9) == '_') && (Filenames(m).name(10) == 'J'), 
+      keep(m) = 1;
+      Filenames(m).name = strrep(Filenames(m).name,'.mat','');
+    end 
+  end
+
 end
 
 Filenames = Filenames(find(keep));
 
 % ----------------------------------------- Write names of models
 
-Types = {'HL','IL','JL'};
-
-for t = 1:length(Types),
-  fid = fopen(['models' filesep Types{t} '_Models.txt'],'w');
-  for m = 1:length(Filenames),
-    if strcmp(Types{t},Filenames(m).name(10:11)),
-      fprintf(fid,'%s\n',[Filenames(m).name '.txt']);
-    end
+fid = fopen(['models' filesep Types{typ} '_Models.txt'],'w');
+for m = 1:length(Filenames),
+  if strcmp(Types{typ},Filenames(m).name(10:11)),
+    fprintf(fid,'%s\n',[Filenames(m).name '.txt']);
   end
-  fclose(fid);
 end
+fclose(fid);
 
 % ----------------------------------------- Load each seach, make a model
 
@@ -41,18 +65,11 @@ for m = 1:length(Filenames),
   % --------------------------------------- Write sequences in FASTA format
   Text = xFASTACandidates(Search.File,Search,1,MN(1:8));
 
-%fprintf('%s\n',MN);
-
   fid = fopen(['sequences' filesep MN '.fasta'],'w');
   for t = 1:length(Text),
     fprintf(fid,'%s\n',Text{t});
-
-%fprintf('%s\n',Text{t});
-
   end
   fclose(fid);
-
-%fprintf('\n');
 
   % --------------------------------------- Make model and write it
 

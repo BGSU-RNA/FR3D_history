@@ -36,7 +36,7 @@ if exist([pwd filesep 'PDBFiles' filesep 'Trouble reading']) == 7,
   if exist([pwd filesep 'PDBFiles' filesep 'Trouble reading' filesep PDBFilename]) == 2,
     Stop = 1;
     if Verbose > 0,
-      fprintf('Skipping %s because it could not be read\n', PDBFilename);
+      fprintf('zReadandAnalyze is skipping %s because it appeared in FR3D/PDBFiles/Trouble Reading\n', PDBFilename);
     end
   else
     Stop = 0;
@@ -57,9 +57,14 @@ TempFileName = ['##TempPDB' num2str(a) '.pdb'];
 
 Header = zExtractAtomsPDB(PDBFilename,TempFileName,Verbose);
 
-[ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P] = zReadPDBTextRead(TempFileName);
+[ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P, Readable] = zReadPDBTextRead(TempFileName);
 
 delete(TempFileName);
+
+if Readable == 0,
+  fprintf('zReadandAnalyze was unable to read the PDB file %s\n',PDBFilename);
+  fprintf('Please move it to FR3D/PDBFiles/Trouble Reading.\n');
+end
 
 % Move models in NMR file apart ---------------------------------------------
 

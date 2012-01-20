@@ -2,6 +2,14 @@
 
 function [matches,align1,align2,s1,s2] = dNeedlemanWunsch(seq1,seq2,p,d)
 
+if nargin < 4,
+  d = 2;
+end
+
+if nargin < 3,
+  p = 0.95;
+end
+
 N = length(seq1);
 M = length(seq2);
 

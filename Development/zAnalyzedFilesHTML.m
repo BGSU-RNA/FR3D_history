@@ -18,14 +18,15 @@ for f = 1:length(File),
   LText{8} = ['<a href = "' FN '_motifs.html">List of motifs found in ' FN '</a><br>'];
   LText{9} = ['<a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=' FN '">PDB entry for ' FN '</a><br>'];
   LText{10} = ['<a href="../">Return to list of analyzed structures</a><br>'];
-  LText{11} = ['<a href="../../basepairs">Basepair catalog</a><br>'];
-  LText{12} = ['<a href="../../MotifLibrary/index.html">FR3D motif library</a><br>'];
-  LText{13} = ['<a href="../../index.html">FR3D home page</a><br>'];
-  LText{14} = ['<a href="http://rna.bgsu.edu">BGSU RNA group home page</a><br><br>'];
+  LText{11} = ['<a href="../../basepairs">FR3D Basepair catalog</a><br>'];
+  LText{12} = ['<a href="../../BasePhosphates">FR3D Base-phosphate interactions</a><br>'];
+  LText{13} = ['<a href="../../MotifLibrary/index.html">FR3D motif library</a><br>'];
+  LText{14} = ['<a href="../../index.html">FR3D home page</a><br>'];
+  LText{15} = ['<a href="http://rna.bgsu.edu">BGSU RNA group home page</a><br><br>'];
 
   HText{1} = ['FR3D classification version ' num2str(File(f).ClassVersion) ' ' date];
 
-  HText{2} = '<p>Basepairing follows the paper Leontis, Stombaugh, Westhof Nucleic Acids Research <b>30</b> No. 16, August 15, 2002.  Basepairs are either <i>cis</i> or <i>trans</i>, denoted c and t below.  Each base can use one of three edges, the Waston-Crick edge (W), the Hoogsteen edge (H) or the Sugar edge (S).  Basepairs listed below indicate which base is using which edge.  For example, a line reading A108 G130 tSH would mean that A108 is using its Sugar Edge and G130 is using its Hoogsteen edge.  In the case that both bases use the same edge, a capital letter indicates which base uses the edge in the dominant way.  For perfectly symmetric basepairs such as AU cWW, the capital and lowercase letters are irrelevant.  Bifurcated basepairs are indicated by the text bif.  It does not indicate which base uses which edge.';
+  HText{2} = '<p>Basepairing follows the paper Leontis, Stombaugh, Westhof Nucleic Acids Research <b>30</b> No. 16, August 15, 2002.  See the <a href="../../basepairs">FR3D Basepair catalog</a>.  Basepairs are either <i>cis</i> or <i>trans</i>, denoted c and t below.  Each base can use one of three edges, the Waston-Crick edge (W), the Hoogsteen edge (H) or the Sugar edge (S).  Basepairs listed below indicate which base is using which edge.  For example, a line reading A108 G130 tSH would mean that A108 is using its Sugar Edge and G130 is using its Hoogsteen edge.  In the case that both bases use the same edge, a capital letter indicates which base uses the edge in the dominant way.  For perfectly symmetric basepairs such as AU cWW, the capital and lowercase letters are irrelevant.  Bifurcated basepairs are indicated by the text bif.  It does not indicate which base uses which edge.';
 
   HText{3} = '<p>Base stacking is divided into three subcategories, according to the faces used by each base.  The faces are named this way:  Imagine a base making a Watson-Crick basepair in a helical context.  The side of the base that faces toward the 3'' end of the strand is called the 3 face, while the side that faces the 5'' end is called the 5 face.  The stacking one finds in a helix is thus refered to as s35, meaning that the first base uses the 3 face and the second uses the 5 face.  Two other types of stacking (s33 and s55) occur in other contexts.';
 
@@ -35,7 +36,7 @@ for f = 1:length(File),
 
   HText{6} = '<p>Classification of basepairs and base stacking is done using the program FR3D developed by the <A href="http://rna.bgsu.edu">Bowling Green State University RNA group</a>, including Neocles Leontis, Craig L. Zirbel, Jesse Stombaugh, Ali Mokdad, and Michael Sarver.';
 
-  HText{7} = '<p>Base-phosphate interactions are described in a forthcoming paper by the BGSU RNA group.  Backbone connectivity relations are denoted c35 or c53.  c35 indicates that the first nucleotide uses its O3'' atom to connect to the phosphorus of the second nucleotide and then to the O5'' atom of the second nucleotide.  c53 is used when the order of the nucleotides is reversed.';
+  HText{7} = '<p>Base-phosphate interactions are described in a forthcoming paper by the BGSU RNA group.  See the catalog of <a href="../../BasePhosphates">FR3D Base-phosphate interactions</a>.  Backbone connectivity relations are denoted c35 or c53.  c35 indicates that the first nucleotide uses its O3'' atom to connect to the phosphorus of the second nucleotide and then to the O5'' atom of the second nucleotide.  c53 is used when the order of the nucleotides is reversed.';
 
   HText{8} = '<p>Backbone conformations are two-character codes which apply to the portion of the backbone shared by the two listed nucleotides.  They are only listed once, with the nucleotides in increasing order.  Nucleotides missing a base in the PDB file are omitted by FR3D.  Conformations are calculated by Dangle and Suitename from the <A href="http://kinemage.biochem.duke.edu/index.php">Richardson lab</A> at Duke University.'; 
 
@@ -67,7 +68,7 @@ for f = 1:length(File),
       
       N2 = File(f).NT(j(k));
       r = sprintf('%4d', File(f).Crossing(i,j(k)));
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0,N1.Code,N2.Code),r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %7s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0,N1.Code,N2.Code),r);
 
       InterType(c) = abs(File(f).Edge(i,j(k)));
 
@@ -81,9 +82,13 @@ for f = 1:length(File),
       N2 = File(f).NT(j(k));
       r = sprintf('%4d', File(f).Range(i,j(k)));
 
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBasePhosphateText(BPh(i,j(k))),r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %7s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBasePhosphateText(BPh(i,j(k)),1), r);
 
-      InterType(c) = 200;                 % code for later
+      if i == j(k),
+        InterType(c) = 200.1;                 % self interaction
+      else
+        InterType(c) = 200;                   % non-self interaction
+      end
 
       c = c + 1;
     end
@@ -95,7 +100,7 @@ for f = 1:length(File),
       N2 = File(f).NT(j(k));
       r = sprintf('%4d', 0);
 
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %4s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBackboneContinuityText(BC(i,j(k))),r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %6s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zBackboneContinuityText(BC(i,j(k))),r);
 
       InterType(c) = 300;                 % code for later
 
@@ -109,7 +114,7 @@ for f = 1:length(File),
       N2 = File(f).NT(j(k));
       r = sprintf('%4d', 0);
 
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %4s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, Codes{File.Backbone(i,j(k))},r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %6s  - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, Codes{File(f).Backbone(i,j(k))},r);
 
       InterType(c) = 400;                 % code for later
 
@@ -236,7 +241,7 @@ for f = 1:length(File),
     fprintf(fid,'%s\n',HText{i});
   end
 
-  k = find(InterType >19);
+  k = find((InterType > 19) .* (InterType < 100));
 
   for i = 1:length(IText(k)),
     fprintf(fid,'%5d %s\n',i,IText{k(i)});
@@ -259,14 +264,30 @@ for f = 1:length(File),
     end
   end
 
-  for i = 1:length(HText),
+  for i = 1:(length(HText)-2),
     fprintf(fid,'%s\n',HText{i});
   end
 
-  k = find(InterType == 200);
+  fprintf(fid,'<p>Non-self interactions listed first, if any, then self interactions.\n');
+
+  for i = (length(HText)-1):length(HText),
+    fprintf(fid,'%s\n',HText{i});
+  end
+
+  k = find(InterType == 200);               % non-self interactions
+
+  c = 1;
 
   for i = 1:length(IText(k)),
-    fprintf(fid,'%5d %s\n',i,IText{k(i)});
+    fprintf(fid,'%5d %s\n',c,IText{k(i)});
+    c = c + 1;
+  end
+
+  k = find(InterType == 200.1);               % self interactions
+
+  for i = 1:length(IText(k)),
+    fprintf(fid,'%5d %s\n',c,IText{k(i)});
+    c = c + 1;
   end
 
   fprintf(fid,'</pre>\n</html>\n');

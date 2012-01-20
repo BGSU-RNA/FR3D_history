@@ -21,6 +21,8 @@ end
 
 % ---------------------------------------- look up IDI values
 
+% [Class Code1 Code2]
+
 IDI = zExemplarIDI(Class,Code1,Code2,ExemplarIDI);
 
 % ---------------------------------------- turn IDI into scores

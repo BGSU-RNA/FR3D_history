@@ -6,7 +6,7 @@ load PairExemplars
 
 Verbose = 1;
 
-method = 2;
+method = 2;                       % method for assigning pair subst probs
 
 cdepth  = 7;                      % how far to look ahead for a cluster
 jcdepth = 4;                      % how far to look for a junction cluster
@@ -52,7 +52,8 @@ end
 
 N = length(File.NT);                       % number of nucleotides in File
 E = abs(fix(File.Edge));                   % don't distinguish subcategories
-G = E .* (E < 15) .* (E ~= 0);             % consider basepairing only
+G = E .* (E < 13) .* (E ~= 0);             % consider basepairing only
+                                           % don't consider bifurcated now
 
 if nargin == 2,
   LastNTNumber = N;

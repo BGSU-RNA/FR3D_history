@@ -53,7 +53,10 @@ end
 % check for chain indicated in parentheses
 
 for k = 1:length(Numb),
-  if ~isempty(strfind(Numb{k},'(')),
+  if Numb{k}(1) == '(' || Numb{k}(1) == '_',         % chain only
+    Chai{k} = Numb{k}(2);
+    Numb{k} = '-';
+  elseif ~isempty(strfind(Numb{k},'(')),
     a = strfind(Numb{k},'(');
     b = strfind(Numb{k},')');
     Chai{k} = Numb{k}(a(1)+1:b(1)-1);     % extract chain
@@ -127,6 +130,8 @@ for k = 1:length(Numb)                      % loop through nucleotide numbers
     for j = (m+1):mm,
       allchains{j} = ch;
     end
+  elseif Numb{k}(1) == '-',
+    ind = find(cat(2,File.NT.Chain) == Chai{k});
   elseif strcmpi(Numb{k},'all'),
     ind = 1:length(File.NT);                  % all nucleotides
   elseif any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz') && isfield(File.NT(1),'Hierarchy'),

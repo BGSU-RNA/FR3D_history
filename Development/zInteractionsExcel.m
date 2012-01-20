@@ -1,7 +1,9 @@
 
+for f = 1:length(File),
+
 clear T
-E = fix(File.Edge);
-BPh = File.BasePhosphate;
+E = fix(File(f).Edge);
+BPh = File(f).BasePhosphate;
 
 W = [1:6 -1 -2];
 H = [7 8 9 10 -3 -4 -7 -8];
@@ -11,8 +13,8 @@ WBPh = [1 2 5 11 12 13 19 15];
 HBPh = [3 4 6 7 8 9 18 14 16 17];
 SBPh = [1 10];
 
-for i = 1:length(File.NT),
-  N = File.NT(i);
+for i = 1:length(File(f).NT),
+  N = File(f).NT(i);
   T{i,1} = N.Base;
   T{i,2} = N.Number;
   for k = 3:14,
@@ -22,16 +24,16 @@ for i = 1:length(File.NT),
   j = find(E(i,:) );
   for k = 1:length(j),
     if any(E(i,j(k)) == W),
-      T{i,3} = [T{i,3} zEdgeText(E(i,j(k)),0,N.Code,File.NT(j(k)).Code)];
-      T{i,4} = [T{i,4} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,3} = [T{i,3} zEdgeText(E(i,j(k)),0,N.Code,File(f).NT(j(k)).Code)];
+      T{i,4} = [T{i,4} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
     if any(E(i,j(k)) == H),
-      T{i,5} = [T{i,5} zEdgeText(E(i,j(k)),0,N.Code,File.NT(j(k)).Code)];
-      T{i,6} = [T{i,6} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,5} = [T{i,5} zEdgeText(E(i,j(k)),0,N.Code,File(f).NT(j(k)).Code)];
+      T{i,6} = [T{i,6} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
     if any(E(i,j(k)) == S),
-      T{i,7} = [T{i,7} zEdgeText(E(i,j(k)),0,N.Code,File.NT(j(k)).Code)];
-      T{i,8} = [T{i,8} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,7} = [T{i,7} zEdgeText(E(i,j(k)),0,N.Code,File(f).NT(j(k)).Code)];
+      T{i,8} = [T{i,8} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
   end
 
@@ -41,15 +43,15 @@ for i = 1:length(File.NT),
   for k = 1:length(j),
     if any(BPh(i,j(k)) == WBPh),
       T{i,9} = [T{i,9} zBasePhosphateText(BPh(i,j(k)))];
-      T{i,10} = [T{i,10} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,10} = [T{i,10} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
     if any(BPh(i,j(k)) == HBPh),
       T{i,11} = [T{i,11} zBasePhosphateText(BPh(i,j(k)))];
-      T{i,12} = [T{i,12} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,12} = [T{i,12} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
     if any(BPh(i,j(k)) == SBPh),
       T{i,13} = [T{i,13} zBasePhosphateText(BPh(i,j(k)))];
-      T{i,14} = [T{i,14} File.NT(j(k)).Base File.NT(j(k)).Number ' '];
+      T{i,14} = [T{i,14} File(f).NT(j(k)).Base File(f).NT(j(k)).Number ' '];
     end
   end
 
@@ -75,5 +77,6 @@ H{14} = '';
 T = [H; T];
 T = T(:,[1 2 3 4 9 10 5 6 11 12 7 8 13 14]);
 
-xlswrite([File.Filename '_InteractionList.xls'],T);
+xlswrite([File(f).Filename '_InteractionList.xls'],T);
 
+end

@@ -186,7 +186,7 @@ for i=1:length(FinalListing)
      FinalListing{i,6}=f;
 end
 
-ExcelName=['c:\rAlignmentBasePairComparison' ' ' File1.Filename ' ' File2.Filename]; 
+ExcelName=[File1.Filename '_' File2.Filename '_Alignment']; 
 
 if isempty(sheet)
    xlswrite(ExcelName,FinalListing)

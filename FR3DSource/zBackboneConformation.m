@@ -11,22 +11,27 @@ if exist('chiropraxis.jar') == 2 ...       % if chiropraxis is here
    && File.NumNT > 1 ...                   % and there is more than one NT
    && exist(File.PDBFilename) == 2,        % and the PDB file is available
 
-fid = fopen('tempbat.bat','w');
+  d = which([File.Filename '.pdb']);
+  e = which('chiropraxis.jar');
+  g = which('suitename.0.3.070628.win.exe');
 
-fprintf(fid,'echo off\n');
-fprintf(fid,'java -cp chiropraxis.jar chiropraxis.dangle.Dangle rnabb < PDBFiles\\%s.pdb > %s_dangle.txt\n', File.Filename, File.Filename);
+  fid = fopen('tempbat.bat','w');
 
-fprintf(fid,'suitename.0.3.070628.win.exe < %s_dangle.txt > %s_suitename.txt\n', File.Filename, File.Filename);
+  fprintf(fid,'echo off\n');
 
-%fprintf(fid,'pause\n');
+  fprintf(fid,'java -cp "%s" chiropraxis.dangle.Dangle rnabb < "%s" > %s_dangle.txt\n', e, d, File.Filename);
 
-fclose(fid);
+  fprintf(fid,'"%s" < %s_dangle.txt > %s_suitename.txt\n', g, File.Filename, File.Filename);
 
-!tempbat.bat
+  %fprintf(fid,'pause\n');
 
-fid = fopen([File.Filename '_suitename.txt'],'r');
+  fclose(fid);
 
-if fid > 0
+  !tempbat.bat
+
+  fid = fopen([File.Filename '_suitename.txt'],'r');
+
+  if fid > 0
 
   clear T
   L = 1;
@@ -44,27 +49,26 @@ if fid > 0
     end
   end
 
-else
+  else
 
-  fprintf('Could not open file %s\n', [File.Filename '_suitename.txt']);
+  fprintf('zBackboneConformation could not open file %s\n', [File.Filename '_suitename.txt']);
 
-end
+  end
 
-fclose(fid);
+  fclose(fid);
 
-%123456789012345678901234567890
-%:1:A: 388: :  G 33 p 1a 0.630
+  %123456789012345678901234567890
+  %:1:A: 388: :  G 33 p 1a 0.630
 
-File.Backbone = sparse(zeros(length(File.NT)));
+  File.Backbone = sparse(zeros(length(File.NT)));
 
-zBackboneCodes;
+  zBackboneCodes;
 
+  Numbers = cat(1,{File.NT(:).Number});
 
-Numbers = cat(1,{File.NT(:).Number});
+  c = 0;                                      % current index in the file
 
-c = 0;                                      % current index in the file
-
-for t = 1:length(T),
+  for t = 1:length(T),
   a = T{t};
 
   h = strfind(a,':');
@@ -105,14 +109,14 @@ for t = 1:length(T),
       end
     end
   end
-end
+  end
 
-delete('tempbat.bat');
-delete([File.Filename '_dangle.txt']);
-delete([File.Filename '_suitename.txt']);
+  delete('tempbat.bat');
+  delete([File.Filename '_dangle.txt']);
+  delete([File.Filename '_suitename.txt']);
 
 else
-  fprintf('Cannot determine backbone conformations for %s\n', File.Filename);
+%  fprintf('Cannot determine backbone conformations for %s\n', File.Filename);
 end
 
 return

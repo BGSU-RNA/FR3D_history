@@ -31,6 +31,7 @@ if fid > 0
 
   for n = 1:length(Data),
     le(n) = length(Data(n).Aligned);
+    Data(n).Aligned = strrep(Data(n).Aligned,'.','-');
     Data(n).Aligned  = [Data(n).Aligned '-'];  % extra column for NT in struct
                                                % with nothing in FASTA
     Data(n).Sequence = strrep(Data(n).Aligned,'-','');

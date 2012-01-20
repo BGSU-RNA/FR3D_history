@@ -1,3 +1,4 @@
+% zResolutionFilter returns only files with resolution at or below ResLimit
 
 function [File] = zResolutionFilter(File,ResLimit)
 

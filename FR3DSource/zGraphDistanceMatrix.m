@@ -1,6 +1,6 @@
-% zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It re-orders the instances to group them into clusters, and puts nearby clusters next to one another.  Then it displays the distances graphically.  W is the number of characters of Lab to use.  pp is an optional user-supplied ordering vector.
+% zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It displays the distances graphically.  W is the number of characters of Lab to use.
 
-function [void] = zClusterGraph(D,Lab,W,Table)
+function [void] = zGraphDistanceMatrix(D,Lab,W,Table)
 
 [s,t] = size(D);
 

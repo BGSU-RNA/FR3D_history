@@ -171,11 +171,11 @@ if L == 0,
     Bases1 = cat(2,File1.NT(Indices1).Base);
   end
 
-  if strcmp(class(NTList1),'cell') && length(NTList1) > 1,
+  if strcmp(class(NTList2),'cell') && length(NTList2) > 1,
     Indices21 = zIndexLookup(File2,NTList2{1});
-    Bases2 = cat(2,File1.NT(Indices21).Base);
+    Bases2 = cat(2,File2.NT(Indices21).Base);
   else
-    Bases2 = cat(2,File1.NT(Indices2).Base);
+    Bases2 = cat(2,File2.NT(Indices2).Base);
   end
 
   [m,a,b] = dNeedlemanWunsch(Bases1, Bases2, 0.99, 2);  % align bases from the two lists
@@ -240,6 +240,34 @@ else
   R = eye(3);
 end
 
+% ---------------- Write PDB file for first set of nucleotides
+
+if VP.Write > 0,
+
+  L1 = strrep(NTList1{1},':','-');
+  L2 = strrep(NTList2{1},':','-');
+
+  Filename = ['Superimpose_' File1.Filename '_' L1 '_' File2.Filename '_' L2 '.pdb'];
+
+  fid = fopen(Filename,'w');                     % open for writing
+
+  a = 1;                                         % atom number
+
+  for i=1:length(Indices1)
+    a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
+  end
+
+  for i=1:length(Indices2)
+    a = zWriteNucleotidePDB(fid,File2.NT(Indices2(i)),a,0,SuperR*R,CC2);
+  end
+
+  zWritePDBColorInformation(fid,[L (length(Indices1)-L) L (length(Indices2)-L)],[[1 0 0]; [0.5 0 0]; [0 1 0]; [0 0.5 0]]);
+
+  fclose(fid);
+  fprintf('Wrote %s\n', Filename);
+
+end
+
 % ---------------- Plot the nucleotides ------------------------------------
 
 if VP.Plot > 0
@@ -280,30 +308,3 @@ if VP.Plot > 0
   rotate3d on
 end
 
-% ---------------- Write PDB file for first set of nucleotides
-
-if VP.Write > 0,
-
-  L1 = strrep(NTList1{1},':','-');
-  L2 = strrep(NTList2{1},':','-');
-
-  Filename = ['Superimpose_' File1.Filename '_' L1 '_' File2.Filename '_' L2 '.pdb'];
-
-  fid = fopen(Filename,'w');                     % open for writing
-
-  a = 1;                                         % atom number
-
-  for i=1:length(Indices1)
-    a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
-  end
-
-  for i=1:length(Indices2)
-    a = zWriteNucleotidePDB(fid,File2.NT(Indices2(i)),a,0,SuperR*R,CC2);
-  end
-
-  zWritePDBColorInformation(fid,[L (length(Indices1)-L) L (length(Indices2)-L)],[[1 0 0]; [0.5 0 0]; [0 1 0]; [0 0.5 0]]);
-
-  fclose(fid);
-  fprintf('Wrote %s\n', Filename);
-
-end

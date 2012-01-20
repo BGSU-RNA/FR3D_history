@@ -93,6 +93,9 @@ for ff = 1:length(File),
 
     [s,t] = size(Candidates);
 
+    File(ff).Motifs(m).Name  = Motif(m).name;
+    File(ff).Motifs(m).Count = s;
+
     if s > 0,
 
       for c = 1:s,

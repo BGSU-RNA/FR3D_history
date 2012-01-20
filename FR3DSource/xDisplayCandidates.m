@@ -6,7 +6,11 @@
 % and after this,
 %    [Search,File] = xDisplayCandidates(File,Search);
 
-function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull,Order)
+function [Search, File] = xDisplayCandidates(FullFile,Search,Level,UsingFull,Order,ShowNavWindow)
+
+if nargin < 6,
+  ShowNavWindow = 0;                           % default is not to
+end
 
 if strcmp(class(Search),'double'),
   S = Search;
@@ -114,58 +118,6 @@ Display(1).p         = r;
 Display(1).MaxDiff   = MaxDiff;
 Display(1).MaxInsert = maxinsert;
 
-% ------------------------------------------- Display distance matrix
-
-Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
-
-for i=1:L,
-  f = Search.Candidates(i,N+1);          % file number
-  b = '';
-  for j = 1:min(4,N),
-    b = [b File(f).NT(Search.Candidates(i,j)).Base];
-  end
-  n = File(f).NT(Search.Candidates(i,1)).Number;
-  n = sprintf('%4s',n);
-  if Search.Query.Geometric > 0,
-      if isfield(Search,'AvgDisc'),
-        d = sprintf('%6.4f',Search.AvgDisc(i));
-      else
-        d = sprintf('%6.4f',Search.Discrepancy(i));
-      end
-    else
-      d = sprintf('%5d',Search.Discrepancy(i)); % orig candidate number
-    end
-  Search.Lab{i} = [b n ' ' File(f).Filename];
-end
-
-% ------------------------------------------- Display distance matrix
-
-if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
-
-Search = xMutualIDI(File,Search,Limit); % calculate some discrepancies
-
-for i=1:L,
-  f = Search.Candidates(i,N+1);          % file number
-  b = '';
-  for j = 1:min(4,N),
-    b = [b File(f).NT(Search.Candidates(i,j)).Base];
-  end
-  n = File(f).NT(Search.Candidates(i,1)).Number;
-  n = sprintf('%4s',n);
-  if Search.Query.Geometric > 0,
-      if isfield(Search,'AvgDisc'),
-        d = sprintf('%6.4f',Search.AvgDisc(i));
-      else
-        d = sprintf('%6.4f',Search.Discrepancy(i));
-      end
-    else
-      d = sprintf('%5d',Search.Discrepancy(i)); % orig candidate number
-    end
-  Search.Lab{i} = [b n ' ' File(f).Filename];
-end
-
-end
-
 % --------- if there is no geometric model, align to the central candidate
 
 if Query.Geometric == 0,
@@ -200,15 +152,19 @@ drawnow
 
 % ------------------------------- display menu -----------------------------
 
-if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
-  figure(98)
+if ShowNavWindow > 0,
+  if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
+    figure(98)
+    axis([1 Limit+1 1 Limit+1]);
+  end
+
+  figure(99)
   axis([1 Limit+1 1 Limit+1]);
 end
 
-figure(99)
-axis([1 Limit+1 1 Limit+1]);
-
 while stop == 0,                            
+
+ if ShowNavWindow > 0,
   % ---------------------------------------- Display table of discrepancies
   figure(99)
   ax = axis;
@@ -224,13 +180,18 @@ while stop == 0,
   m = q(find(Search.Marked));
   plot(m+0.5,m+0.5,'w.');
 %  axis(ax);
-  title(['Discrepancies between candidates, ordered by ' OrderText{Order}]);
+  if Limit < L,
+    title(['Discrepancies between first ' num2str(Limit) ' candidates, ordered by ' OrderText{Order}]);
+  else
+    title(['Discrepancies between all candidates, ordered by ' OrderText{Order}]);
+  end
   colormap('default');
   map = colormap;
   map = map((end-8):-1:8,:);
   colormap(map);
   caxis([0 0.8]);
   colorbar('location','eastoutside');
+  set(gcf,'Name','Navigation window; click here, then click the "Navigate" button');
 
   if N == 2 && exist('zIsoDiscrepancy') ==2,              % 2-NT candidates
  
@@ -249,14 +210,18 @@ while stop == 0,
   m = q(find(Search.Marked));
   plot(m+0.5,m+0.5,'w.');
 %  axis(ax);
-  title(['IDI between candidates, ordered by ' OrderText{Order}]);
+  if Limit < L,
+    title(['IsoDiscrepancies between first ' num2str(Limit) ' candidates, ordered by ' OrderText{Order}]);
+  else
+    title(['IsoDiscrepancies between all candidates, ordered by ' OrderText{Order}]);
+  end
   colormap('default');
   map = colormap;
   map = map((end-8):-1:8,:);
   colormap(map);
   caxis([0 5]);
   colorbar('location','eastoutside');
-
+  set(gcf,'Name','Navigation window; click here, then click the "Navigate" button');
 
   fprintf('Counts of base combinations found in this set.\n');
 
@@ -278,10 +243,9 @@ while stop == 0,
   end
   fprintf('\n');
 
-
-
-
   end
+ end
+
 
   if (Display(1).neighborhood == NeighMax),
     Neighborhood = 'No Neighborhood';
@@ -317,19 +281,85 @@ while stop == 0,
   Display(1).y=YLim;
   Display(1).z=ZLim;
 
+
+ % ------------------------------------------- Want the navigation window?
+
+  if any(k == [12 13 16]),
+    ShowNavWindow = min(2,1+ShowNavWindow);
+  end
+
+ % ------------------------------------------- Calculate distance matrix
+
+ if ShowNavWindow == 1,                     % just indicated to show this
+  fprintf('Calculating discrepancies between first %d candidates\n',Limit);
+  Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
+
+  for ii=1:L,
+    f = Search.Candidates(ii,N+1);          % file number
+    b = '';
+    for j = 1:min(4,N),
+      b = [b File(f).NT(Search.Candidates(ii,j)).Base];
+    end
+    n = File(f).NT(Search.Candidates(ii,1)).Number;
+    n = sprintf('%4s',n);
+    if Search.Query.Geometric > 0,
+        if isfield(Search,'AvgDisc'),
+          d = sprintf('%6.4f',Search.AvgDisc(ii));
+        else
+          d = sprintf('%6.4f',Search.Discrepancy(ii));
+        end
+      else
+        d = sprintf('%5d',Search.Discrepancy(ii)); % orig candidate number
+      end
+    Search.Lab{ii} = [b n ' ' File(f).Filename];
+  end
+
+  % ------------------------------------------- Calculate IDI matrix
+
+  if N == 2 && exist('zIsoDiscrepancy') == 2,              % 2-NT candidates
+
+  Search = xMutualIDI(File,Search,Limit); % calculate some discrepancies
+
+  for ii=1:L,
+    f = Search.Candidates(ii,N+1);          % file number
+    b = '';
+    for j = 1:min(4,N),
+      b = [b File(f).NT(Search.Candidates(ii,j)).Base];
+    end
+    n = File(f).NT(Search.Candidates(ii,1)).Number;
+    n = sprintf('%4s',n);
+    if Search.Query.Geometric > 0,
+        if isfield(Search,'AvgDisc'),
+          d = sprintf('%6.4f',Search.AvgDisc(ii));
+        else
+          d = sprintf('%6.4f',Search.Discrepancy(ii));
+        end
+      else
+        d = sprintf('%5d',Search.Discrepancy(ii)); % orig candidate number
+      end
+    Search.Lab{ii} = [b n ' ' File(f).Filename];
+    end
+  end
+ end
+
+
+
   switch k                               % k is the menu choice
     case 1                                      % next plot
       n = Display(i).n;                         % actual candidate displayed
       if q(n) + 1 > L,                          % q(n) is display order
-        Limit = min(Limit*2,L);                 % increase limit
         Display(i).n = p(1);
 
-Limit
-disp('Calculating more discrepancies');
-Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
+        if (ShowNavWindow > 0) && (min(Limit*2,L) > Limit),
+          Limit = min(Limit*2,L);                 % increase limit
+          fprintf('Increased display limit to %d; calculating more discrepancies\n',Limit);
+          Search = xMutualDiscrepancy(File,Search,Limit); % calculate some discrepancies
+        else
+          Limit = min(Limit*2,L);                 % increase limit
+        end
 
-p = 1:L;                                     % default permutation for display
-q(p) = 1:L;                                  % inverse permutation
+        p = 1:L;                             % default permutation for display
+        q(p) = 1:L;                          % inverse permutation
 
       else
         Display(i).n = p(q(n) + 1);
@@ -397,9 +427,7 @@ q(p) = 1:L;                                  % inverse permutation
         [y,m] = sort(q(j));
         j = j(m);                               % put j in display order
         Search2 = SearchSubset(Search,j);
-        xDisplayCandidates(File(FIndex),Search2,Level+1);
-        figure(99)
-        axis(ax);
+        xDisplayCandidates(File(FIndex),Search2,Level+1,UsingFull,Order,ShowNavWindow);
       end
 
     case 10                                      % list on screen
@@ -436,8 +464,8 @@ q(p) = 1:L;                                  % inverse permutation
       Search = SearchT;
 
     case 12                                     % sort by centrality
-%     [z,j] = sort(max(Search.Disc(1:Limit,1:Limit)));% sort by max discrepancy
-      [z,j] = sort(sum(Search.Disc));           % sort by average discrepancy
+      [z,j] = sort(max(Search.Disc(1:Limit,1:Limit)));% sort by max discrepancy
+%      [z,j] = sort(sum(Search.Disc));           % sort by average discrepancy
       S.AvgDisc  = z / (Limit - 1);             % average discrep among these
       p(1:Limit) = j;
       p((Limit+1):L) = (Limit+1):L;      
@@ -477,7 +505,12 @@ q(p) = 1:L;                                  % inverse permutation
 
     case 16
       figure(99)
-      pt = get(gca,'CurrentPoint')
+      if ShowNavWindow == 2,                    % already displayed
+        pt = get(gca,'CurrentPoint');
+      else
+        pt(1,1) = Display(i).n;                 % current candidate
+        pt(1,2) = Display(i).n;
+      end
 
       if abs(pt(1,1)-pt(1,2)) > Limit/20,           % clicked off the diagonal
         Search.Marked = 0 * Search.Marked;      % unmark all candidates
@@ -546,6 +579,10 @@ q(p) = 1:L;                                  % inverse permutation
       set(gcf, 'UserData', linkobj);
   end
 
+  if ShowNavWindow == 1,
+    ShowNavWindow = 2;
+  end
+
   figure(i)
   rotate3d on
   drawnow
@@ -593,6 +630,19 @@ function  PlotMotif(File,Search,Query,Display,i)
   f       = Search.Candidates(n,N+1);
   Indices = double(Search.Candidates(n,1:N));
 
+  if isfield(File(f),'Filename'),
+    FN = File(f).Filename;
+  else
+    FN = '';
+  end
+
+  nt = File(f).NT(Indices(1));
+  Title = [strrep(FN,'_','\_') ' ' nt.Base nt.Number];
+  for j=2:min(10,length(Indices)),
+    nt = File(f).NT(Indices(j));
+    Title = [Title '-' nt.Base nt.Number];
+  end;
+
   VP.Sugar    = Display(1).sugar;
   VP.LabelBases = Display(1).labelbases;
 
@@ -623,13 +673,15 @@ function  PlotMotif(File,Search,Query,Display,i)
 
   zDisplayNT(File(f),Indices,VP);
 
+  set(gcf,'Name',Title);
+
   if isfield(Search,'AvgDisc'),   
-    xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Average discrepancy from others ', num2str(Search.AvgDisc(n))]);
+    xlabel(['Candidate ',int2str(n),' of ',int2str(s),'   Average discrepancy from others ', num2str(Search.AvgDisc(n))]);
   elseif Query.Geometric > 0,
-    xlabel(['Plot ',int2str(n),' of ',int2str(s),'   Discrepancy ',...
+    xlabel(['Candidate ',int2str(n),' of ',int2str(s),'   Discrepancy ',...
           num2str(Search.Discrepancy(n))]);
   else
-    xlabel(['Plot ',int2str(n),' of ',int2str(s)]);
+    xlabel(['Candidate ',int2str(n),' of ',int2str(s)]);
   end
 
   if Search.Marked(n) == 1;
@@ -668,8 +720,6 @@ function  PlotMotif(File,Search,Query,Display,i)
     else
       ylabel(['Plot ',int2str(n),' of ',int2str(s)]);
     end
-
-
   end
   % end of commands for Amal
 

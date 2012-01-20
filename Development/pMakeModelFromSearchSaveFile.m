@@ -18,16 +18,7 @@ if strcmp(class(Search),'char'),
   load(['SearchSaveFiles' filesep Search],'Search','-mat');
 end
 
-% somehow the program needs to figure out what type of motif we have,
-% whether it is a hairpin, internal loop, or junction.
-% That information will be stored in the filename for the motif library,
-% but for other motifs one might want, it will need to be found another way.
-
-%if nargin == 1,
-  Type = 'IL';                          % work with internal loops for now
-%end
-
-% ----------------------------------- Depending on the type of motif ...
+% ----------------------------------- Gather basic information about the search
 
 [L,N] = size(Search.Candidates);        % L = num instances; N = num NT
 N = N - 1;                              % number of nucleotides
@@ -106,7 +97,7 @@ end
 F.NT = File.NT(Search.Candidates(1,1:N));
 
 %Node = pMakeNodes(File,NTNumber,LastNTNumber,Truncate);
-Node = pMakeNodes(F,1,N,Truncate);
+Node = pMakeNodes(F,1,N,Truncate);          % make the SCFG/MRF model
 
 for m = 1:length(Node),
 %  Node(m)
@@ -141,11 +132,11 @@ for n = 1:length(Node),
     b = Node(n).RightIndex;                  % right NT of the query motif
     Score = pConsensusPairSubstitution(a,b,f,Search.File,F,Node(n).Delete,L,Search);
 
-fprintf('Original substitution probabilities\n');
-Node(n).SubsProb
+%fprintf('Original substitution probabilities\n');
+%Node(n).SubsProb
 
-fprintf('Consensus substitution probabilities\n');
-Score
+%fprintf('Consensus substitution probabilities\n');
+%Score
 
     Node(n).SubsProb = Score;
 

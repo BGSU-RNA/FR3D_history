@@ -1,6 +1,6 @@
-% zPairIDI(Class,Code1,Code2) returns the 4x4 matrix of IDI values for pair Code1,Code2 in geometric family class.  You can use text for these, for example, zPairIDI('cWW','A','U');  For speed, load PairExemplars and pass in ExemplarIDI.
+% zExemplarIDI(Class,Code1,Code2) returns the 4x4 matrix of IDI values for pair Code1,Code2 in geometric family Class.  You can use text for these, for example, zExemplarIDI('cWW','A','U');  For speed, load PairExemplars and pass in ExemplarIDI.
 
-function [IDI] = zPairIDI(Class,Code1,Code2,ExemplarIDI)
+function [IDI] = zExemplarIDI(Class,Code1,Code2,ExemplarIDI)
 
 if nargin < 4,
   load PairExemplars

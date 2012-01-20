@@ -7,7 +7,7 @@ for r = 1:length(t(:,1)),
   end
 end
 
-Format = 1;
+Format = 2;
 
 switch Format
 case 1, 
@@ -16,8 +16,6 @@ case 1,
   [y,j] = sort(-n(i,2));                  % sort by number of nucleotides
   i = i(j);
 
-  j = find(n(i,2)>0);
-  i = i(j);                               % keep structures with nucleotides
 
 case 2,
   OK = zeros(1,length(t(:,1)));
@@ -47,14 +45,12 @@ case 1,
   fprintf(fid,'<title>List of all RNA-containing structures</title>\n');
   fprintf(fid,'</head>\n');
   fprintf(fid,'<body>\n');
-  fprintf(fid,'<h3>List of all RNA-containing structures</h3>\n');
-  fprintf(fid,'<a href="nonredlist.html">Click here for the non-redundant list of high-resolution x-ray structures</a>\n');
+  fprintf(fid,'<a href="nonredlist.html">Click here for the reduced-redundancy list</a>\n');
 case 2,
   fprintf(fid,'<head>\n');
-  fprintf(fid,'<title>Non-redundant list of RNA-containing structures from X-ray crystallography with resolution <= %7.1f</title>\n', max(nn(:,1)));
+  fprintf(fid,'<title>Reduced-redundancy list of RNA-containing structures from X-ray crystallography with resolution <= %7.1f</title>\n', max(nn(:,1)));
   fprintf(fid,'</head>\n');
   fprintf(fid,'<body>\n');
-  fprintf(fid,'<h3>Non-redundant list of RNA-containing structures from X-ray crystallography with resolution <= %7.1f</h3>\n', max(nn(:,1)));
   fprintf(fid,'<a href="index.html">Click here for the full list</a>\n');
 end
 

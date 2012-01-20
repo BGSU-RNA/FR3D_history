@@ -2,9 +2,9 @@
 % 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
 
 if exist('File'),
-  [File,FIndex] = zAddNTData('2avy',2,File);
+  [File,FIndex] = zAddNTData('2avy',0,File);
 else
-  [File,FIndex] = zAddNTData('2avy',2);
+  [File,FIndex] = zAddNTData('2avy',0);
 end
 
 F = File(FIndex);
@@ -41,4 +41,4 @@ fprintf('%s\n', S{1});
 fprintf('%s\n', S{2});
 fprintf('\n');
 
-pWriteJavaNodeFile(File(FIndex),Node,4);
+pWriteJavaNodeFile(File(FIndex),Node,4,'16S_from_2avy.txt');

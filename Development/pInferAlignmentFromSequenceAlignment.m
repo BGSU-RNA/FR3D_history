@@ -2,7 +2,7 @@
 
 % the program assumes that every index in File1 and File2 has an A, C, G, or U base.
 
-function [i1,i2] = pInferAlignmentFromSequenceAlignment(File1,S1,File2,S2)
+function [i1,i2] = pInferAlignmentFromSequenceAlignment(S1,S2)
 
 [cti1,itc1] = pColumnToIndex(S1);
 [cti2,itc2] = pColumnToIndex(S2);

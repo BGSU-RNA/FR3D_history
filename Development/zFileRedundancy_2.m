@@ -9,13 +9,15 @@
 %  load PDBInfo
 %end 
 
+diary Redundancy_Report_2009-05-13_Criterion_5.txt
+
 Timeline = [];
 
 if ~exist('TodayDate')
-  TodayDate = date;
+  TodayDate = datestr(date,'yyyy-mm-dd');
 end
 
-tot = cputime;                     % keep track of total time
+tot = cputime;                    % keep track of total time
 
 p = 0.95;                         % cutoff base match fraction
 maxd = 0.5;                       % cutoff discrepancy between structures
@@ -23,7 +25,7 @@ NTLimit = 7300;                   % above this limit, do not align sequences
 MaxRes  = 4;                      % maximum resolution value to use
 SL = 3000;                        % upper limit on # bases to align
 
-Criterion = 1;                   
+Criterion = 15;                   
                                   % 1-earliest release date 
                                   % 2-resolution 
                                   % 3-number of nucleotides
@@ -35,41 +37,54 @@ Criterion = 1;
 
 Preferred = zReadPDBList('Preferred_list',1);
 
+JoinList = {'1FKA','1J5E'};       % structures that are redundant
+%JoinList = [JoinList; {'1C2W','2AW4'}];
+
 % --------------------------------- Look up information on these structures
 
 load PDBInfo
 
-diary Redundancy_Report_2009-02-11_Criterion_1.txt
-
-fprintf('Found %d structures containing RNA in the PDB.\n', length(t(:,1)));
-
-i = find(n(:,1) > 0);             % omit structures with no resolution, esp NMR
+i = find(n(:,2) > 0);             % restrict to structures with nucleotides
 t = t(i,:);
 n = n(i,:);           
 
-fprintf('Found %d structures with two or more nucleotides.\n', length(t(:,1)));
+fprintf('Found %4d structures containing RNA in the PDB.\n', length(t(:,1)));
+
+i = find(n(:,2) > 1);             % restrict to structures with nucleotides
+t = t(i,:);
+n = n(i,:);           
+
+fprintf('Found %4d structures with two or more nucleotides.\n', length(t(:,1)));
 
 i = find(n(:,3) > 0);             % restrict to structures with basepairs
 t = t(i,:);
 n = n(i,:);           
 
-fprintf('Found %d structures with one or more basepairs.\n', length(t(:,1)));
+fprintf('Found %4d structures with one or more basepairs.\n', length(t(:,1)));
 
-[y,i] = sort(n(:,2));             % sort by number of nucleotides
+i = find(n(:,1) > 0);             % omit structures with no resolution, esp NMR
 t = t(i,:);
-n = n(i,:);
+n = n(i,:);           
 
-fprintf('Found %d structures having a stated resolution.\n', length(t(:,1)));
+fprintf('Found %4d structures having a stated resolution.\n', length(t(:,1)));
 
 i = find(n(:,1) <= MaxRes);       % restrict to structures with res <= MaxRes
 t = t(i,:);
 n = n(i,:);           
 
-fprintf('Found %d structures with resolution at or better than %6.2f\n', length(t(:,1)), MaxRes);
+fprintf('Found %4d structures with resolution at or better than %6.2f\n', length(t(:,1)), MaxRes);
 
-i = find(n(:,2) > 1);             % restrict to structures with nucleotides
+[y,i] = sort(n(:,2));             % sort by number of nucleotides
 t = t(i,:);
-n = n(i,:);           
+n = n(i,:);
+
+
+%i = find((n(:,2) > 1170) .* (n(:,2) < 1675));
+%t = t(i,:);
+%n = n(i,:);
+
+%fprintf('Focusing on 16S structures today!\n');
+
 
 %i = find(n(:,2) > 2000);       % big ribosomes only, for now
 %i = find(n(:,2) < 40);       % big ribosomes only, for now
@@ -78,7 +93,7 @@ n = n(i,:);
 
 F = length(i);                    % number of files
 
-fprintf('Found %d 3D structures with resolution better than %6.1f and at least one basepair.\n', F, MaxRes);
+fprintf('Found %4d 3D structures with resolution better than %6.2f and at least one RNA basepair.\n', F, MaxRes);
 
 fprintf('Preparing a redundancy report on %d RNA 3D structures.\n',F);
 fprintf('Sequence identity cutoff will be %7.2f.\n', p);
@@ -88,51 +103,37 @@ fprintf('Geometric discrepancy cutoff will be %7.2f.\n', maxd);
 
 for i = 1:F,
   d = datenum(t{i,4}, 'mm/dd/yyyy');
-  Timeline = [Timeline; [d 1 n(i,2) n(i,3)]];
+  Timeline = [Timeline; [d 1 n(i,2) n(i,3)]];  % accumulate data
 end
 
-  [y,i] = sort(Timeline(:,1));                 % sort by date of increase
-  Timeline = Timeline(i,:);                    % re-order data
+[y,i] = sort(Timeline(:,1));                 % sort by date of increase
+Timeline = Timeline(i,:);                    % re-order data
 
-  Date  = Timeline(:,1);
-  NumF  = Timeline(:,2);
-  NumNT = Timeline(:,3);
-  NumP  = Timeline(:,4);
+Date  = Timeline(:,1);
+NumF  = Timeline(:,2);
+NumNT = Timeline(:,3);
+NumP  = Timeline(:,4);
 
-  Year = 1995 + (Date - datenum('01/01/1995','mm/dd/yyyy'))/365;
+Year = 1995 + (Date - datenum('01/01/1995','mm/dd/yyyy'))/365;
 
-  figure(1)
-  clf
-  subplot(3,1,1)
-  stairs(Year,cumsum(NumF));
-  title('Total number of non-NMR RNA 3D structures');
-  axis([1992 2009 0 1.05*sum(NumF)]);
+figure(1)
+clf
+subplot(3,1,1)
+stairs(Year,cumsum(NumF));
+title(['Total number of RNA 3D structures with resolution better than ' num2str(MaxRes)]);
+axis([1992 2009 0 1.05*sum(NumF)]);
 
-  subplot(3,1,2)
-  stairs(Year,cumsum(NumNT));
-  title('Number of nucleotides in these structures');
-  axis([1992 2009 0 1.05*sum(NumNT)]);
+subplot(3,1,2)
+stairs(Year,cumsum(NumNT));
+title('Number of nucleotides in these structures');
+axis([1992 2009 0 1.05*sum(NumNT)]);
 
-  subplot(3,1,3)
-  stairs(Year,cumsum(NumP));
-  title('Number of basepairs in these structures');
-  axis([1992 2009 0 1.05*sum(NumP)]);
+subplot(3,1,3)
+stairs(Year,cumsum(NumP));
+title('Number of basepairs in these structures');
+axis([1992 2009 0 1.05*sum(NumP)]);
 
 RTimeline = Timeline;
-
-
-% --------------------------------- Examine redundant chains
-
-coun = 0;
-
-for i = 1:F,
-  if length(t{i,9}) > length(t{i,11}),
-    coun = coun + 1;
-  end
-end
-  
-fprintf('Found %d structures with redundant chains.\n', coun);
-
 
 % --------------------------------- Compare sequences between files
 
@@ -156,24 +157,7 @@ for i = 1:(F-1),
 
   j = i + 1;                              % index of structure to compare to
 
-  while (j <= F) && (p*n(j,2) < n(i,2)),  % while seqs COULD match well enough,
-    SameName = 0;
-    ti = lower(t{i,8});
-    tj = lower(t{j,8});
-
-    % simply comparing names doesn't work so well since they can be wrong!
-    % that's why the first line prevents this from being considered
-    if n(i,2) > 9300 && length(ti) > 0 && length(tj) > 0,
-      [namematch,a,b,ss,tt] = zNeedlemanWunsch(ti, tj);  % compare source organism instead of sequence
-      namematch = sum(ti(a) == tj(b));
-      if namematch / min(length(ti),length(tj)) > 0.9,
-%        fprintf('%s matches %s\n', t{i,8}, t{j,8});
-         SameName = 1;
-         Close(i,j) = 1;
-      else
-%        fprintf('           %s does not match %s\n', t{i,8}, t{j,8});
-      end
-    end                
+  while (j <= F) && (p*length(t{j,11}) < length(t{i,11})),  % while seqs COULD match well enough,
 
     if n(i,2) <= NTLimit || length(t{i,8}) == 0 || length(t{j,8}) == 0,
       ti = t{i,11};                           % seq from non-red chains
@@ -189,7 +173,7 @@ for i = 1:(F-1),
 drawnow
 
       if ((n(i,2) - matches < 4) || (pro > p)),
-        Close(i,j) = 1;
+        Close(i,j) = 1;                       % sequences agree well enough
         prop(i,j)  = pro;
         Linked(j)  = Linked(j) + 1;
         if n(i,2) > NTLimit,
@@ -209,14 +193,23 @@ end
 
 fprintf('\nComparing sequences from structures took %7.1f minutes.\n\n', (cputime-stim)/60);
 
+% ------------------------------------------ Join specified structures
 
-Close = Close + Close';
+for j = 1:length(JoinList(:,1)),
+  a = find(ismember(t(:,1),JoinList{j,1}));
+  b = find(ismember(t(:,1),JoinList{j,2}));
+  Close(a,b) = 1;
+  prop(a,b) = 1;
+end
+
+
+Close = Close + Close';           % extend by symmetry
 prop  = prop + prop';
 
 closeseq = Close;                 % store this for later
 
 for k = 1:20,                     % Markov transitions for transitivity
-  Close = Close * Close;
+  Close = Close * Close;          % extend by transitivity
 end
 
 figure(2)
@@ -233,14 +226,14 @@ done = zeros(1,F);                % whether each file has been considered
 
 stim = cputime;
 
-for i = 1:(F-1),
-  if done(i) == 0,
+for i = 1:(F-1),                  % loop through files
+  if done(i) == 0,                % if file i hasn't been considered yet
     j = find(Close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
-      done(i) = 1;
+      done(i) = 1;                % file i has a unique sequence
     elseif n(i,2) < NTLimit,
       File = zAddNTData(t(j,1));     % load nucleotide data
-      File = zOrderChains(File);
+      File = zOrderChains(File);     % put largest chain first
 
       for m = 1:length(j),
         E  = abs(triu(File(m).Edge));
@@ -318,6 +311,9 @@ end
           if ~(d <= maxd),                  % allow for d = NaN
             closeseq(j(m),j(nn)) = 0;       % these are not that close!
             closeseq(j(nn),j(m)) = 0;  
+
+%            fprintf('Big discrepancy of %7.4f between %s and %s\n',d,t{j(m),1},t{j(nn),1});
+
           end     
         end
       end
@@ -378,6 +374,15 @@ clear Text
 
 Close = closeseq;                 % 
 
+% ------------------------------------------ Join specified structures
+
+for j = 1:length(JoinList(:,1)),
+  a = find(ismember(t(:,1),JoinList{j,1}));
+  b = find(ismember(t(:,1),JoinList{j,2}));
+  Close(a,b) = 1;
+  prop(a,b) = 1;
+end
+
 for k = 1:20,                     % Markov transitions for transitivity
   Close = Close * Close;
 end
@@ -412,7 +417,7 @@ fprintf('\n');
 done = zeros(1,F);                % whether each file has been considered
 c = 0;                            % counts the number of files selected so far
 
-for i = 1:(F-1),
+for i = 1:(F-1),                  % loop through all files
   if done(i) == 0,                % file does not already appear in a report
     j = find(Close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
@@ -653,22 +658,24 @@ if Criterion == 1,
   subplot(3,1,1)
   stairs(Year,cumsum(NumF));
   title('Number of distinct RNA 3D structures');
-  axis([1992 2009 0 1.05*sum(NumF)]);
+  axis([1992 2010 0 1.05*sum(NumF)]);
 
   subplot(3,1,2)
   stairs(Year,cumsum(NumNT));
   title('Number of nucleotides in distinct structures');
-  axis([1992 2009 0 1.05*sum(NumNT)]);
-  get(gca,'YTickLabel')
-  set(gca,'YTickLabel',{'0','20000','40000'});
+  axis([1992 2010 0 1.05*sum(NumNT)]);
+  set(gca,'YTick',[0 10000 20000 30000 40000])
+  set(gca,'YTickLabel',{'0','10000','20000','30000','40000'});
 
   subplot(3,1,3)
   stairs(Year,cumsum(NumP));
   title('Number of basepairs in distinct structures');
-  axis([1992 2009 0 1.05*sum(NumP)]);
+  axis([1992 2010 0 1.05*sum(NumP)]);
 end
 
 % ----------------------------------------- Update PDBInfo with this list
+
+if Criterion == 15,
 
 fprintf('\nUpdating PDB Info with non-redundant list and equivalencies\n');
 
@@ -693,7 +700,11 @@ end
 
 save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 
+end
+
 fprintf('Total elapsed time %8.6f minutes.\n', (cputime-tot)/60);
+
+
 
 diary off
 
