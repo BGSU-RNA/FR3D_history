@@ -3,7 +3,7 @@
 
 function [File] = zGetPDBInfo(File)
 
-load('PDBInfo.mat','n','t','-mat');
+load(['FR3DSource' filesep 'PDBInfo.mat'],'n','t','-mat');
 
 PDBNames = lower(t(:,1));              % convert PDB filenames to lowercase
 
@@ -22,7 +22,7 @@ if ~isempty(i),
     t{i(1),9} = BaseSequence;
   end
 
-  save('PDBInfo.mat','n','t'); % Matlab version 7
+  save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
 else
   File.Info.Resolution  = [];
   File.Info.Descriptor  = [];

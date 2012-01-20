@@ -94,7 +94,7 @@ for k = 1:length(i),                            % loop through possible pairs
           pc = pc + 1;
         end
 
-        File(f).BasePhosphate(i(k),j(k)) =   g;
+        File(f).BasePhosphate(i(k),j(k)) =  g;
 
         if Verbose > 0,
           ox = (N2.Sugar(p(jj(kk)),:)-N1.Fit(1,:)) * N1.Rot; % oxygen displ
@@ -128,7 +128,7 @@ for k = 1:length(i),                            % loop through possible pairs
 end   % loop over pairs
 end   % loop over files
 
-if Verbose > 1,
+if Verbose > 0,
 
 fprintf('Classifying base-phosphate interactions took %8.2f minutes\n', (cputime-t)/60);
 
@@ -194,17 +194,7 @@ end
 
 end
 
-
-
-
-
-
 return
-
-
-
-
-
 
 for v = 1:4,
   figure(v+4)

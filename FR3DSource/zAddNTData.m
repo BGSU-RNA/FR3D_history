@@ -8,16 +8,20 @@
 % SizeCode = 3     : load, but do not append to File (for reclassification)
 % SizeCode = 4     : load _small.mat files, do not compute distances
 
-function [File,Index] = zAddNTData(Filenames,SizeCode,File,PDBStart)
+function [File,Index] = zAddNTData(Filenames,SizeCode,File,Verbose,PDBStart)
 
 if nargin < 2,
   SizeCode = 1;                           % default is to read full files
 end
 
+if nargin < 4,
+  Verbose = 0;
+end
+
 LoadedFiles = [];
 F = 0;
 
-if nargin == 3,
+if nargin >= 3,
   F = length(File);
   for j = 1:length(File),
     LoadedFiles{j} = lower(File(j).Filename);
@@ -49,7 +53,7 @@ end
 
 % ----------------------------------------- Skip some files
 
-if nargin == 4,
+if nargin == 5,
   if strcmp(PDBStart,'back') == 1,
     FullList = FullList(end:-1:1);
   else
@@ -71,7 +75,7 @@ for f = 1:length(FullList),                       % loop through PDB list
   if ~isempty(FullList{f}),
     i = strmatch(lower(FullList{f}), LoadedFiles, 'exact');
     if isempty(i),                                  % if PDB not loaded,
-      NewF = zGetNTData(FullList{f},0,SizeCode); %   load it
+      NewF = zGetNTData(FullList{f},0,SizeCode,Verbose); %   load it
       if SizeCode ~= 3,
         File(F+1) = NewF;
       end
@@ -83,7 +87,7 @@ for f = 1:length(FullList),                       % loop through PDB list
     else                                      % but if PDB has been loaded
       Index(f) = i(1);                        %   point to first instance
       if length(File(i(1)).NT) == 0,
-        NewF = zGetNTData(File(Index(f)).Filename,0,SizeCode);
+        NewF = zGetNTData(File(Index(f)).Filename,0,SizeCode,Verbose);
         if SizeCode ~= 3,
           File(Index(f)) = NewF;
           clear NewF;

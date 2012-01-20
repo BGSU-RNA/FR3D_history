@@ -1,6 +1,10 @@
 % zSaveNTData saves File in File.Filename.analyzed
 
-function [void] = zSaveNTData(Files)
+function [void] = zSaveNTData(Files,Verbose)
+
+if nargin < 2,
+  Verbose = 1;
+end
 
 for f=1:length(Files),
 
@@ -19,13 +23,18 @@ for f=1:length(Files),
 
    if File.SizeCode == 1,
      save([pwd filesep 'PrecomputedData' filesep File.Filename '.mat'],'File');
-     fprintf('Saved %s\n', [File.Filename '.mat']);
+
+     if Verbose > 0,
+       fprintf('Saved %s.  ', [File.Filename '.mat']);
+     end
 
      File = zSmallVersion(File);
    end
 
    save([pwd filesep 'PrecomputedData' filesep File.Filename '_small.mat'],'File');
-   fprintf('Saved %s\n', [File.Filename '_small.mat']);
+   if Verbose > 0,
+     fprintf('Saved %s\n', [File.Filename '_small.mat']);
+   end
   end
 
 end

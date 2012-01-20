@@ -1,25 +1,51 @@
-% zDisplayPairCounts displays counts of pairwise interactions, either from exemplars or from structures.  The format is Count(base1code,base2code,category).
+% zCountInstancesofPairs summarizes information on pair interaction frequency from the exemplar file
 
-function [void] = zDisplayPairCounts(Count,CountFilename)
+MaxCat = 25;
+
+Count = zeros(4,4,MaxCat);
+
+load('PairExemplarsTemp','Exemplar');
+
+for c1 = 1:4,                              % loop through code of nucleotide 1
+ for c2 = 1:4,                             % loop through code of nucleotide 2
+  for r = 1:length(Exemplar(:,1)),         % loop through rows of Exemplar
+   pc  = 4*(c2-1)+c1;                      % current paircode
+
+   E = Exemplar(r,pc);                     % current exemplar
+
+   if ~isempty(E.Filename),
+     ca    = fix(abs(E.Class));            % current category
+
+     if (E.Class < 0),
+       Count(c2,c1,ca) = Count(c2,c1,ca) + E.Count;
+     else
+       Count(c1,c2,ca) = Count(c1,c2,ca) + E.Count;
+     end
+
+    end
+  end
+ end
+end
+
+c1 = 3;
+c2 = 2;
+
+for ca = 1:MaxCat,
+  t = Count(c1,c2,ca);
+  Count(c1,c2,ca) = Count(c2,c1,ca);       % reverse GC and CG counts
+  Count(c2,c1,ca) = t;
+end
 
 Total = [];
 
-[s,t,MaxCat] = size(Count);
-
-if MaxCat > 100,
-  m = 10;                           % category numbers are all multiplied by 10
-else
-  m = 1;
-end
-
-for ca = 1:12,
-  Total(ca) = sum(sum(Count(:,:,m*ca)));
+for ca = 1:MaxCat,
+  Total(ca) = sum(sum(Count(:,:,ca)));
 end
 
 for ca = [1 2 7 8];
   for c1 = 2:4,
     for c2 = 1:(c1-1);
-%      Count(c1,c2,m*ca) = -Count(c2,c1,m*ca);
+      Count(c1,c2,ca) = -Count(c2,c1,ca);
     end
   end
 end
@@ -50,13 +76,13 @@ for ca = 1:12,
     T{row+i,1} = Letters(i);
     T{row,1+i} = Letters(i);
     for j = 1:4,
-      T{row+j,1+i} = Count(j,i,m*ca);
+      T{row+j,1+i} = Count(j,i,ca);
     end
 
     T{row+i,1+S} = Letters(i);
     T{row,1+i+S} = Letters(i);
     for j = 1:4,
-      T{row+j,1+i+S} = 100*Count(j,i,m*ca)/Total(ca);
+      T{row+j,1+i+S} = 100*Count(j,i,ca)/Total(ca);
     end
 
   end
@@ -80,8 +106,8 @@ for ca = 1:12,
   for i = 1:4,
     for j = 1:4,
       pc = 4*(j-1) + i;
-      if Count(i,j,m*ca) ~= 0,
-        T{row+ca,1+pc} = Count(j,i,m*ca);
+      if Count(i,j,ca) ~= 0,
+        T{row+ca,1+pc} = Count(j,i,ca);
       end
     end
   end
@@ -107,8 +133,8 @@ for ca = 1:12,
   for i = 1:4,
     for j = 1:4,
       pc = 4*(j-1) + i;
-      if Count(i,j,m*ca) ~= 0,
-        T{row+ca,1+pc} = 100*Count(j,i,m*ca)/Total(ca);
+      if Count(i,j,ca) ~= 0,
+        T{row+ca,1+pc} = 100*Count(j,i,ca)/Total(ca);
       end
     end
   end
@@ -116,5 +142,8 @@ for ca = 1:12,
   T{row+ca,19} = 100*Total(ca)/sum(Total(1:12));
 end
 
-xlswrite(CountFilename,T);
+xlswrite('Basepair_counts',T);
+
+
+
 

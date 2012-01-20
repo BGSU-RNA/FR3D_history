@@ -291,6 +291,7 @@ if Query.Geometric > 0,
 
 else
   Query.SSCutoff = Inf * ones(1,Query.NumNT);
+  Query.DistCutoff = 30;        % default distance cutoff for symbolic search
 end
 
 % --------- Read minimum and maximum distance specifications

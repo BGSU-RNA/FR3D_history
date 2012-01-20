@@ -1,5 +1,4 @@
-% zWriteExemplarPDB reads the file of pair exemplars and writes them out
-% to a single PDB file, spaced 20 Angstroms apart in a plane
+% zWriteExemplarPDB reads the file of pair exemplars and writes them out to a single PDB file, spaced 20 Angstroms apart in a plane (using Separate = 0) or to individual PDB files, using Separate = 1.
 
 function [void] = zWriteExemplarPDB(Separate)
 
@@ -100,6 +99,8 @@ sh = E.NT1.Fit(1,:);
 % simple form for Jesse's online database of exemplars
 
 ET = zEdgeText(E.Class,1,E.NT1.Code,E.NT2.Code);
+ET = strrep(ET,'WW','Ww');
+ET = strrep(ET,'HH','Hh');
 ET = strrep(ET,' ','');
 
 FN = [ET '_' E.NT1.Base E.NT2.Base '_Exemplar.pdb'];

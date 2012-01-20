@@ -1,7 +1,11 @@
 % zExtractAtomsPDB(Filename) reads Filename.pdb and writes out lines 
 % containing ATOM to Filename_Atoms.pdb
 
-function [Header] = zExtractAtomsPDB(Filename,Outputname)
+function [Header] = zExtractAtomsPDB(Filename,Outputname,Verbose)
+
+if nargin < 3,
+  Verbose = 1;
+end
 
 fid = fopen([Filename '.pdb'],'r');
 
@@ -50,8 +54,9 @@ if fid > 0
   fclose(fid);
   fclose(out);
 
-  fprintf('Read %s.pdb for header information\n', Filename)
-
+  if Verbose > 0,
+    fprintf('Read %s.pdb\n', Filename)
+  end
 else
 
   fprintf('Could not open file %s.pdb\n', Filename);

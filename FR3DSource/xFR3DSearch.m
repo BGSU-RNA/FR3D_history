@@ -20,9 +20,9 @@ end
 % ----------------------------------------- Load PDB files if needed --------
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData(Filenames,2);   % load PDB data
+  [File,SIndex] = zAddNTData(Filenames,2,[],Verbose);   % load PDB data
 else
-  [File,SIndex] = zAddNTData(Filenames,2,File); % add PDB data if needed
+  [File,SIndex] = zAddNTData(Filenames,2,File,Verbose); %add PDB data if needed
 end                       % SIndex tells which elements of File to search
 
 % ------------------------------------------- Store actual filenames

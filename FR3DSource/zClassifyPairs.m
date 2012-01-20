@@ -2,10 +2,14 @@
 % between bases in File that are close enough to possibly be interacting, then
 % classifies the interaction
 
-function [File] = zClassifyPairs(File)
+function [File] = zClassifyPairs(File,Verbose)
 
 if isfield(File,'Pair'),
   File = rmfield(File,'Pair');                  % remove previous pair info
+end
+
+if nargin < 2,
+  Verbose = 1;
 end
 
 if File.NumNT > 0,
@@ -44,7 +48,7 @@ for k = 1:length(i),                            % loop through possible pairs
   Ni = File.NT(i(k));                           % nucleotide i information
   Nj = File.NT(j(k));                           % nucleotide j information
 
-  [Pair,s] = zClassifyPair(Ni,Nj,CL,Exemplar);
+  [Pair,s] = zClassifyPair(Ni,Nj,CL,Exemplar,0,Verbose);
 
   if ~isempty(Pair),
 
@@ -90,9 +94,10 @@ else
   File.Pair = [];
 end
 
-%fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
-
-%fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
+if Verbose > 1,
+  fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
+  fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
+end
 
 else                                                % no nucleotides
   File.Pair = [];

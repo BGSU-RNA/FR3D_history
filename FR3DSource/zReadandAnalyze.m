@@ -21,7 +21,11 @@
 %  Shift    Best shift from standard to observed locations
 %  Fit      Best fit of observed locations to standard base locations
 
-function [File] = zReadandAnalyze(Filename)
+function [File] = zReadandAnalyze(Filename,Verbose)
+
+if nargin < 2,
+  Verbose = 1;
+end
 
 % read Filename.pdb ----------------------------------------------------
 
@@ -35,7 +39,7 @@ a = 1000+round(8900*rand);
 
 TempFileName = ['##TempPDB' num2str(a)];
 
-Header = zExtractAtomsPDB(Filename,TempFileName);
+Header = zExtractAtomsPDB(Filename,TempFileName,Verbose);
 
 [ATOM_TYPE, ATOMNUMBER, ATOMNAME, VERSION, NTLETTER, CHAIN, NTNUMBER, P] = zReadPDBTextRead(TempFileName);
 
@@ -231,7 +235,9 @@ while i < length(NTNUMBER),                 % go through all atoms
 
   if (Flag < 1),
     if (max(max(Loc)) == Inf),                 % base atoms missing
-      fprintf('Base %s%s is missing an atom, so it will be skipped\n',NT(n).Base,NT(n).Number);
+      if Verbose > 0,
+        fprintf('Base %s%s is missing an atom, so it will be skipped\n',NT(n).Base,NT(n).Number);
+      end
       n = n - 1;
     elseif (max(max(Sugar)) == Inf),          % sugar atom missing
       for k = 1:12,
@@ -266,7 +272,7 @@ for n=1:NumNT,                                   % analyze all nucleotides
   F  = (sh*ones(1,L2) + r*X2')';                 % best fit without scaling
   e  = sqrt(sum(sum((Y - F(1:L,:)).^2)))/L;      % error measure;
                                                  % should be between 0 and 10
-  if (e > 0.1),
+  if (e > 0.1) && Verbose > 0,
     fprintf('Nucleotide %c%s has average fitting error %6.4f Angstroms\n', NT(n).Base, NT(n).Number, e);
   end
 

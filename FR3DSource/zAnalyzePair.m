@@ -1,7 +1,7 @@
 % zAnalyzePair(N1,N2,CL) computes distances, angles, and classification
 % codes.
 
-function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
+function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ,Verbose)
 
   if nargin < 3,
     CL = zClassLimits;                              % read ClassLimits matrix
@@ -54,11 +54,13 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   if length(a) > 1,
     if max(fix(a)) > min(fix(a)),              % different integer parts
-      fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) fall into categories ', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
-      for k=1:length(a),
-        fprintf('%6.2f ',a(k));
+      if Verbose > 1,
+        fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) fall into categories ', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
+        for k=1:length(a),
+          fprintf('%6.2f ',a(k));
+        end
+        fprintf('\n');
       end
-      fprintf('\n');
       a = a(1);
     else
       a = sign(a(1))*min(abs(a));               % use primary version of class

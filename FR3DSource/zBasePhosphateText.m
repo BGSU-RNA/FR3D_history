@@ -3,40 +3,27 @@ function [E] = zBasePhosphateText(e)
 
 E = [];
 
+% The following vector converts internal FR3D codes to Base-phosphate categories1 to 9.  To change the categories, change here and in xGetEdgeNums.m
+
+BPCat = [2 5 6 9 5 6 7 8 9 1 3 4 5 9 4 8 9];
+
 for i=1:length(e),
   if e(i) > 100,
-    E = [E 'nB' num2str(e(i)-100)];
-  elseif e(i) > 0,
-    E = [E ' B' num2str(e(i))];
+    E = [E 'n'];
+    a = e(i) - 100;
   elseif e(i) < -100,
-    E = [E 'nP' num2str(e(i)+100)];
-  elseif e(i) < 0,
-    E = [E ' P' num2str(e(i))];
+    E = [E 'n'];
+    a = e(i) + 100;
   else
-    E = [E '   -'];
+    E = [E ' '];
+    a = e(i);
   end
-end
 
-return
-
-for i=1:length(e),
-  switch fix(e(i))
-    case    1,    E = [E ' B1P'];
-    case    2,    E = [E ' B2P'];
-    case    3,    E = [E ' B3P'];
-    case    4,    E = [E ' B4P'];
-    case  101,    E = [E 'nB1P'];
-    case  102,    E = [E 'nB2P'];
-    case  103,    E = [E 'nB3P'];
-    case  104,    E = [E 'nB4P'];
-    case   -1,    E = [E ' P1B'];
-    case   -2,    E = [E ' P2B'];
-    case   -3,    E = [E ' P3B'];
-    case   -4,    E = [E ' P4B'];
-    case -101,    E = [E 'nP1B'];
-    case -102,    E = [E 'nP2B'];
-    case -103,    E = [E 'nP3B'];
-    case -104,    E = [E 'nP4B'];
-    otherwise E = [E '   -'];
+  if a > 0,
+    E = [E num2str(BPCat(a)) 'BP'];
+  elseif a < 0,
+    E = [E num2str(BPCat(-a)) 'PB'];
+  else
+    E = [E '  -'];
   end
 end

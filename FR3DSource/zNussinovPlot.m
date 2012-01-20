@@ -3,13 +3,17 @@
 
 function [void] = zNussinovPlot(File,Edge,Color,Thickness)
 
-if nargin < 3,
-  Thickness = 1;
+if nargin < 2,
+  Edge = File.Edge;
 end
 
-if nargin < 2,
+if nargin < 3,
   Color = sparse(zeros(size(Edge)));
   Color(1,1) = 1;
+end
+
+if nargin < 4,
+  Thickness = 1;
 end
 
 [i,j] = find(Edge);

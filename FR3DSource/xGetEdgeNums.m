@@ -119,26 +119,45 @@ BPequiv{33} = [2 4 6 8 10 12 -2 -4 -6 -8 -10 -12];
 EdgeStr{34} = 'bif';
 BPequiv{34} = [13 -13];
 
+EdgeStr{35} = 'cWw';
+BPequiv{35} = [1];
+
+EdgeStr{36} = 'cwW';
+BPequiv{36} = [-1];
+
+EdgeStr{37} = 'cHh';
+BPequiv{37} = [7];
+
+EdgeStr{38} = 'chH';
+BPequiv{38} = [-7];
+
+EdgeStr{39} = 'tHh';
+BPequiv{39} = [8];
+
+EdgeStr{40} = 'thH';
+BPequiv{40} = [-8];
+
+
 BPStr{1}    = 'BP';
-basephoscode{1}  = 1:9;
+basephoscode{1}  = 1:17;
 
 BPStr{2}    = '1BP';
-basephoscode{2}  = [1];
+basephoscode{2}  = [10];
 
 BPStr{3}    = '2BP';
-basephoscode{3}  = [2];
+basephoscode{3}  = [1];
 
 BPStr{4}    = '3BP';
-basephoscode{4}  = [3];
+basephoscode{4}  = [11];
 
 BPStr{5}    = '4BP';
-basephoscode{5}  = [4];
+basephoscode{5}  = [12 15];
 
 BPStr{6}    = '5BP';
-basephoscode{6}  = [5];
+basephoscode{6}  = [2 5 13];
 
 BPStr{7}    = '6BP';
-basephoscode{7}  = [6];
+basephoscode{7}  = [3 6];
 
 BPStr{8}    = '7BP';
 basephoscode{8}  = [7];
@@ -147,37 +166,37 @@ BPStr{9}    = '8BP';
 basephoscode{9}  = [8];
 
 BPStr{10}    = '9BP';
-basephoscode{10}  = [9];
+basephoscode{10}  = [4 9 14 17];
 
 BPStr{21}    = 'PB';
-basephoscode{21}  = (-9):(-1);
+basephoscode{21}  = 1:17;
 
 BPStr{22}    = '1PB';
-basephoscode{22}  = [-1];
+basephoscode{22}  = [10];
 
 BPStr{23}    = '2PB';
-basephoscode{23}  = [-2];
+basephoscode{23}  = [1];
 
 BPStr{24}    = '3PB';
-basephoscode{24}  = [-3];
+basephoscode{24}  = [11];
 
 BPStr{25}    = '4PB';
-basephoscode{25}  = [-4];
+basephoscode{25}  = [12 15];
 
 BPStr{26}    = '5PB';
-basephoscode{26}  = [-5];
+basephoscode{26}  = [2 5 13];
 
 BPStr{27}    = '6PB';
-basephoscode{27}  = [-6];
+basephoscode{27}  = [3 6];
 
 BPStr{28}    = '7PB';
-basephoscode{28}  = [-7];
+basephoscode{28}  = [7];
 
 BPStr{29}    = '8PB';
-basephoscode{29}  = [-8];
+basephoscode{29}  = [8];
 
 BPStr{30}    = '9PB';
-basephoscode{30}  = [-9];
+basephoscode{30}  = [4 9 14 17];
 
 BPequiv{100} = [];
 
@@ -222,7 +241,7 @@ for i=1:length(lim)-1                    % loop through tokens
     Reverse = 0;
   end
 
-  if (Token(1) == 'n') | (Token(1) == 'N'),  % near
+  if ((Token(1) == 'n') | (Token(1) == 'N')) && (length(Token) > 1),  % near
     Token = Token(2:length(Token));
     Near = 1;
   else
@@ -256,17 +275,31 @@ for i=1:length(lim)-1                    % loop through tokens
       end
     end
 
-    if strcmpi(Token,'flank'),
+    newRange = [];
+
+    if strcmpi(Token,'flank') || strcmpi(Token,'f'),
       Flank = 1 - Reverse;
-    elseif strcmpi(Token,'local'),
-      Range = [1 10];
-      RRange = [11 Inf];
-    elseif strcmpi(Token,'nested'),
-      Range = [1 1];
-      RRange = [2 Inf];
-    elseif strcmpi(Token,'long-range') || strcmpi(Token,'LR'),
-      Range = [11 Inf];
-      RRange = [1 10];
+    elseif strcmpi(Token,'local') || strcmpi(Token,'L'),
+      newRange = [1 10];
+      newRRange = [11 Inf];
+    elseif strcmpi(Token,'ested') || strcmpi(Token,'n'),
+      newRange = [0 0];
+      newRRange = [1 Inf];
+    elseif strcmpi(Token,'long-range') || strcmpi(Token,'LR') || strcmpi(Token,'D') || strcmpi(Token,'Distant'),
+      newRange = [11 Inf];
+      newRRange = [0 10];
+    end
+
+    if isempty(Range),
+      if ~isempty(newRange),
+        Range = newRange;
+        RRange = newRRange;
+      end
+    elseif ~isempty(newRange),
+      Range(1) = min(Range(1),newRange(1));     % expand range
+      Range(2) = max(Range(2),newRange(2));
+      RRange(1) = max(RRange(1),newRRange(1));  % narrow RRange
+      RRange(2) = min(RRange(2),newRRange(2));
     end
 
     EdgeNum = BPequiv{EdgeCode};

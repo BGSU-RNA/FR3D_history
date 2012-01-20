@@ -5,9 +5,7 @@
 % threshold controls coloring of the dendrogram
 % Subcat = 1, include subcategories, Subcat = 0, don't
 
-function [Y,Z,DD] = zExemplarTable(Category,threshold,Subcat,Verbose)
-
-close all
+function [Y,Z,DD] = zExemplarTable(Category,threshold,Subcat)
 
 if nargin < 1,
   Category = 1;
@@ -21,81 +19,9 @@ if nargin < 3,
   Subcat = 1;
 end
 
-if nargin < 4,
-  Verbose = 2;
-end
-
 % load exemplars -------------------------------------
 
 load('PairExemplars','Exemplar');
-
-% loop through computer classifications, accumulating exemplars ------------
-
-B(1) = Exemplar(1,1);
-B(1).HydrogenClass = 0;
-B(1).subplot  = 0;
-B(1).original = 0;
-
-Lab = [];
-Cat = [];
-
-% 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
-% 9-AG 10-CG 11-GG 12-UG 13-AU 14-CU 15-GU 16-UU
-
-for c1 = 1:4,
- for c2 = 1:4,
-  pc  = 4*(c2-1)+c1;                       % current paircode
-  for r = 1:length(Exemplar(:,1)),         % loop through rows of Exemplar
-
-    E = Exemplar(r,pc);                    % current exemplar
-
-    if ~isempty(E.NT1),                    % non-empty entry of Exemplar
-    if  any(abs(E.Class) == Category) || ...
-       (any(fix(abs(E.Class)) == Category) && (Subcat == 1)),
-    if (E.Count >= 1),
-    
-      [B,Lab,Cat] = AddExemplar(E,B,Lab,Cat,Subcat);
-
-      % ------- in some symmetric families, produce the symmetric version
-      if (any(pc == [5 7 9 13 14 15])) && any(fix(E.Class) == [1 2 7 8]),
-        E.Class = -E.Class;
-        [B,Lab,Cat] = AddExemplar(E,B,Lab,Cat,Subcat);
-        E.Class = -E.Class;
-      end
-
-      % ------- in some symmetric families, store AA, CC, GG, UU pairs twice
-
-      if (E.NT1.Code == E.NT2.Code) && any(fix(E.Class) == [1 7 8 11 12]),
-        E.HydrogenClass = 0;
-        E.subplot  = 0;
-        E.original = 0;
-        E.Class = -E.Class;
-        [B,Lab,Cat] = AddExemplar(E,B,Lab,Cat,Subcat);
-      end
-
-
-    end
-    end
-    end
-  end
- end
-end
-
-% -------------------------------------- Sort exemplars by category
-
-B   = B(2:end);
-Lab = Lab(2:end);
-Cat = Cat(2:end);
-
-for m = 1:length(B),
-  categ(m) = abs(B(m).Class);
-end
-
-[y,i] = sort(categ);
-
-B = B(i);
-Lab = Lab(i);
-Cat = Cat(i);
 
 % specify parameters for viewing -------------------------------------------
 
@@ -111,19 +37,45 @@ ViewParam.Hydrogen  = 1;
 ViewParam.Sort      = 0;
 ViewParam.LabelBases= 8;                    % font size
 
-% -------------------------------------- Plot exemplars
+% loop through computer classifications, accumulating exemplars ------------
 
-if Verbose > 1,
-  for ca = 1:length(Category),
-    figure(fix(Category(ca)))
-    clf
-    plotted = zeros(16,1);                   % keep track of which are plotted
-    for m = 1:length(B),
-     if (B(m).original == 1) && ((abs(B(m).Class) == Category(ca)) ...
-        || ((abs(fix(B(m).Class)) == Category(ca)) && (Subcat == 1))),
+m = 1;                                      % counter for stored exemplars
 
-        pc2 = B(m).subplot;
-        E   = B(m);
+for ca = 1:length(Category),
+ figure(fix(Category(ca)))
+ clf
+ plotted = zeros(16,1);                     % keep track of which are plotted
+
+ for c1 = 1:4,
+  for c2 = 1:4,
+   for r = 1:length(Exemplar(:,1)),         % loop through rows of Exemplar
+    pc  = 4*(c2-1)+c1;                      % current paircode
+    pc2 = 4*(c1-1)+c2;                      % current subplot number
+
+    E = Exemplar(r,pc);                     % current exemplar
+
+    if isempty(E.Filename),                 % no such exemplar
+      E.Class = 0;                          % avoid errors below
+    end
+
+    if (isempty(E.Filename) && any(Category(ca) == [1 2 7 8]) ...
+       && any(pc == [2 3 4 8 10 12])),       % use symmetric case
+      E     = Exemplar(r,pc2);
+      E.NT1 = Exemplar(r,pc2).NT2;           % reverse nucleotides
+      E.NT2 = Exemplar(r,pc2).NT1;
+    elseif (E.Class < 0) && ~(pc == 7 && any(Category(ca) == [1 2 7 8])),
+      pc2   = pc;                            % display across diagonal
+      T     = E.NT1;
+      E.NT1 = E.NT2;
+      E.NT2 = T;
+      E.Class = -E.Class;
+    end
+
+    if ~isempty(E.Filename),
+
+     if (abs(E.Class) == Category(ca)) ...
+        || ((abs(fix(E.Class)) == Category(ca)) && (Subcat == 1)),
+
         % display the exemplar pair -----------------------------------------
 
        if abs(E.Class - fix(E.Class)) == 0,
@@ -141,7 +93,7 @@ if Verbose > 1,
        if plotted(pc2) > 0,
          ViewParam.LabelBases = 0;                  % don't display now
          xlab{pc2} = [xlab{pc2} ', ' num2str(E.Count)];  % append subcat count
-       else,
+       else
          ViewParam.LabelBases = 8;                  % font size
          xlab{pc2} = ['Count: ' num2str(E.Count)];
          Title{pc2} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' strrep(E.Filename,'_','\_') ' '];
@@ -154,7 +106,7 @@ if Verbose > 1,
        F.NT(2) = E.NT2;
        F.Filename = E.Filename;
        zDisplayNT(F,[1 2],ViewParam);
-       zPlotHydrogenBonds(E.NT1,E.NT2,E.HydrogenClass,E.NT1.Rot,E.NT1.Fit(1,:));
+       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
 
        view(2)
        grid off
@@ -170,10 +122,31 @@ if Verbose > 1,
        rotate3d on
        plotted(pc2) = 1;
 
+
+      if (E.Count >= 1),
+       B(m) = E;                    % store this exemplar for isodisc calc
+       Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
+       Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
+       m = m + 1;
+
+       % ------- in symmetric families, store AA, CC, GG, UU pairs twice
+
+       if (E.NT1.Code == E.NT2.Code) && any(Category(ca) == [1 7 8 11 12]),
+         B(m) = E;                              % store again
+         B(m).NT1 = E.NT2;
+         B(m).NT2 = E.NT1;
+         B(m).Class = -E.Class;
+         Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',B(m).Pair.Class) ' ' B(m).Filename ' ' sprintf('%4d',B(m).Count) ];
+         Cat{m} = upper(zEdgeText(B(m).Class,Subcat,E.NT1.Code,E.NT2.Code));
+         m = m + 1;
+       end
+      end
+
      end
     end
+   end
   end
-
+ end
  h = gcf;
  orient landscape
 % print(h,'-depsc2',['Isostericity\Exemplars' zEdgeText(Category(ca))]);
@@ -195,8 +168,8 @@ for a = 1:length(B),
     D(a,b) = zIsoDiscrepancy(B(a).NT1,B(a).NT2,B(b).NT1,B(b).NT2);
 
 if B(a).Class == B(b).Class,
-%  LookupTable{B(a).Class}(B(a).NT1.Code,B(a).NT2.Code,B(b).NT1.Code,B(b).NT2.Code) = D(a,b);
-%  LookupTable{B(a).Class}(B(a).NT2.Code,B(a).NT1.Code,B(b).NT2.Code,B(b).NT1.Code) = D(a,b);
+  LookupTable{B(a).Class}(B(a).NT1.Code,B(a).NT2.Code,B(b).NT1.Code,B(b).NT2.Code) = D(a,b);
+  LookupTable{B(a).Class}(B(a).NT2.Code,B(a).NT1.Code,B(b).NT2.Code,B(b).NT1.Code) = D(a,b);
 end
   
 
@@ -217,7 +190,7 @@ Z = linkage(Y,'average');                      % compute cluster tree
 
 % ----------------------------------------- Display dendrogram
 
-figure
+figure(fix(Category(ca))+13)
 [H,T,p] = dendrogram(Z,0,'colorthreshold',threshold,'orientation','left','labels',Lab);
 
 h = gcf;
@@ -252,8 +225,6 @@ saveas(gcf,['Isostericity' filesep Title '.png'],'png');
 
 % ----------------------------------------- Calculate avg dist btw families
 
-if length(Category) > 1,
-
 Fam{1}  = 'cWW';
 Fam{2}  = 'tWW';
 Fam{3}  = 'cWH';
@@ -287,8 +258,6 @@ for p = 1:12,
 end
 
 zClusterGraph(MeanD,Fam,[3 3]);
-
-end
 
 return
 
@@ -461,40 +430,4 @@ zExemplarTable([1 5],3.5,0);
 zExemplarTable(1:6,3.5,0);
 zExemplarTable(7:12,3.5,0);
 
-
-% --------------------------------------------------------------------------
-
-function [B,Lab,Cat] = AddExemplar(E,B,Lab,Cat,Subcat)
-
-m = length(B) + 1;
-
-pc = 4*(E.NT2.Code-1)+E.NT1.Code;                  % paircode
-
-E.HydrogenClass = E.Class;
-
-if (E.Class < 0),
-  T     = E.NT1;
-  E.NT1 = E.NT2;
-  E.NT2 = T;
-  if E.NT1.Code ~= E.NT2.Code,
-    E.Class = -E.Class;
-  end
-end
-
-if (pc == 7),                                      % reverse GC pairs
-  T     = E.NT1;
-  E.NT1 = E.NT2;
-  E.NT2 = T;
-end
-
-pc2 = 4*(E.NT1.Code-1)+E.NT2.Code;                 % paircode when reversed
-
-E.subplot = pc2;
-if ~isfield(E,'original'),
-  E.original = 1;
-end
-
-B(m) = E;                    % store this exemplar for isodisc calc
-Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
-Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
 

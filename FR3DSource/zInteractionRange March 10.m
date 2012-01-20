@@ -3,10 +3,6 @@
 
 function [File] = zInteractionRange(File, Verbose)
 
-if nargin < 2,
-  Verbose = 1;
-end
-
 for f = 1:length(File),
 
 if length(File.NT) > 1,
@@ -21,7 +17,7 @@ end
 if Verbose > 3,
   figure(1)
   clf
-  zNussinovPlot(triu(E.*(abs(E)<20)), E.*(E<20));
+  zNussinovPlot(File, triu(E.*(abs(E)<20)), E.*(E<20));
   title('Locations of basepair interactions of all types');
 end
 
@@ -45,26 +41,29 @@ c = c(k);
 
 d = zeros(size(c));                              % current distance from local
 
+figure(2)
+spy(triu(E.*(abs(E)<20)));
+
 for m = 1:length(i),
   if (c(m) == 1) && (d(m) <= 10),                % pair, not pseudoknot
-    p =     (i <= i(m)) .* (j >= i(m)) .* (j <= j(m));
-    p = p + (i >= i(m)) .* (i <= j(m)) .* (j >= j(m));
-    q = find(p);
+    p =     (i <= i(m)) .* (j >= i(m)) .* (j <= j(m)); % pairs whose interaction range are affected by the current basepair
+    p = p + (i >= i(m)) .* (i <= j(m)) .* (j >= j(m)); % more such pairs
+    q = find(p);                                 % indices of these pairs
 
-    if c(m) == 1,
+    if c(m) == 1,                      % current basepair is cWW
       a = 1;                           % record Manhattan distance to i(m),j(m)
     else
       a = 0.5;                         % use half the distance
     end
 
-    d(q) = max(d(q), a*(abs(i(m)-i(q))+abs(j(m)-j(q))));
+    d(q) = max(d(q), a*(abs(i(m)-i(q))+abs(j(m)-j(q)))); % Manhattan distance
 
     if Verbose > 2,
-      figure(2)
+      figure(3)
       clf
-      plot(j(q),i(q),'.');
+      plot(j(q),i(q),'.');             
       hold on
-      plot(j(m),i(m),'r.');
+      plot(j(m),i(m),'r.');            % current basepair
       axis([1 max(i) 1 max(i)]);
       axis ij
       drawnow
@@ -87,13 +86,13 @@ if Verbose > 1,
   figure(3)
   clf
   S = sparse(i,j,d);
-  zNussinovPlot(triu((E == 1)), 1+2*(S > 0));
+  zNussinovPlot(File, triu((E == 1)), 1+2*(S > 0));
   title(['cis Watson-Crick interactions in ' File(f).Filename]);
 
   figure(4)
   clf
   B = E .* (E > 0) .* (E < 24);                 % pairs and stacks
-  zNussinovPlot(triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.8);
+  zNussinovPlot(File,triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.8);
 %  title(['All basepairs in ' File(f).Filename]);
 
 end
@@ -102,7 +101,7 @@ S = sparse(i,j,d);
 S = S + S';
 File(f).Range = S;
 
-if Verbose > 1,
+if Verbose > 0,
   fprintf('%s has %d basepairs, of which %d are local.\n', File.Filename, full(sum(sum((C > 0) .* (C < 15)))), full(sum(sum(((S<=10).*C > 0) .* ((S<=10).*C < 15)))));
   for m = 1:14,
     all = length(find(c==m));

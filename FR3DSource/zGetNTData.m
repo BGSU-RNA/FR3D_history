@@ -50,7 +50,7 @@ for f=1:length(Filenames),
   end
 
   if ReadCode == 4,                     % re-read the PDB file
-    File = zReadandAnalyze(Filename);   % might not work on a Mac
+    File = zReadandAnalyze(Filename,Verbose);   % might not work on a Mac
     ClassifyCode = 1;
   elseif SizeCode >= 2,                 % try to load a small version
     if (exist(strcat(Filename,'_small.mat'),'file') > 0),
@@ -96,7 +96,7 @@ for f=1:length(Filenames),
         fprintf('Loaded   %s\n', [filename '.mat']);
       end
     else
-      File = zReadandAnalyze(Filename);
+      File = zReadandAnalyze(Filename,Verbose);
       ClassifyCode = 1;
     end
   end
@@ -109,10 +109,6 @@ for f=1:length(Filenames),
     File = zGetPDBInfo(File);          % get resolution and other info
   else
     File.SizeCode = 2;
-
-    % if File.Info is empty, do this:
-
-    File = zGetPDBInfo(File);          % temporary!
   end
 
   if ~isfield(File,'ClassVersion'),
@@ -157,20 +153,24 @@ for f=1:length(Filenames),
          File.Pair = [];
        else
          t = cputime;
-         File = zClassifyPairs(File);
+         File = zClassifyPairs(File,Verbose);
 
          if Verbose > 0,
-           fprintf(' Base-phosphate interactions ... ');
+           fprintf(' Base-phosphate interactions ...');
          end
 
          File = zPhosphateInteractions(File);
          File.ClassVersion = CurrentVersion;
          ClassifyCode = 1;
 
+         if Verbose > 0,
+           fprintf(' Interaction range ... ');
+         end
+
          File = zInteractionRange(File,Verbose);
 
          if Verbose > 0,
-           fprintf('Classification took %4.2f minutes\n', (cputime-t)/60);
+           fprintf('\nClassification took %4.2f minutes\n', (cputime-t)/60);
          end
        end
       end
@@ -197,7 +197,7 @@ for f=1:length(Filenames),
   Saved = 0;
 
   if (ReadCode > 0) || (ClassifyCode > 0),
-    zSaveNTData(File);
+    zSaveNTData(File,Verbose);
     Saved = 1;
   end
 
@@ -205,7 +205,7 @@ for f=1:length(Filenames),
     File = zSmallVersion(File);
 
     if (ReadFull == 1) && (Saved == 0),
-      zSaveNTData(File);
+      zSaveNTData(File,Verbose);
     end
   end
 
