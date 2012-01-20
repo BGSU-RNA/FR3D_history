@@ -20,7 +20,7 @@ clear Text
 
 r = 1;
 while r <= L/2,
-  m = min(Cand(2*r,[1 2]));
+  m = min(Cand(2*r,[1 2]));          % the smaller 
   M = max(Cand(2*r,[1 2]));
   i = m:M;
 
@@ -32,14 +32,14 @@ while r <= L/2,
 
   [a,b,c] = find(File(f).Edge(i,j));
   c = abs(c);
-  c = c .* (c > 0) .* (c < 13);
+  c = c .* (c > 0) .* (c < 13);             % "true" basepairs
   c = c(find(c));
   c = sort(c);
 
   if length(c) == 2,
     [a,b,c] = find(File(f).Edge(i,j));
     c = abs(c);
-    c = c .* (c > 100) .* (c < 113);
+    c = c .* (c > 100) .* (c < 113);       % "near" basepairs
     c = c(find(c));
     c = sort(c);
     c = [1; 1; c];

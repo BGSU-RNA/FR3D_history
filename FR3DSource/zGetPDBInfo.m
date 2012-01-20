@@ -23,7 +23,9 @@ if ~isempty(i),
   File.Info.Keywords    = t{i(1),6};
   File.Info.Source      = t{i(1),8};
 
-  if ((n(i(1),2) ~= length(File.NT)) && (length(File.NT) > 0)) || isempty(t{i(1),9}),
+  if ((n(i(1),2) ~= length(File.NT)) || isempty(t{i(1),9}) || n(i(1),3) == 0) && (length(File.NT) > 0) ,
+    E  = abs(triu(File.Edge));
+    n(i(1),3) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
     n(i(1),2) = length(File.NT);
     t{i(1),9} = cat(2,File.NT.Base);
     save(['FR3DSource' filesep 'PDBInfo.mat'],'n','t'); % Matlab version 7
@@ -39,14 +41,3 @@ else
   File.Info.Source      = '';
 end
 
-return
-
-% Here is how to establish PDBInfo.mat in the first place:
-
-[n,t,r] = xlsread('PDB_File_Information 2008-05-20.xls');
-t = t(2:end,:);                  % remove the header row
-t{1,9} = '';                     % make space to save base sequence
-n(1,2) = 0;                      % make space to save number of nucleotides
-save('PDBInfo.mat','n','t'); % Matlab version 7
-
-%save PDBInfo.mat n t -V6      % for compatibility with earlier versions

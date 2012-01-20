@@ -137,6 +137,10 @@ BPequiv{39} = [8];
 EdgeStr{40} = 'thH';
 BPequiv{40} = [-8];
 
+%BPCat = [2 6 8 0 6 7 8 9 0 1 3 4 5 0 5 8 0];  % updated 8-7-2008
+%         1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 
+
+% Convert external category names for BP interactions to internal codes
 
 BPStr{1}    = 'BP';
 basephoscode{1}  = 1:17;
@@ -151,22 +155,25 @@ BPStr{4}    = '3BP';
 basephoscode{4}  = [11];
 
 BPStr{5}    = '4BP';
-basephoscode{5}  = [12 15];
+basephoscode{5}  = [12];
 
 BPStr{6}    = '5BP';
-basephoscode{6}  = [2 5 13];
+basephoscode{6}  = [13 15];
 
 BPStr{7}    = '6BP';
-basephoscode{7}  = [3 6];
+basephoscode{7}  = [2 5];
 
 BPStr{8}    = '7BP';
-basephoscode{8}  = [7];
+basephoscode{8}  = [3 6];
 
 BPStr{9}    = '8BP';
-basephoscode{9}  = [8];
+basephoscode{9}  = [7];
 
 BPStr{10}    = '9BP';
-basephoscode{10}  = [4 9 14 17];
+basephoscode{10}  = [8 16];
+
+BPStr{11}    = '0BP';
+basephoscode{11}  = [4 9 14 17];
 
 BPStr{21}    = 'PB';
 basephoscode{21}  = 1:17;
@@ -181,22 +188,25 @@ BPStr{24}    = '3PB';
 basephoscode{24}  = [11];
 
 BPStr{25}    = '4PB';
-basephoscode{25}  = [12 15];
+basephoscode{25}  = [12];
 
 BPStr{26}    = '5PB';
-basephoscode{26}  = [2 5 13];
+basephoscode{26}  = [13 15];
 
 BPStr{27}    = '6PB';
-basephoscode{27}  = [3 6];
+basephoscode{27}  = [2 5];
 
 BPStr{28}    = '7PB';
-basephoscode{28}  = [7];
+basephoscode{28}  = [3 6];
 
 BPStr{29}    = '8PB';
-basephoscode{29}  = [8];
+basephoscode{29}  = [7];
 
 BPStr{30}    = '9PB';
-basephoscode{30}  = [4 9 14 17];
+basephoscode{30}  = [8 16];
+
+BPStr{31}    = '0PB';
+basephoscode{31}  = [4 9 14 17];
 
 BPequiv{100} = [];
 

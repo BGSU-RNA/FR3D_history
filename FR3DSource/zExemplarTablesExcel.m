@@ -6,6 +6,8 @@ UU = {};
 for c = 1:12,
   [T,U] = zExemplarTable(c,1,0,0);
 
+T
+
   [a,b] = size(T);
   [c,d] = size(TT);
   TT((c+2):(c+1+a),1:b) = T;

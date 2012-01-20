@@ -125,7 +125,7 @@ axis off
 
 text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 text(-1.2,-1.4,'Dark blue chords indicate nested Watson-Crick basepairs');
-text(-1.2,-1.5,'Red chords indicate non-nested Watson-Cricky basepairs');
+text(-1.2,-1.5,'Red chords indicate non-nested Watson-Crick basepairs');
 text(-1.2,-1.6,'Cyan chords indicate nested non-Watson-Crick basepairs');
 text(-1.2,-1.7,'Green chords indicate non-nested non-Watson-Crick basepairs');
 text(-1.2,-1.8,'Yellow chords indicate stacking interactions');

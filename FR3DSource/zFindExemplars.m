@@ -1,7 +1,8 @@
 % zFindExemplars finds the best representative for each category of pairs.
+% For basepairing, 
 
 Verbose = 1;              % Verbose = 1 tells it to show distance graphs
-LMax    = 200;             % maximum number of pairs to consider in each class
+LMax    = 500;             % maximum number of pairs to consider in each class
 
 % Pair codes:  1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
 
@@ -31,10 +32,10 @@ Pairs{16} = 'UU';
 % ------------------------------------------ Load non-redundant dataset
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2);   % load PDB data
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,[],1);   % load PDB data
   File = File(SIndex);
 else
-  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2,File); % add PDB data if needed
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,File,1); % add PDB data if needed
   File = File(SIndex);
 end                       
 
@@ -55,9 +56,9 @@ S = S(i);
 % ------------------------------------------ Load modeled basepairs
 
 if ~exist('ModelFile'),                           % if no molecule data is loaded,
-  [ModelFile,SIndex] = zAddNTData('Model_list',2);   % load PDB data
+  [ModelFile,SIndex] = zAddNTData('Model_list',0,[],1);   % load PDB data
 else
-  [ModelFile,SIndex] = zAddNTData('Model_list',2,ModelFile); % add PDB data if needed
+  [ModelFile,SIndex] = zAddNTData('Model_list',0,ModelFile,1); % add PDB data if needed
 end                       
 
 ModelFile = ModelFile(SIndex);
@@ -65,9 +66,9 @@ ModelFile = ModelFile(SIndex);
 % ------------------------------------------ Load curated exemplars
 
 if ~exist('CuratedFile'),                           % if no molecule data is loaded,
-  [CuratedFile,SIndex] = zAddNTData('Curated_list',2);   % load PDB data
+  [CuratedFile,SIndex] = zAddNTData('Curated_list',1,[],1);   % load PDB data
 else
-  [CuratedFile,SIndex] = zAddNTData('Curated_list',2,CuratedFile); % add PDB data if needed
+  [CuratedFile,SIndex] = zAddNTData('Curated_list',1,CuratedFile,1); % add PDB data if needed
 end                       
 
 CuratedFile = CuratedFile(SIndex);
@@ -89,9 +90,9 @@ for j = 1:length(pcodes),            % run through all pair codes specified
   Param(1,2) = pc;
 
   if abs(CLE(row)) < 20,
-    Decimal = 1;
+    Decimal = 1;                          % treat subcategories separately
   else
-    Decimal = 0;
+    Decimal = 0;                          % group subcategories together
   end
 
   % select pairs using selection criteria -----------------------------------
@@ -109,6 +110,7 @@ for j = 1:length(pcodes),            % run through all pair codes specified
     Exemplar(row,pc).Class      = CLE(row);
     Exemplar(row,pc).NT1        = CuratedFile(f).NT(List(1,1));
     Exemplar(row,pc).NT2        = CuratedFile(f).NT(List(1,2));
+    Exemplar(row,pc).Resolution = 0;
 
     CList = zFindPairs(File,Param,Decimal);   % search the non-redundant list
 
@@ -172,8 +174,8 @@ for j = 1:length(pcodes),            % run through all pair codes specified
     [z,k] = sort(qs);
 
     if (length(List(:,1)) > 2) && (Verbose > 0),
-      figure(1)
-      clf
+      subplot(1,2,1)
+      cla
       q = zClusterGraph(PD);
       colormap('default');
       map = colormap;
@@ -194,8 +196,8 @@ for j = 1:length(pcodes),            % run through all pair codes specified
 
       drawnow
 
-      figure(2)
-      clf
+      subplot(1,2,2)
+      cla
       q = zClusterGraph(ID);
       colormap('default');
       map = colormap;
@@ -223,6 +225,7 @@ for j = 1:length(pcodes),            % run through all pair codes specified
     Exemplar(row,pc).NT1        = File(f).NT(List(i(1),1));
     Exemplar(row,pc).NT2        = File(f).NT(List(i(1),2));
     Exemplar(row,pc).Count      = length(List(:,1));
+    Exemplar(row,pc).Resolution = File(f).Info.Resolution;
 
     else
 
@@ -238,6 +241,7 @@ for j = 1:length(pcodes),            % run through all pair codes specified
         Exemplar(row,pc).NT1        = ModelFile(f).NT(List(1,1));
         Exemplar(row,pc).NT2        = ModelFile(f).NT(List(1,2));
         Exemplar(row,pc).Count      = 0;
+        Exemplar(row,pc).Resolution = 0;
       else
         fprintf('No instances and no model for %2s %4s %6.1f\n', Pairs{pc}, zEdgeText(CLE(row),1), CLE(row));
       end
@@ -267,3 +271,18 @@ for j = 1:length(pcodes),            % run through all pair codes specified
 end
 
 zWriteExemplarPDB(1)
+
+zExemplarTable(1,0,0,1);
+zExemplarTable(2,0,0,1);
+zExemplarTable(3,0,0,1);
+zExemplarTable(4,0,0,1);
+zExemplarTable(5,0,0,1);
+zExemplarTable(6,0,0,1);
+zExemplarTable(7,0,0,1);
+zExemplarTable(8,0,0,1);
+zExemplarTable(9,0,0,1);
+zExemplarTable(10,0,0,1);
+zExemplarTable(11,0,0,1);
+zExemplarTable(12,0,0,1);
+
+zExemplarTablesExcel

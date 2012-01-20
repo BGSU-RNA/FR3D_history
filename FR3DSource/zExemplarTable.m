@@ -1,9 +1,12 @@
 % zExemplarTable(Cateogry) displays the best known representatives for interactions involving all pairs in interaction category(ies) Category
-% Example:  zExemplarTable(1,3.5)
-% Example:  zExemplarTable(1:12,3.5)
+
+% zExemplarTable(1,0,0,1)
 
 % Coarse = 1 produces a 4-color version of the isodiscrepancy figure
 % Subcat = 1, include subcategories, Subcat = 0, don't
+
+% T is the full IDI map for the category
+% U is a set of 4x4 tables
 
 function [T, U] = zExemplarTable(Category,Coarse,Subcat,Verbose)
 
@@ -270,16 +273,37 @@ T = {};
 T{1,1} = zEdgeText(Category(1));
 T{1,1} = T{1,1}(1:3);
 T{1,2} = 'Family';
-T{1,3} = 'LSW 2000 subfamily';
+T{1,3} = 'LSW 2002 subfamily';
 T{1,4} = 'Structure';
 T{1,5} = 'Count';
+
+Cat  = [num2str(abs(Category(1))) '.'];
+
 for i = 1:length(Lab),
   T{1,5+i} = Lab{p(i)}(1:2);
   T{i+1,1} = Lab{p(i)}(1:2);
   T{i+1,2} = Lab{p(i)}(3:5);
-  T{i+1,3} = Lab{p(i)}(8:12);
-  T{i+1,4} = Lab{p(i)}(21:24);
-  T{i+1,5} = str2num(Lab{p(i)}(26:29));  
+
+  Cate = strrep(Lab{p(i)}(8:12),'I',Cat);
+  Cate = strrep(Cate,'i',['i' Cat]);
+  Cate = strrep(Cate,'(','[');
+  Cate = strrep(Cate,')',']');
+  T{i+1,3} = Cate;                                % isosteric subgroup
+
+  T{i+1,4} = Lab{p(i)}(21:(end-4));                    % structure
+
+  Cou      = lower(Lab{p(i)}((end-4):end));  
+  Cou      = strrep(Cou,' ','');
+  if ~isempty(strfind(lower(Lab{p(i)}),'curated_model')),
+    Cou = [Cou '(CM)'];
+  elseif ~isempty(strfind(lower(Lab{p(i)}),'curated')),
+    Cou = [Cou '(C)'];
+  elseif ~isempty(strfind(lower(Lab{p(i)}),'model')),
+    Cou = [Cou '(M)'];
+  end
+
+  T{i+1,5} = Cou;
+
   for j = 1:length(Lab),
     T{i+1,5+j} = D(p(i),p(j));
   end
@@ -437,19 +461,19 @@ Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
 
 return  
 
-zExemplarTable(1,3.5,0,1);
-zExemplarTable(2,3.5,0,1);
-zExemplarTable(3,3.5,0,1);
-zExemplarTable(4,3.5,0,1);
-zExemplarTable(5,3.5,0,1);
-zExemplarTable(6,3.5,0,1);
-zExemplarTable(7,3.5,0,1);
-zExemplarTable(8,3.5,0,1);
-zExemplarTable(9,3.5,0,1);
-zExemplarTable(10,3.5,0,1);
-zExemplarTable(11,3.5,0,1);
-zExemplarTable(12,3.5,0,1);
-zExemplarTable(13,3.5,0,1);
+zExemplarTable(1,0,0,1);
+zExemplarTable(2,0,0,1);
+zExemplarTable(3,0,0,1);
+zExemplarTable(4,0,0,1);
+zExemplarTable(5,0,0,1);
+zExemplarTable(6,0,0,1);
+zExemplarTable(7,0,0,1);
+zExemplarTable(8,0,0,1);
+zExemplarTable(9,0,0,1);
+zExemplarTable(10,0,0,1);
+zExemplarTable(11,0,0,1);
+zExemplarTable(12,0,0,1);
+zExemplarTable(13,0,0,1);
 zExemplarTable([1:12],3.5,0,0);
 zExemplarTable([1 5 4 7 10 11 2 6 3 8 9 12],3.5,0,0);
 

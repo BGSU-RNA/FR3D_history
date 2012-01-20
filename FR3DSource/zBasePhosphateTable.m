@@ -49,13 +49,10 @@ for i=1:length(Indices),
   for j=1:length(Indices),
     if j > i,
       fprintf('%6s', zBasePhosphateText(File.BasePhosphate(Indices(i),Indices(j))));
-
-%      fprintf('%6s', zBasePhosphateText(File.BasePhosphate(Indices(i),Indices(j))));
-
     elseif j == i,
       fprintf('%6s', [File.NT(Indices(i)).Base Config{File.NT(Indices(i)).Syn+1}]);
     else
-      fprintf('%6d', File.Range(Indices(i),Indices(j)));% display interaction range
+      fprintf('%6s', zBasePhosphateText(File.BasePhosphate(Indices(i),Indices(j))));
     end
   end
   fprintf('\n');

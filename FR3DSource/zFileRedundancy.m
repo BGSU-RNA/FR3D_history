@@ -3,9 +3,11 @@
 % zFileRedundancy('Allfiles_list') % should give a huge report
 % zFileRedundancy('NonRedundant_2008_02_21_list') % should show very little possible redundancy
 
-function [void] = zFileRedundancy(Filenames)
+Filenames = 'NonRedundant_2008_02_21_list';
 
-p = 0.70;                         % cutoff base match fraction
+% function [void] = zFileRedundancy(Filenames)
+
+p = 0.90;                                 % cutoff base match fraction
 
 % ----------------------------------------- Read PDB lists, if any
 
@@ -157,6 +159,8 @@ for i = 1:(F-1),
 
       for m = 1:length(j),
         for nn = (m+1) : length(j),
+
+[size(align) j(m) j(nn)]
 
           malign = align{j(m),j(nn)}(1,:);     % use stored data
           nalign = align{j(m),j(nn)}(2,:);

@@ -10,7 +10,7 @@ end
 
 load('PairExemplars','Exemplar');
 
-if Separate == 0,
+if Separate == 0,                        % write all in one single file
 
   % loop through pairs and classifications ----------------------
 
@@ -44,9 +44,12 @@ if Separate == 0,
 
 else                                       % write to separate PDB files
 
+ load(['FR3DSource' filesep 'PDBInfo.mat'],'n','t','-mat');
+
  efid = fopen(['Isostericity' filesep 'Exemplar_list.txt'],'w');
 
- fprintf('Edge Pair NT1   NT2    Source Structure C1  Count Class PDB_file_for_pair\n');
+ fprintf('Edge Pair NT1   NT2    Source Structure C1  Count Class  Res  PDB_file_for_pair\n');
+ fprintf(efid, 'Edge Pair NT1   NT2    Source Structure C1  Count Class  Res  PDB_file_for_pair\n');
 
  for c1 = 1:4,
   for c2 = 1:4,
@@ -55,9 +58,11 @@ else                                       % write to separate PDB files
     for row = 1:length(Exemplar(:,pc)),
 
       E = Exemplar(row,pc);
+
+      
   
       if ~isempty(E.NT1),
-        WriteOneExemplar(E,pc,efid);
+        WriteOneExemplar(E,pc,efid,lower(t(:,1)),n);
       end
 
       if (any(pc == [2 3 4 8 10 12])),     % need to produce symmetric version
@@ -65,7 +70,7 @@ else                                       % write to separate PDB files
         if ~isempty(E.Class),
           if any(fix(E.Class) == [1 2 7 8])  % but only for these families
             E.Class = -E.Class;            % other side of diagonal
-            WriteOneExemplar(E,pc2,efid);
+            WriteOneExemplar(E,pc2,efid,lower(t(:,1)),n);
           end
         end
       end
@@ -76,14 +81,14 @@ else                                       % write to separate PDB files
   end
  end
 
- fprintf('Wrote individual pair exemplar PDB files\n');
+ fprintf('Wrote individual pair exemplar PDB files and Exemplar_list.txt\n');
  fclose(efid);
 
 end
 
 % ---------------------------------------------------------------------------
 
-function [void] = WriteOneExemplar(E,pc,efid)
+function [Text] = WriteOneExemplar(E,pc,efid,t,n)
 
 if (E.Class < 0),
   Tem   = E.NT1;                       % reverse order of nucleotides
@@ -134,8 +139,18 @@ else
   Source    = 'Structure';
 end
 
-fprintf('%5s %s%s %s%5s %s%5s %9s %5s %4.1f %5d %4.1f %s\n', ET, E.NT1.Base, E.NT2.Base, E.NT1.Base, E.NT1.Number, E.NT2.Base, E.NT2.Number, Source, Structure, CP, E.Count, abs(E.Class), FN);
 
+if isempty(E.Resolution) || E.Resolution == 0,
+  i = find(ismember(t(:,1),lower(Structure)));
+  if ~isempty(i),
+    E.Resolution = n(i(1),1);
+  end
+end
+
+
+fprintf(efid,'%5s %s%s %s%5s %s%5s %9s %5s %4.1f %5d %4.1f %6.2f %s\n', ET, E.NT1.Base, E.NT2.Base, E.NT1.Base, E.NT1.Number, E.NT2.Base, E.NT2.Number, Source, Structure, CP, E.Count, abs(E.Class), E.Resolution, FN);
+
+fprintf('%5s %s%s %s%5s %s%5s %9s %5s %4.1f %5d %4.1f %6.2f %s\n', ET, E.NT1.Base, E.NT2.Base, E.NT1.Base, E.NT1.Number, E.NT2.Base, E.NT2.Number, Source, Structure, CP, E.Count, abs(E.Class), E.Resolution, FN);
 
 fid = fopen(['Isostericity' filesep ET '_' E.NT1.Base E.NT2.Base '_Exemplar.pdb'],'w');
 

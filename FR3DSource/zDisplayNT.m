@@ -119,7 +119,7 @@ if strcmp(class(File),'char'),
   File = zGetNTData(Filename,0);
 end
 
-if nargin == 1,
+if nargin == 1 || isempty(NTList),
   NTList = 1:File.NumNT;                  % display them all
 end
 

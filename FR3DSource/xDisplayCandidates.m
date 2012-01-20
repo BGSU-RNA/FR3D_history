@@ -329,8 +329,16 @@ q(p) = 1:L;                                  % inverse permutation
       end
 
     case 11                                     % write PDB of all
-      Search2 = SearchSubset(Search,p);
-      xWriteCandidatePDB(Search2);
+      SearchT = Search;
+      Search = SearchSubset(Search,p);
+      xWriteCandidatePDB(Search);
+      if Level > 0,
+        SN = [Search.ActualFilename '_Subset_' datestr(now,31)];
+        SN    = strrep(SN,' ','_');
+        SN    = strrep(SN,':','_');
+        save(['SearchSaveFiles' filesep SN], 'Search');
+      end
+      Search = SearchT;
 
     case 12                                     % sort by centrality
 %     [z,j] = sort(max(Search.Disc(1:Limit,1:Limit)));% sort by max discrepancy

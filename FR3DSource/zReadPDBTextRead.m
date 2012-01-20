@@ -6,13 +6,13 @@ Readable = 1;
 try
 
   [A, B, C, E, F, G, X, Y, Z, OCC, TEMP] ...
-   = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %1s%5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+   = textread(Filename,'%6s%5d  %4c%4s %1s%5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
 
 catch
 
   try
     [A, B, C, E, G, X, Y, Z, OCC, TEMP] ...
-     = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+     = textread(Filename,'%6s%5d  %4c%4s %5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
     for i=1:length(A),
       F{i} = '1';                % invent a chain number
     end
@@ -40,7 +40,7 @@ CHAIN = cell(s,1);
 
 if NoChain == 1,
   [A, B, C, E, G, X, Y, Z, OCC, TEMP] ...
-   = textread(strcat(Filename,'.pdb'),'%6s%5d  %4c%4s %5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
+   = textread(Filename,'%6s%5d  %4c%4s %5s  %8.3f%8.3f%8.3f%6.2f%6.2f%*[^\n]');
   for i=1:s,
     CHAIN{i,1} = '1';
   end
@@ -61,8 +61,6 @@ for i=1:s,
   ATOMNAME{i,1} = deblank(C(i,1:3));
   VERSION{i,1}  = C(i,4);
 end
-
-%fprintf('Read  %s\n', [Filename '_Atoms.pdb']);
 
 else
 

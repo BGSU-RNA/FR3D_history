@@ -71,10 +71,21 @@ delete(h);
 %         v=find(strcmp(s,Search.Query.ChainList{i}));
 %         set(h,'Value',v);
 %     end
-set(handles.NumberOfNTsTitle,'Visible','off');
-set(handles.NumberOfNTs,'Visible','off');
+  set(handles.NumberOfNTsTitle,'Visible','off'); 
+  set(handles.NumberOfNTs,'Visible','off');
+  set(handles.GuarCutoff,'Visible','on');
+  if isfield(Search.Query,'DiscCutoff')
+      set(handles.GuarCutoff,'String',num2str(Search.Query.DiscCutoff));
+  end
+  set(handles.RelCutoff,'Visible','on');
+  if isfield(Search.Query,'RelCutoff')
+      set(handles.RelCutoff,'String',num2str(Search.Query.RelCutoff));
+  end
+
 
 else
+  set(handles.GuarCutoff,'Visible','off');
+  set(handles.RelCutoff,'Visible','off');
     set(handles.Geometric,'Value',0);
     set(handles.NonGeometric,'Value',1);
     set(handles.ViewQuery,'Visible','off');
@@ -110,14 +121,6 @@ end
 set(handles.SearchDescription,'Visible','on');
 if isfield(Search.Query,'Description')
     set(handles.SearchDescription,'String',Search.Query.Description);
-end
-set(handles.GuarCutoff,'Visible','on');
-if isfield(Search.Query,'DiscCutoff')
-    set(handles.GuarCutoff,'String',num2str(Search.Query.DiscCutoff));
-end
-set(handles.RelCutoff,'Visible','on');
-if isfield(Search.Query,'RelCutoff')
-    set(handles.RelCutoff,'String',num2str(Search.Query.RelCutoff));
 end
 set(handles.Overlap,'Visible','on');
 if isfield(Search.Query,'ExcludeOverlap')

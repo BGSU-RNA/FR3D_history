@@ -163,7 +163,7 @@ switch ViewParam.Color,
   case 3, ColorAxis =  [15 19];
   case 4, ColorAxis =  [-12 30];
   case 5, ColorAxis =  [1 16];
-  case 6, ColorAxis =  [-90 270];
+  case 6, ColorAxis =  [min(Color) max(Color)];      % color by angle
   case 7, ColorAxis =  [min(Color) max(Color)];
   case 8, ColorAxis =  [-1 3];
   case 9, ColorAxis =  [0 4];

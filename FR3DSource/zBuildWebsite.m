@@ -1,21 +1,26 @@
 
-StartFile = '409d';
-%StartFile = '';
+load PDBInfo
 
-[NamesLists,Names] = mGetPDBFilenames;
+Names = t(:,1);                        % names of files from PDB/NDB
 
-%Names = zReadPDBList('NonRedundant_2008_02_21_list');
+%for f = 1:length(Names),  
 
-s = find(ismember(upper(Names),upper(StartFile)));
+%1354
 
-if isempty(s)
-  s = 1;
-end
+for f = 1391:length(Names),  
+ t = cputime;
 
-for f = s(1):length(Names),  
-  File = zAddNTData(Names{f},0,[],2);              % load RNA data
+ File = zAddNTData(Names{f},0,[],2);              % load RNA data
 
-  zAnalyzedFilesHTML(File);                 % make HTML
+ t(end+1) = cputime;
+
+ if ~isempty(File.NT),
+
+  fprintf('Writing HTML files for %s, file %d of %d\n', Names{f}, f, length(Names));
+
+  zAnalyzedFilesHTML(File);                        % make HTML
+
+  t(end+1) = cputime;
 
   % ----------------------------------------------- Create circular diagram
 
@@ -29,15 +34,28 @@ for f = s(1):length(Names),
   Y = X(30:830,210:1030,:);
   imwrite(Y,[mypath File.Filename '_circular_diagram.png']);
 
+  t(end+1) = cputime;
+
   clf
   zCircularDiagram(File,0.1);
   saveas(gcf,[mypath File.Filename '_circular_diagram.pdf'],'pdf');
+
+  t(end+1) = cputime;
 
   % ----------------------------------------------- Write PDB file
 
   zWritePDB(File,[mypath File.Filename '_RNA.pdb']);
 
+  t(end+1) = cputime;
+
   % ----------------------------------------------- Annotate with known motifs
 
   xAnnotateWithKnownMotifs(File);           % find and list motifs
+
+  t(end+1) = cputime;
+
+  fprintf('Time taken:');
+  fprintf(' %6.2f', diff(t));
+  fprintf(' seconds \n');
+ end
 end

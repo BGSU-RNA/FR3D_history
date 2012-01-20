@@ -3,64 +3,57 @@
 % zFileRedundancy('Allfiles_list') % should give a huge report
 % zFileRedundancy('NonRedundant_2008_02_21_list') % should show very little possible redundancy
 
-Filenames = 'Allfiles_list';
-
 Timeline = [];
 
 % function [ChosenNames] = zFileRedundancy(Filenames)
+
+if ~exist(Date)
+  Date = date;
+end
+
 
 p = 0.95;                         % cutoff base match fraction
 maxd = 0.5;                       % cutoff discrepancy between structures
 NTLimit = 7300;                   % above this limit, do not align sequences
 MaxRes  = 4;                      % maximum resolution value to use
-Criterion = 1;                    % 1-earliest release date 
+Criterion = 15;                   % 1-earliest release date 
                                   % 2-resolution 
                                   % 3-number of nucleotides
                                   % 4-#pairs
+                                  % 5-highest #BP / #nucleotides
+                                  %12-resolution, but use preferred list
 
-
-% ----------------------------------------- Read PDB structure names and lists
-
-if strcmp(class(Filenames),'char'),
-  Filenames = {Filenames};                % make into a cell array
-end
-
-FullList = [];
-
-for j=1:length(Filenames),
-  FullList = [FullList; zReadPDBList(Filenames{j})];
-end
-
-% FullList = FullList(1:50);
+Preferred = zReadPDBList('Preferred_list',1);
 
 % --------------------------------- Look up information on these structures
 
 load PDBInfo
 
-i = [];
-
-for f = 1:length(FullList),
-  pp = find(ismember(upper(t(:,1)),upper(FullList{f})));
-  if ~isempty(pp),
-    i = [i pp(1)];   
-  else
-    fprintf('No information on file %s\n', FullList{f});
-  end
-end
-t = t(i,:);                       % omit structures with no information
-n = n(i,:);           
+size(t)
 
 i = find(n(:,1) > 0);             % omit structures with no resolution, esp NMR
 t = t(i,:);
 n = n(i,:);           
 
-i = find(n(:,2) > 1);             % restrict to structures with nucleotides
-t = t(i,:);
-n = n(i,:);           
+size(t)
 
 i = find(n(:,1) <= MaxRes);       % restrict to structures with res <= MaxRes
 t = t(i,:);
 n = n(i,:);           
+
+size(t)
+
+i = find(n(:,2) > 1);             % restrict to structures with nucleotides
+t = t(i,:);
+n = n(i,:);           
+
+size(t)
+
+i = find(n(:,3) > 0);             % restrict to structures with basepairs
+t = t(i,:);
+n = n(i,:);           
+
+size(t)
 
 [y,i] = sort(n(:,2));             % sort by number of nucleotides
 t = t(i,:);
@@ -71,6 +64,8 @@ n = n(i,:);
 %n = n(i,:);
 
 F = length(i);                    % number of files
+
+fprintf('Found %d 3D structures with resolution better than %6.1f and at least one basepair.\n', F, MaxRes);
 
 % ---------------------------------------------- Growth of whole database
 
@@ -108,14 +103,14 @@ end
 
 RTimeline = Timeline;
 
-diary Redundancy_Report_4_Angstrom_2008_06_17.txt
+diary Redundancy_Report_2008_New.txt
 
 fprintf('Preparing a redundancy report on %d RNA 3D structures\n',F);
 [p maxd MaxRes]
 
 % --------------------------------- Compare sequences between files
 
-close = 0.5*sparse(eye(F));       % indicator of whether sequences are close
+Close = 0.5*sparse(eye(F));       % indicator of whether sequences are close
 prop  = 0.5*sparse(eye(F));
 
 clear align
@@ -147,7 +142,7 @@ for i = 1:(F-1),
       if namematch / min(length(ti),length(tj)) > 0.9,
 %        fprintf('%s matches %s\n', t{i,8}, t{j,8});
          SameName = 1;
-         close(i,j) = 1;
+         Close(i,j) = 1;
       else
 %        fprintf('           %s does not match %s\n', t{i,8}, t{j,8});
       end
@@ -167,7 +162,7 @@ for i = 1:(F-1),
 drawnow
 
       if ((n(i,2) - matches < 4) || (pro > p)),
-        close(i,j) = 1;
+        Close(i,j) = 1;
         prop(i,j)  = pro;
         Linked(j)  = Linked(j) + 1;
         if n(i,2) > NTLimit,
@@ -185,18 +180,18 @@ drawnow
 %fprintf('\n');
 end
 
-close = close + close';
+Close = Close + Close';
 prop  = prop + prop';
 
-closeseq = close;                 % store this for later
+closeseq = Close;                 % store this for later
 
 for k = 1:20,                     % Markov transitions for transitivity
-  close = close * close;
+  Close = Close * Close;
 end
 
 figure(1)
 clf
-spy(close)
+spy(Close)
 title(['Structures connected by a chain of more than ' num2str(p*100) '% similarity']);
 drawnow
 
@@ -208,7 +203,7 @@ done = zeros(1,F);                % whether each file has been considered
 
 for i = 1:(F-1),
   if done(i) == 0,
-    j = find(close(i,:));         % files that are "close" to i
+    j = find(Close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
       done(i) = 1;
     elseif n(i,2) < NTLimit,
@@ -348,15 +343,15 @@ Timeline = [];
 clear ChosenNames
 clear Text
 
-close = closeseq;                 % 
+Close = closeseq;                 % 
 
 for k = 1:20,                     % Markov transitions for transitivity
-  close = close * close;
+  Close = Close * Close;
 end
 
 figure(2)
 clf
-spy(close)
+spy(Close)
 title(['Structures connected by ' num2str(p*100) '% sequence similarity and ' num2str(maxd) ' discrepancy']);
 drawnow
 
@@ -367,7 +362,7 @@ c = 0;                            % counts the number of files selected so far
 
 for i = 1:(F-1),
   if done(i) == 0,                % file does not already appear in a report
-    j = find(close(i,:));         % files that are "close" to i
+    j = find(Close(i,:));         % files that are "close" to i
     if length(j) < 2,             % no file is close to i
       done(i) = 1;                % no need to display this one again
       File = zAddNTData(t(i,1),2); % load this file
@@ -385,11 +380,12 @@ for i = 1:(F-1),
         done(j(f)) = 1;
         E  = abs(triu(File(f).Edge));
         np(f) = full(sum(sum((E > 0) .* (E < 16)))); % number of pairs
-        switch Criterion
+        switch mod(Criterion,10)
           case 1, crit(f) = datenum(File(f).Info.ReleaseDate, 'mm/dd/yyyy');
           case 2, crit(f) = n(j(f),1);            % resolution
           case 3, crit(f) = -length(File(f).NT);  % number of nucleotides
           case 4, crit(f) = -np(f);               % number of pairs
+          case 5, crit(f) = -n(j(f),3)/n(j(f),2); % # bp / # nucleotides
         end
       end
 
@@ -502,11 +498,31 @@ for i = 1:(F-1),
 
     c = c + 1;
     ChosenNames{c} = File(1).Filename;
-    if length(File) == 1,
-      Text{c} = sprintf('Unique structure is %4s, which ', File(1).Filename);
-    else
-      Text{c} = sprintf('Chosen structure is %4s, which ', File(1).Filename);
+
+    if Criterion > 10,                    % replace with preferred name
+       pp = [];
+       for f = 1:length(File),
+         p = find(ismember(Preferred,File(f).Filename));
+         if ~isempty(p),
+           pp = p;
+           fprintf('Found %s in the list of preferred structures\n', File(f).Filename);
+           cn = File(f).Filename;
+         end
+       end
+       if ~isempty(pp),
+         ChosenNames{c} = cn;
+       end
     end
+
+    if length(File) == 1,
+      Text{c} = sprintf('Unique structure is %4s, which ', ChosenNames{c});
+    else
+      Text{c} = sprintf('Chosen structure is %4s, which ', ChosenNames{c});
+    end
+
+% THIS HAS TO BE MODIFIED TO PROPERLY ACCOUNT FOR THE PREFERRED LIST!
+
+
     Text{c} = [Text{c} sprintf('has %4d nucleotides, %4d pairs, ', File(1).NumNT, np(1))];
     if isempty(File(1).Info.Resolution),
       Text{c} = [Text{c} sprintf('resolution  ---- ')];
@@ -543,18 +559,22 @@ for i = 1:(F-1),
   end
 end
 
+% ----------------------------------------------- List chosen files
 
-
-fprintf('List of chosen files:\n');
+fprintf('\nList of chosen files:\n');
 
 for c = 1:length(ChosenNames),
   fprintf('%4s\n', ChosenNames{c});
 end
 
+fid = fopen(['PDBFiles' filesep 'Nonredundant_' Date '_list.pdb'],'w');
+for c = 1:length(ChosenNames),
+  fprintf(fid,'%4s\n', ChosenNames{c});
+end
+fclose(fid);
+fprintf('\nChosen files were written to %s\n', ['PDBFiles' filesep 'Nonredundant_' Date '_list.pdb']);
 
-
-
-fprintf('Information about chosen files:\n');
+fprintf('\nInformation about chosen files:\n');
 
 for c = 1:length(ChosenNames),
   fprintf('%4s\n', Text{c});
@@ -594,3 +614,21 @@ if Criterion == 1,
 end
 
 diary off
+
+return
+
+% ----------------------------------------- Read PDB structure names and lists
+Filenames = 'Allfiles_list';
+
+if strcmp(class(Filenames),'char'),
+  Filenames = {Filenames};                % make into a cell array
+end
+
+FullList = [];
+
+for j=1:length(Filenames),
+  FullList = [FullList; zReadPDBList(Filenames{j})];
+end
+
+% FullList = FullList(1:50);
+

@@ -6,8 +6,6 @@ function [void] = zAnalyzedFilesHTML(File)
 for f = 1:length(File),
   FN = upper(File(f).Filename);
 
-  fprintf('Writing HTML files for %s, file %d\n', FN, f);
-
   LText{1} = ['<a href = "index.html">Return to FR3D home page for ' FN '</a><br>'];
   LText{2} = ['<a href = "' FN '_interactions.html">List of all pairwise interactions in ' FN '</a><br>'];
   LText{3} = ['<a href = "' FN '_basepairs.html">List of basepair interactions in ' FN '</a><br>'];
@@ -102,6 +100,15 @@ for f = 1:length(File),
   fprintf(fid,'<tr>\n<td>\n%s\n</td>\n', DiagramText);
 
   fprintf(fid,'<td><a href="%s_RNA.pdb">Click here</a> to download the RNA coordinate file.\n</td>\n</tr>\n</table>\n',FN);
+
+  fprintf(fid,'<b>Resolution: </b>%7.1f<br>\n', File(f).Info.Resolution);
+  fprintf(fid,'<b>Descriptor: </b>%s<br>\n', File(f).Info.Descriptor);
+  fprintf(fid,'<b>Experimental technique: </b>%s<br>\n', File(f).Info.ExpTechnique);
+  fprintf(fid,'<b>Release Date: </b>%s<br>\n', File(f).Info.ReleaseDate);
+  fprintf(fid,'<b>Author: </b>%s<br>\n', File(f).Info.Author);
+  if ~isempty(File(f).Info.Source),
+    fprintf(fid,'<b>Biological source: </b>%s<br>\n', File(f).Info.Source);
+  end
 
   fprintf(fid,'</html>\n');
 

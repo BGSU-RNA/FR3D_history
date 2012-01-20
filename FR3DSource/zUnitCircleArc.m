@@ -18,7 +18,7 @@ case 4,
 case 5,
   h = [1 1 0];                          % yellow
 case 6,
-  h = [1 0 1];                          % magenta
+  h = [0.8 0 1];                          % magenta
 otherwise,
   h = [0 0 0];                          % black
 end

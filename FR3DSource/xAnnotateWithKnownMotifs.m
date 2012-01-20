@@ -1,28 +1,24 @@
 % xAnnotateWithKnownMotifs(File) finds all instances of motifs from the motif
 % library in the folder MotifLibrary in the given file(s)
  
-function [File] = xAnnotateWithKnownMotifs(Files)
+function [File] = xAnnotateWithKnownMotifs(Files,Verbose)
+
+if nargin < 2,
+  Verbose = 0;
+end
 
 Motif = dir([pwd filesep 'MotifLibrary' filesep 'LIB*.mat']);
-% Motif = [Motif; dir(['MotifLibrary' filesep 'LIB*.MAT'])];         
-% for the Mac, but then you need to eliminate redundant listings for the PC
 
 if strcmp(class(Files),'char'),
   Filename = Files;
-  Files = zAddNTData(Filename,2);
+  Files = zAddNTData(Filename,0,[],Verbose);
 end
 
 UsingLibrary = 1;                                % so FR3D just searches
 
-%for m = 1:length(Motif),
-%  load(['MotifLibrary' filesep Motif(m).name]);
-%  MSearch(m) = Search;
-%end
-
-
 for f = 1:length(Files),
   File = Files(f);
-  FN = upper(File.Filename);
+  FN   = upper(File.Filename);
   Filenames = {File.Filename};
 
   LText{1} = ['<a href = "index.html">Return to FR3D home page for ' FN '</a><br>'];
@@ -38,11 +34,16 @@ for f = 1:length(Files),
   LText{10} = ['<a href="../../index.html">FR3D home page</a><br>'];
   LText{11} = ['<a href="http://rna.bgsu.edu">BGSU RNA group home page</a><br><br>'];
 
-  ffid = fopen([pwd filesep 'Web' filesep 'AnalyzedStructures' filesep FN filesep FN '_motifs.html'],'w');
+  DN = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep FN];
+
+  if ~(exist(DN) == 7),        % if directory doesn't yet exist
+    mkdir(DN);
+  end
+
+  ffid = fopen([DN filesep FN '_motifs.html'],'w');
 
   fprintf(ffid,'<html>\n<title>%s motif list\n</title>\n', FN);
   fprintf(ffid,'<body>\n');
-
 
   fprintf(ffid,'<h1>Motif list for %s</h1>\n', FN);
 
@@ -54,11 +55,16 @@ for f = 1:length(Files),
 
   for m = 1:length(Motif),
 
+   if (Motif(m).name(9) == '_') && (Motif(m).name(4) ~= 'U'),
+
     load(['MotifLibrary' filesep Motif(m).name]);
 
     MotifNumber = Motif(m).name(1:8);
+    MotifName   = Motif(m).name(10:end);
 
-%    fprintf('\nSearching %s for %s\n', FN, Search.Query.Description);
+    if Verbose > 0,
+      fprintf('\nSearching %s for %s\n', FN, Motif(m).name);
+    end
 
     Query = Search.Query;
 
@@ -68,24 +74,22 @@ for f = 1:length(Files),
 
     [s,t] = size(Candidates);
 
-    fprintf(ffid,'<a name=%s>\n',MotifNumber);
-    fprintf(ffid,'<a href="%s"><h2>%s</h2></a>\n',['../../MotifLibrary/' MotifNumber '/index.html'], Query.Description);
-
     if s > 0,
+      fprintf(ffid,'<a name=%s>\n',MotifNumber);
+      fprintf(ffid,'<h2><a href="%s">%s</a></h2>\n',['http://rna.bgsu.edu/FR3D/MotifLibrary/' MotifNumber '/index.html'], strrep(Motif(m).name,'.mat',''));
+
       [y,i] = sort(Candidates(:,1));               % sort by 1st nucleotide #
       Search.Candidates = Candidates(i,:);         % re-order candidates
       Search.Discrepancy = Search.Discrepancy(i);
 
       fprintf(ffid,'<pre>\n');
       Text = xListCandidates(Search,Inf,6,{MotifNumber});
-      for c = 1:length(Text),
+      for c = 4:length(Text),
         fprintf(ffid,'%s\n',Text{c});
       end
       fprintf(ffid,'</pre>\n');
-    else
-      fprintf(ffid,'No motifs of this type found\n');
     end
+   end
   end
-
   fclose(ffid);
 end

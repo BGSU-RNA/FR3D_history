@@ -29,11 +29,22 @@ end
 
 for f=1:length(Filenames),
   Filename = Filenames{f};
+
+  if isempty(strfind(lower(Filename),'.pdb')),
+    PDBFilename  = [Filename '.pdb'];
+  else
+    PDBFilename  = Filename;
+    i = strfind(Filename,'.');
+    Filename = Filename(1:(i(end)-1));
+    ReadCode = 4;
+  end
+
   FILENAME = upper(Filename);
   filename = lower(Filename);
 
   ClassifyCode = 0;
   SaveCode     = 0;
+  ReadPDB      = 0;
 
   if (ReadCode > 0),
     ReadFull = 1;
@@ -44,9 +55,10 @@ for f=1:length(Filenames),
   clear File
 
   if ReadCode == 4,                     % re-read the PDB file
-    File = zReadandAnalyze(Filename,Verbose);   % might not work on a Mac
+    File = zReadandAnalyze(PDBFilename,Verbose);   % might not work on a Mac
     ClassifyCode = 1;
     ReadFull = 0;                       % no need to read PDB file again
+    ReadPDB  = 1;
   else                                  % try to load a precomputed version
     if (exist(strcat(Filename,'.mat'),'file') > 0),
       load(strcat(Filename,'.mat'),'File','-mat');
@@ -69,26 +81,13 @@ for f=1:length(Filenames),
   end
 
   if (ReadFull == 1),                     % try to load the full version
-    File = zReadandAnalyze(Filename,Verbose);
+    File = zReadandAnalyze(PDBFilename,Verbose);
     ClassifyCode = 1;
+    ReadPDB      = 1;
   end
 
   if ~exist('File'),
     File = [];
-  end
-
-% File = zGetPDBInfo(File);
-
-  if ~isfield(File,'Info'),
-    File = zGetPDBInfo(File);          % get resolution and other info
-    SaveCode = 1;
-  else
-    if isempty(File.Info.Descriptor),
-      File = zGetPDBInfo(File);          % look for file information
-      if ~isempty(File.Info.Descriptor),
-        SaveCode = 1;
-      end
-    end
   end
 
   if ~isfield(File,'ClassVersion'),
@@ -130,13 +129,17 @@ for f=1:length(Filenames),
       File.Edge = sparse(File.NumNT,File.NumNT);
 
       c = cat(1,File.NT(1:File.NumNT).Center); % nucleotide centers
+
       File.Distance = zMutualDistance(c,16); % compute distances < 16 Angstroms
       d = sort(nonzeros(File.Distance));
 
-      if ~isempty(d),
-
+      if isempty(d),
+       % more than one nucleotide, but too far apart to pair
+       File.Range = sparse(File.NumNT,File.NumNT);
+       File.BasePhosphate = sparse(File.NumNT,File.NumNT);
+      else
        if d(min(10,length(d))) < 1,
-         fprintf('%s has overlapping nucleotides and should be avoided as such\n',File.Filename);
+         fprintf('%s has overlapping nucleotides and should be avoided\n',File.Filename);
          Overlap = 1;
        else
          t = cputime;
@@ -145,6 +148,8 @@ for f=1:length(Filenames),
          if Verbose > 0,
            fprintf(' Base-phosphate interactions ...');
          end
+
+
 
          File = zPhosphateInteractions(File);
          File.ClassVersion = CurrentVersion;
@@ -179,6 +184,43 @@ for f=1:length(Filenames),
     ClassifyCode = 1;
   end
 
+  if ~isfield(File,'Info'),
+    File = zGetPDBInfo(File);          % get resolution and other info
+    SaveCode = 1;
+  else
+    if isempty(File.Info.Descriptor),
+      File = zGetPDBInfo(File);          % look for file information
+      if ~isempty(File.Info.Descriptor),
+        SaveCode = 1;
+      end
+    end
+  end
+
+  % ----------------- If it just read the .pdb file and no pairs, look at BUC
+
+  if (ReadPDB == 1) && (isempty(strfind(PDBFilename,'.pdb1'))),
+    E = abs(File.Edge);                       % all interactions
+    bp = full(sum(sum((E > 0) .* (E < 15))));       % number of basepairs
+    r  = bp / length(File.NT);                % ratio of bp to nt
+    if (r < 0.4),                             % very few basepairs found
+      if Verbose > 0,
+        fprintf('Few basepairs found (ratio %7.2f), reading the biological unit coordinates\n',r);
+      end
+      File1 = zGetNTData([PDBFilename '1'],4,1);   % read biological unit coords
+      if length(File1.NT) > 0,
+        E1  = abs(File1.Edge);
+        bp1 = full(sum(sum((E > 0) .* (E < 15))));       % number of basepairs
+        r1  = bp / length(File1.NT);               % ratio of bp to nt
+        if Verbose > 0,
+          fprintf('Biological unit coordinates have ratio %7.2f\n',r1);
+        end
+        if r1 > r,
+          File = File1;                         % use biological unit coords
+        end
+      end
+    end
+  end
+    
   File = orderfields(File);
 
   Saved = 0;
