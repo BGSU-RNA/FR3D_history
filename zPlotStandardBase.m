@@ -1,3 +1,7 @@
+% zPlotStandardBase(code,textoption) plots base with code,
+% where A=1, C=2, G=3, U=4 and textoption:
+% textoption = 0 - no text
+% textoption = 1 - label atoms
 
 function [void] = zPlotStandardBase(code,textoption)
 

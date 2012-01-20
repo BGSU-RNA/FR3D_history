@@ -5,6 +5,9 @@ function [void] = zPlotHydrogenBonds(NT1,NT2,Class,R,S)
 
 if (abs(Class) < 14),
   [X,Y] = zHydrogenLocations(NT1,NT2,Class);
+else
+  X = [];
+  Y = [];
 end
 
 if ~isempty(X),

@@ -1,6 +1,6 @@
 % zDisplayNT(File,NTList,ViewParam) is a general-purpose nucleotide
 % plotting program.  It can be called in several ways, for example,
-% zDisplayNT('rr0033_23S',{'27','28','29'},ViewParam), and it will load the
+% zDisplayNT('1s72',{'27','28','29'},ViewParam), and it will load the
 % named datafile and plot the nucleotides by nucleotide number.  Or, if
 % data files have already been loaded, one can use zDisplayNT(File(1),[32
 % 34 35],ViewParam) to plot the nucleotides in File(1) having indices 32,

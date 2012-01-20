@@ -2,6 +2,7 @@
 % number Num and, if specified, Chain
 % Num can be a cell array of N nucleotide numbers
 % Any entry of that cell array can use the notation '1830:1835' for a range
+% Nucleotide numbers can be followed by (A) to indicate chain A
 % ind is a 1xN vector of the first match to each, the easy answer
 % allindices is a 1xN cell array, each row being a 1xN vector
 % allchains is a Cx1 cell array as well.
@@ -14,9 +15,32 @@ if nargin < 3,
   end
 end
 
+if strcmp(class(Num),'char'),
+  Num = {Num};
+end
+
+if strcmp(class(Chain),'char'),
+  Chain = {Chain};
+end
+
+% check for chain indicated in parentheses
+
+for k = 1:length(Num),
+  if ~isempty(strfind(Num{k},'(')),
+    a = strfind(Num{k},'(');
+    b = strfind(Num{k},')');
+    Chain{k} = Num{k}(a(1)+1:b(1)-1);
+    if length(a) == 1,                    % one chain specified
+      Num{k} = [Num{k}(1:a(1)-1) Num{k}(b(1)+1:end)];
+    elseif length(a) == 2,                % range with two chains specified
+      Num{k} = [Num{k}(1:a(1)-1) Num{k}(b(1)+1:a(2)-1)];
+    end
+  end
+end
+
 ind = [];
   
-% if File is a text string (filename), load the file and display
+% if File is a text string (filename), load the file
 
 if strcmp(class(File),'char'),
   Filename = File;

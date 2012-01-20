@@ -73,38 +73,44 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
     Pair.Hydrogen = [];
   end
 
-  % ---------- Eliminate out of plane interactions and bad hydrogen bonds
+  % ---------- Eliminate out of plane interactions
 
-  if (abs(Pair.Gap) > 1.0) && (abs(a) < 20),     % bad basepairing?
+  if (abs(a) < 11) || ((abs(a) >= 13) && (abs(a) < 14)),   % avoid cSS, tSS
     if length(Pair.Hydrogen) > 0,
-      if (abs(a) < 11) || (abs(a) >= 13),        % avoid cSS, tSS cases
-        if abs(Pair.Gap) > 2.0,
-          a = 30.05;
-        end
-      end
-      for ii = 1:length(Pair.Hydrogen),
-        if ~isempty(Pair.Hydrogen(ii).Angle),
-          if Pair.Hydrogen(ii).Angle < 110,
-            a = 30.1;
-          end
-        end
+      if abs(Pair.Gap) > 2.0,
+        a = 30.1;
       end
     elseif abs(Pair.Gap) > 1.6,
       a = 30.2;
     end
   end
 
-  if (abs(a) < 14) & (length(Pair.Hydrogen) > 0),
-    for ii = 1:length(Pair.Hydrogen),
-      if isempty(Pair.Hydrogen(ii).Angle),
-        if Pair.Hydrogen(ii).Distance > 4.5,
-          a = 30.5;
-        end
-      else 
-        if Pair.Hydrogen(ii).Distance > 4,
-          a = 30.4;
+  % ---------- Eliminate bad hydrogen bonds
+
+  if (abs(a) < 14),                             % planar interaction
+    if (length(Pair.Hydrogen) > 0),             % with hydrogens to check
+      goodhydrogens = 0;
+      for h = 1:length(Pair.Hydrogen),
+        if isempty(Pair.Hydrogen(h).Angle),     % no third atom available
+          if Pair.Hydrogen(h).Distance <= 4.5,  % 
+            goodhydrogens = goodhydrogens + 1;
+          end
+        else 
+          if (Pair.Hydrogen(h).Angle >= 110)&&(Pair.Hydrogen(h).Distance <= 4),
+            goodhydrogens = goodhydrogens + 1;
+          end
         end
       end
+
+      if ((length(Pair.Hydrogen) == 4) && (goodhydrogens >= 3)) ...
+         || ((length(Pair.Hydrogen) == 3) && (goodhydrogens >= 2)) ...
+         || ((length(Pair.Hydrogen) < 3) && (goodhydrogens == length(Pair.Hydrogen)))
+        % don't reject it
+      else
+        a = 30.3;
+      end
+    else
+
     end
   end
 
@@ -121,7 +127,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
   
   % ----------- Is an unclassified pair really stacked?
 
-  if (a == 30) & (Pair.StackingOverlap > 0) & (Pair.MinDist < 4),
+  if (fix(a) == 30) & (Pair.StackingOverlap > 0) & (Pair.MinDist < 4),
     if Pair.Displ(3) > 0,
       if Pair.Normal(3) > 0,
         a = 21;                       % second base above, pointing up
