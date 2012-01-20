@@ -55,9 +55,6 @@ for f=1:length(Filenames),
       ClassifyCode = 1;
   end
 
-  c = cat(1,File.NT(1:File.NumNT).Center);
-  File.Distance = zMutualDistance(c,35); 
-
   if isfield(File,'BI'),
     File = rmfield(File,'BI');
   end
@@ -76,9 +73,13 @@ for f=1:length(Filenames),
     File.ClassVersion = 0;
   end
 
+  if length(File.NT) > 0,                    % if it has nucleotides,
+
+  c = cat(1,File.NT(1:File.NumNT).Center);
+  File.Distance = zMutualDistance(c,35); 
+
   if (ReadCode == 1) | (ReadCode == 3) | (ReadCode == 4) | ... 
-    (ClassifyCode == 1) | (length(fieldnames(File)) < 11) | ...
-    (max(max(File.Inter)) < 100) | File.ClassVersion < 1,
+    (ClassifyCode == 1) | (File.ClassVersion < 1),
     File.Edge = sparse(File.NumNT,File.NumNT);
 
     d = sort(nonzeros(File.Distance));
@@ -88,7 +89,7 @@ for f=1:length(Filenames),
     else
       File = zClassifyPairs(File);
       File = zUpdateDistanceToExemplars(File);
-      File.ClassVersion = 1;
+      File.ClassVersion = 1.1;
       ClassifyCode = 1;
     end
   end
@@ -101,7 +102,7 @@ for f=1:length(Filenames),
     ClassifyCode = 1;
   end
 
-File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
+%File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
 
   if ~isfield(File,'Header'),
     File.Header.ModelStart = [];
@@ -118,5 +119,6 @@ File.Header = zExtractAtomsPDB(Filename,'##TempPDB');
     end
 
     Files(f) = File;
+  end
   end
 end

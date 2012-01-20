@@ -4,6 +4,8 @@ function [NewNames] = zReadPDBList(Filename)
 
 if isempty(strfind(Filename,'_list')),
   NewNames = {Filename};
+elseif strcmp(Filename,'AllFiles_list'),
+  [s,NewNames] = mGetPDBFilenames;
 else
   NewNames = [];
 

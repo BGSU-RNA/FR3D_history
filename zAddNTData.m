@@ -17,6 +17,8 @@ for j=1:length(Filenames),
   FullList = [FullList; zReadPDBList(Filenames{j})];
 end
 
+if length(FullList) > 0,
+
 for f = 1:length(FullList),
   FL{f} = lower(FullList{f});
   FirstOccurence(f) = isempty(strmatch(FL{f},FL(1:(f-1)),'exact'));
@@ -50,3 +52,4 @@ for f = 1:length(FullList),                       % loop through PDB list
   end
 end
 
+end

@@ -72,11 +72,17 @@ else
 end
 set(handles.LOAD,'String',savedff);
 
-mGetPDBfilenames                                   % defines s
-set(handles.SearchPDBs,'String',s);
-set(handles.SearchPDBs,'Min',1);
-set(handles.SearchPDBs,'Max',length(s)+1);
-set(handles.QueryPDB,'String',snolist);
+[s,snolist] = mGetPDBFilenames;                          % defines s
+
+if length(s) == 0,
+    set(handles.Status,'String','ALERT: there are no PDB files or saved PDB data in the folders "PDBFiles" and "PrecomputedData". Please put some PDB files in these locations and try again!');
+    set(handles.ReadQuery,'Visible','Off'); %just to prevent the user from clicking it anyway!
+else
+  set(handles.SearchPDBs,'String',s);
+  set(handles.SearchPDBs,'Min',1);
+  set(handles.SearchPDBs,'Max',length(s)+1);
+  set(handles.QueryPDB,'String',snolist);
+end
 
 handles.output = hObject;
 guidata(hObject, handles);

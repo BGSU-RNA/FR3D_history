@@ -4,7 +4,7 @@
 % Extended to search Matlab's path for PDB files and to use the native
 % file separator rather than \  - CLZ 2006-07-18
 
-clear s temp snolist
+function [s,snolist] = mGetPDBFilenames(void)
 
 a = dir(['PDBFiles' filesep '*.pdb']);
 a = [a; dir(['PDBFiles' filesep '*.PDB'])];         % for the Mac
@@ -48,11 +48,8 @@ if ~isempty(a)
         count = count + 1;
       end
     end
-   
-
 else
-    set(handles.Status,'String','ALERT: there are no PDB files or saved PDB data in the folders "PDBFiles" and "PrecomputedData". Please put some PDB files in these locations and try again!');
-    s{1,1} =' ';%to prevent error
-    set(handles.ReadQuery,'Visible','Off'); %just to prevent the user from clicking it anyway!
+  s = [];
+  snolist = []; 
 end
 
