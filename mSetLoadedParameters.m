@@ -1,4 +1,4 @@
-%mSetLoadedParameters.m
+%mSetLoadedParameters.m fills in entries in the GUI from a saved search file
 
 Query=Search.Query;
 
@@ -93,8 +93,8 @@ if isfield(Search.Query,'Description')
     set(handles.SearchDescription,'String',Search.Query.Description);
 end
 set(handles.GuarCutoff,'Visible','on');
-if isfield(Search.Query,'GuarCutoff')
-    set(handles.GuarCutoff,'String',num2str(Search.Query.GuarCutoff));
+if isfield(Search.Query,'DiscCutoff')
+    set(handles.GuarCutoff,'String',num2str(Search.Query.DiscCutoff));
 end
 set(handles.RelCutoff,'Visible','on');
 if isfield(Search.Query,'RelCutoff')

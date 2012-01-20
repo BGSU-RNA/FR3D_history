@@ -13,7 +13,7 @@ if ~exist('GUIactive'),                      % if the GUI is not being used
   end
 end
 
-% Query
+Query
 
 % ----------------------------------------- Load PDB files if needed --------
 
@@ -88,7 +88,8 @@ if ~isempty(Candidates),                         % some candidate(s) found
   [Discrepancy, Candidates] = xRankCandidates(File(SIndex),Query,Candidates);
   fprintf('Found %d candidates in the desired discrepancy range\n',length(Discrepancy));
 
-   if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0),
+   if (Query.ExcludeOverlap > 0) & (length(Discrepancy) > 0) ...
+     & (Query.NumNT > 2),
      [Candidates, Discrepancy] = xReduceOverlap(Candidates,Discrepancy); 
                                                  % quick reduction in number
      [Candidates, Discrepancy] = xExcludeOverlap(Candidates,Discrepancy,400); 

@@ -4,7 +4,7 @@ function [] = xListCandidates(File,Search,NumToOutput)
 
 Model       = Search.Query;
 Candidates  = Search.Candidates;
-Discrepancy = Search.Discrepancy;
+
 [s,t]       = size(Candidates);
 N           = Model.NumNT;
 
@@ -21,19 +21,33 @@ Notify = 1;
 % ------------------------------- Print to screen
 
 if Model.Geometric > 0,
-  fprintf('       Filename Discrepancy Nucleotides ... Chains\n');
+  if isfield(Search,'AvgDisc'),
+    fprintf('       Filename Avg Discrep Nucleotides');
+  else
+    fprintf('       Filename Discrepancy Nucleotides');
+  end
 else
-  fprintf('       Filename Number Nucleotides ... Chains\n');
+    fprintf('       Filename Number      Nucleotides');
 end
 
+c = max(1,N*6-12);
+for i=1:c,
+  fprintf(' ');
+end
+fprintf('     Chains\n');
+
 for i=1:s,
-  if (Discrepancy(i) >= 0) & (i <= NumToOutput),
+  if (i <= NumToOutput),
     f = double(Candidates(i,N+1));
     fprintf('%15s', File(f).Filename);
     if Model.Geometric > 0,
-      fprintf('%11.4f',Discrepancy(i));
+      if isfield(Search,'AvgDisc'),
+        fprintf('%11.4f',Search.AvgDisc(i));
+      else
+        fprintf('%11.4f',Search.Discrepancy(i));
+      end
     else
-      fprintf('%4d',Discrepancy(i));            % original candidate number
+      fprintf('%4d',Search.Discrepancy(i));      % original candidate number
     end
     for j=1:N,
       fprintf('%3s',File(f).NT(Candidates(i,j)).Base);    
@@ -58,7 +72,8 @@ for i=1:s,
   end
 end
 
-if (Model.Geometric > 0) & (Model.RelCutoff > Model.DiscCutoff),
+if (Model.Geometric > 0) & (Model.RelCutoff > Model.DiscCutoff) ...
+   && ~isfield(Search,'AvgDisc'),
   fprintf(fidOUT,'Some motifs with discrepancy between %7.4f and %7.4f might not appear above\n\n', Model.DiscCutoff, Model.RelCutoff);
 end
 

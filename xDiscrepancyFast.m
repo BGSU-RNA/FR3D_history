@@ -4,7 +4,7 @@
 % The current sum is returned as a negative discrepancy, shifted to
 % record when the calculation stopped.
 
-function [Disc] = xDiscrepancy(Model,Cand)
+function [Disc] = xDiscrepancyFast(Model,Cand)
 
 L = length(Cand);
 

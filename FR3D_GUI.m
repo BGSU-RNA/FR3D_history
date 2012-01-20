@@ -117,15 +117,15 @@ function QueryNTs_Callback(hObject, eventdata, handles)
 % --- Executes on button press in ReadQuery.
 function ReadQuery_Callback(hObject, eventdata, handles)
 %%%DetermineQuery.NTList %%%%This must be done before running mCreateDynamicGUI
-NTs = get(handles.QueryNTs,'String');
+NTs = [',' get(handles.QueryNTs,'String') ','];
+NTs    = regexprep(NTs,'A|C|G|U','');      % strip out base letters is present
 NTs    = regexprep(NTs,';| ',',');
 while strfind(NTs,',,'),
     NTs = regexprep(NTs,',,',',');
 end
 ind=findstr(',',NTs);
-ind=[0 ind length(NTs)+1];
 for i=1:length(ind)-1
-    NT{i}=NTs(ind(i)+1:ind(i+1)-1);
+    NT{i}=NTs(ind(i)+1:ind(i+1)-1);        % read nucleotide numbers
 end
 Query.NTList=NT;
 %%%End DetermineQuery.NTList

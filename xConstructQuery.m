@@ -1,4 +1,4 @@
-% xConstructQuery(Query,File,f) fills in details of Query from File
+% xConstructQuery(Query,File) fills in details of Query from File
 
 % defaults:
 % Query.Geometric = 1 if Query.Filename and Query.NTList are defined
@@ -16,7 +16,7 @@
 % Query.ChainList is not needed unless there is ambiguity in nucleotide
 %                 numbers, and if there is, xConstructQuery will tell you
 
-function [Query] = xConstructQuery(Query,File,f)
+function [Query] = xConstructQuery(Query,File)
 
 % ------------------------------- Determine whether search is geom. or symb.
 
@@ -149,9 +149,6 @@ if Query.Geometric == 1,                    % model comes from a file
 
   Query.Inter = File.Inter(Query.Indices,Query.Indices);
   Query.Edge  = File.Edge(Query.Indices,Query.Indices);
-
-  Query.Centers  = cat(1,Query.NT.Center);
-  Query.Distance = zMutualDistance(Query.Centers,Inf);
 end
 
 % --------- Interpret model mask
@@ -271,41 +268,36 @@ end
 
 % --------- precompute parameters for geometric screening and ranking
 
-if (Query.Geometric > 0) & (Query.NumNT >= 2),
-
-  Query.DistCutoff = max(max(Query.Distance)) + sqrt(2)*Query.NumNT*Query.DiscCutoff;
-                                     % distances this large needed in File
-
+if Query.Geometric > 0,
   Query.LocWeight = Query.NumNT * Query.LocWeight / sum(Query.LocWeight);
                                         % weights sum to Query.NumNT
+  Query.SSCutoff  =(Query.NumNT^2)*(Query.RelCutoff^2)*cumsum(Query.LocWeight);
+                                  % cutoffs for first 1, 2, 3, ... nucleotides
+  
+  Query = xPrecomputeForDiscrepancy(Query);
 
-  Query.SSCutoff  = (Query.NumNT^2)*(Query.RelCutoff^2)*cumsum(Query.LocWeight);
-                                    % cutoffs for first 1, 2, 3, ... nucleotides
-
-  Query.WeightedCenter = Query.LocWeight * Query.Centers / Query.NumNT;
-
-  Query.CenteredCenters = Query.Centers-ones(Query.NumNT,1)*Query.WeightedCenter;
-  Query.WeightedCenteredCenters = diag(Query.LocWeight)* Query.CenteredCenters;
+  Query.Distance = zMutualDistance(Query.Centers,Inf);
 
   Query.LDiscCutoff = (Query.NumNT*Query.RelCutoff)^2;
 
-  if isfield(Query,'Flex'),
-    Query.DistanceScreen = 0;            % cannot use sums of squares with flex
-    Query.Flex(Query.NumNT,Query.NumNT) = 0; % make big enough
-    Query.Flex = Query.Flex + Query.Flex';   % make symmetric
+  if (Query.NumNT >= 2),
+
+    if isfield(Query,'Flex'),                  % not checked in a long time
+      Query.DistanceScreen = 0;        % cannot use sums of squares with flex
+      Query.Flex(Query.NumNT,Query.NumNT) = 0; % make big enough
+      Query.Flex = Query.Flex + Query.Flex';   % make symmetric
+    end
+
+    Query.DistCutoff = max(max(Query.Distance)) ...
+                     + sqrt(2)*Query.NumNT*Query.DiscCutoff;
+                                     % distances this large needed in File
+
+  else       % --------- Special calculations for two-nucleotide motifs
+    Query.DistCutoff = Query.Distance(1,2) + 2 * Query.DiscCutoff;
   end
+
 else
   Query.SSCutoff = Inf * ones(1,Query.NumNT);
-end
-
-% --------- Special calculations for two-nucleotide motifs
-
-if Query.NumNT == 2 & Query.Geometric > 0,
-  Query.DistCutoff = Query.Distance(1,2) + 2 * Query.DiscCutoff;
-  Query.LocWeight  = ones(1,Query.NumNT);
-  Query.R  = Query.NT(2).Rot' * Query.NT(1).Rot;
-  Query.T1 = (Query.NT(2).Center - Query.NT(1).Center)*Query.NT(1).Rot;
-  Query.T2 = (Query.NT(1).Center - Query.NT(2).Center)*Query.NT(2).Rot;
 end
 
 % --------- Read minimum and maximum distance specifications

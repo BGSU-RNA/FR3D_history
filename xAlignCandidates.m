@@ -4,9 +4,8 @@ function [void] = xAlignCandidates(File,Search,Direction)
 
 Model       = Search.Query;
 Candidates  = Search.Candidates;
-Discrepancy = Search.Discrepancy;
 
-L = length(Discrepancy);
+[L,t] = size(Candidates);
 
 [y,p] = sort(Direction*double(Candidates(1,1:Model.NumNT)));    
                                     % put in increasing or decreasing order
@@ -58,7 +57,11 @@ for c = 1:L,                                      % loop through candidates
   f = F(c);                                       % file number
   fprintf('%15s', File(f).Filename);
   if Model.Geometric > 0,
-    fprintf('%11.4f',Discrepancy(c));
+    if isfield(Search,'Discrepancy'),
+      fprintf('%11.4f',Search.Discrepancy(c));
+    elseif isfield(Search,'AvgDisc'),
+      fprintf('%11.4f',Search.AvgDisc(c));
+    end
   end
   for j=1:Model.NumNT,                            % print candidate
     fprintf('%3s',File(f).NT(Cand(c,j)).Base);    

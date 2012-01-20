@@ -33,6 +33,7 @@ if nargin > 0,
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
   Query.Name = 'Basepair';
+  Query.Name = 'Sarcin5Geo';
 end
 
 switch Query.Name
@@ -45,6 +46,7 @@ case 'Sarcin5Geo'
   Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
   Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
   Query.DiscCutoff     = 0.5;
+  Query.SearchFiles    = {'1s72'};
 
 case 'Sarcin5Symb'
   Query.Description    = 'Sarcin five nucleotide symbolic';
