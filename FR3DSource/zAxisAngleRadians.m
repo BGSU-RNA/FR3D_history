@@ -1,7 +1,7 @@
-% zAxisAngleBasic computes the axis and angle of rotation in an
+% zAxisAngleRadians computes the axis and angle of rotation in an
 % orthogonal matrix R
 
-function [axis, angle] = zAxisAngleBasic(R)
+function [axis, angle] = zAxisAngleRadians(R)
 
 [v,d] = eig(R);                % get eigenvectors and values of R
 [y,i] = sort(imag(diag(d)));   % sort by imaginary part of eigenvalues

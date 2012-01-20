@@ -11,8 +11,8 @@ for f = 1:length(File),
 
 if length(File.NT) > 1,
 
-C = fix(abs(File(f).Edge))+0.01*(fix(abs(File(f).BasePhosphate+File(f).BasePhosphate')));
-E = fix(abs(File(f).Edge));
+C = fix(abs(File(f).Edge))+0.001*(fix(abs(File(f).BasePhosphate+File(f).BasePhosphate')));                  % matrix of interactions, including base-phosphate
+E = fix(abs(File(f).Edge)); % matrix of base-base interactions
 
 for i = 1:length(C(:,1)),
   C(i,i) = 0;               % remove phosphate self interactions
@@ -36,21 +36,27 @@ i = i(k);
 j = j(k);
 c = c(k);
 
-d = zeros(size(c));                              % current distance from local
+d = zeros(size(c));                              % current interaction range
 
-for m = 1:length(i),
-  if (c(m) == 1) && (d(m) <= 10),                % pair, not pseudoknot
+for m = 1:length(i),                             % go through all pairs once
+  if (c(m) == 1) && (d(m) == 0),                 % cWW pair, not pseudoknotted
+
     p =     (i <= i(m)) .* (j >= i(m)) .* (j <= j(m));
     p = p + (i >= i(m)) .* (i <= j(m)) .* (j >= j(m));
-    q = find(p);
+    q = find(p);                      % indices of pairs that overlap i(m),j(m)
 
-    if c(m) == 1,
-      a = 1;                           % record Manhattan distance to i(m),j(m)
-    else
-      a = 0.5;                         % use half the distance
-    end
+%    d(q) = max(d(q), abs(i(m)-i(q))+abs(j(m)-j(q))); 
+                            % increase interaction range for these pairs
+                            % to account for how far they cross i(m),j(m)
 
-    d(q) = max(d(q), a*(abs(i(m)-i(q))+abs(j(m)-j(q))));
+    d(q) = max([d(q) min([abs(i(m)-i(q)) abs(j(m)-j(q))],[],2)],[],2); 
+                            % for all nested cWW pairs crossed, keep track
+                            % of how many nucleotides this pair would need to
+                            % move over to get uncrossed, keep the maximum
+
+%    d(q) = d(q) + 1;        % count number of nested cWW's crossed
+
+    d(m) = 0;               % don't inadvertently make this non-nested!
 
     if Verbose > 2,
       figure(2)

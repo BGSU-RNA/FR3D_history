@@ -72,7 +72,7 @@ n  = 1;                                     % current NT index
 i  = 1;                                     % current atom/row number
 
 while i < length(NTNUMBER),                 % go through all atoms
-  Flag = 0;
+  Flag = 0;                                 % not a recognized nucleotide
   j = [];                                   % initialize rows of next nucleo.
   ntnum = NTNUMBER{i};                      % nucleotide number from pdb file
 
@@ -227,7 +227,7 @@ while i < length(NTNUMBER),                 % go through all atoms
     NT(n).Center = mean(Loc(1:8,:));
     NT(n).Code   = 4;                          % A is 1, C is 2, etc.
   else 
-%    fprintf('Unrecognized nucleotide: %s %s\n', NT(n).Base,NT(n).Number);
+    fprintf('Unrecognized nucleotide: %s %s\n', NT(n).Base,NT(n).Number);
     n = n - 1;                                 % not a recognized
                                                % nucleotide, do nothing
     Flag = 1;
@@ -236,7 +236,8 @@ while i < length(NTNUMBER),                 % go through all atoms
   if (Flag < 1),
     if (max(max(Loc)) == Inf),                 % base atoms missing
       if Verbose > 0,
-        fprintf('Base %s%s is missing an atom, so it will be skipped\n',NT(n).Base,NT(n).Number);
+        NumGood = length(find((Loc(1,:) < Inf) .* (abs(Loc(1,:)) > 0)));
+        fprintf('Base %s%s has %d atoms, so it will be skipped\n',NT(n).Base,NT(n).Number,NumGood);
       end
       n = n - 1;
     elseif (max(max(Sugar)) == Inf),          % sugar atom missing
@@ -323,11 +324,13 @@ else
   File.Pair      = [];
   File.ClassVersion = 0;
   File.Header    = [];
-  File.Info.Resolution = [];
-  File.Info.Type       = '';
-  File.Info.RNA        = '';
-  File.Info.Species    = '';
-  File.Info.LigandsAndComments = '';
+  File.Info.Resolution  = [];
+  File.Info.Descriptor  = '';
+  File.Info.ExpTechnique= '';
+  File.Info.ReleaseDate = '';
+  File.Info.Author      = '';
+  File.Info.Keywords    = '';
+  File.Info.Source      = '';
   File.BasePhosphate = [];
 
 end

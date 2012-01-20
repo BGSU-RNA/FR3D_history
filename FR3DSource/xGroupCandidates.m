@@ -57,8 +57,6 @@ for pp = 1:length(Z(:,1));
   ClusterNum = ClusterNum + 1;
 end
 
-
-
 for i = 1:L,
   La = Label{i};
   SLabel{i} = '';                       % short label
@@ -92,38 +90,10 @@ for i = 1:L,
   FLabel{i} = [Lab{i} ' ' SLabel{i}];
 end
 
-%figure(25)
-%[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',FLabel);
-%set(gca,'FontSize',1)
+figure(99)
+[H,T,p] = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',FLabel);
+%set(gca,'FontSize',1)             % helpful when printing to PDF
 %set(gcf,'Renderer','painters');
-%saveas(gcf,[ 'Temp0.pdf'],'pdf');
-
-%figure(26)
-%zClusterGraph(D,FLabel,15,p,0);
-%set(gcf,'Renderer','painters');
-%saveas(gcf,[ 'Temp1.pdf'],'pdf');
-
-figure(25)
-clf
-p = zClusterGraph(D,FLabel,15,[],0);
-title('Table of discrepancies between candidates');
-
-colormap('default');
-map = colormap;
-map = map((end-8):-1:8,:);
-colormap(map);
-caxis([0 0.8]);
-colorbar('location','eastoutside');
-
-
-%set(gcf,'Renderer','painters');
-%saveas(gcf,[ 'Temp2.pdf'],'pdf');
-
-if length(p) < -100,
-  figure(28)
-  clf
-  SPIN_neighborhood(D,FLabel,15);
-end
 
 Search.GroupLabel = SLabel;
 

@@ -21,6 +21,10 @@ for f = 1:length(File),
 end
 HFile = File(find((Res > 0) .* (Res < 3)));
 
+[y,i] = sort(Res);
+for j = 1:length(Res),
+  fprintf('%7.2f %s %4d nucleotides %s\n', Res(i(j)), File(i(j)).Filename, File(i(j)).NumNT, File(i(j)).Info.Descriptor);
+end
 
 StudyNum = -4;
 Verbose = 2;
@@ -69,9 +73,9 @@ Discreps = [];
 
 for i = 1:length(Param(:,1)),
   List  = zFindPairs(HFile,Param(i,:),1);
-  [s,t] = size(List);
   fprintf('Found %5d instances of %2s %4s class %5.1f\n', s, Pairs{Param(i,2)}, zEdgeText(Param(i,1),Decimal,Param(i,2)), Param(i,1));
 
+  [s,t] = size(List);
   [y,j] = sort(rand(s,1));
   List = List(j,:);                     % order randomly
   List = List(1:min(s,N),:);            % take the first N instances
@@ -120,13 +124,13 @@ for i = 1:length(Param(:,1)),
   end
 end
 
-figure(6)
-subplot(2,2,1)
+figure(2)
+clf
 colormap('default')
 hist(Discreps,75);                          % all pairs
 ax = axis;
 ax(1) = 0;
-ax(2) = 6;
+ax(2) = 5;
 axis(ax);
 title('IsoDiscrepancy within basepairs');
 saveas(gcf,[strrep('IsoDiscrepancy within basepairs',' ','_') '.png'],'png');

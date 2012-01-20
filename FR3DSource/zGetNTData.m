@@ -33,6 +33,7 @@ for f=1:length(Filenames),
   filename = lower(Filename);
 
   ClassifyCode = 0;
+  SaveCode     = 0;
 
   if (ReadCode > 0),
     ReadFull = 1;
@@ -76,8 +77,18 @@ for f=1:length(Filenames),
     File = [];
   end
 
-  if ReadFull == 1,
+% File = zGetPDBInfo(File);
+
+  if ~isfield(File,'Info'),
     File = zGetPDBInfo(File);          % get resolution and other info
+    SaveCode = 1;
+  else
+    if isempty(File.Info.Descriptor),
+      File = zGetPDBInfo(File);          % look for file information
+      if ~isempty(File.Info.Descriptor),
+        SaveCode = 1;
+      end
+    end
   end
 
   if ~isfield(File,'ClassVersion'),
@@ -172,7 +183,7 @@ for f=1:length(Filenames),
 
   Saved = 0;
 
-  if (ReadCode > 0) || (ClassifyCode > 0),
+  if (ReadCode > 0) || (ClassifyCode > 0) || (SaveCode > 0),
     zSaveNTData(File,Verbose);
     Saved = 1;
   end

@@ -40,3 +40,7 @@ switch v,
 end
 
 NewIndices = sort(NewIndices);
+
+% it should make sure there are no duplicates in NewIndices
+% it should check File to make sure that everything in NewIndices really
+% is present in File, otherwise something will crash

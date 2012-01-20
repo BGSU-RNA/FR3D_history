@@ -26,9 +26,10 @@ if ~isempty(a)
       end
     end
 
-    temp = ['AllFiles_list' temp];
+    temp = [' AllFiles_list' temp];
     
-    temp = sort(temp);                              % sort list of PDB names
+    [t,i] = sort(upper(temp));                       % sort list of PDB names
+    temp = temp(i);
 
     for i=1:length(temp),
       temp{i} =regexprep(temp{i},' ','');           % strip spaces from lists
@@ -37,7 +38,7 @@ if ~isempty(a)
     s{1,1}=temp{1};
     count=2;
     for i=2:length(temp)
-      if ~strcmp(temp{i},s{count-1,1})              % remove duplicates
+      if ~strcmpi(temp{i},s{count-1,1})              % remove duplicates
         s{count,1}=temp{i};
         count=count+1;
       end

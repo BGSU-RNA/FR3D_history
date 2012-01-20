@@ -1,4 +1,6 @@
 % zCountInteractions(File) tabulates the number of each type of interaction in File
+% It formats the counts by geometric family and, within each family, by basepair.
+% It writes an Excel sheet with a standard format.
 % CountFilename could be 'Basepair_counts_NonRedundant_2008_02_21_list.xls'
 % If omitted, the filenames in File are used to construct the filename.
 

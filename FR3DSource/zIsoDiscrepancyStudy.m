@@ -1,4 +1,4 @@
-% zIsoDiscrepancyStudy compares instances of two or more basepair families
+% zIsoDiscrepancyStudy compares instances of two or more basepair families, making a variety of graphs 
 
 if ~exist('File'),                           % if no molecule data is loaded,
   [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2);   % load PDB data

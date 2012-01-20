@@ -22,13 +22,16 @@ if nargin < 4,
   Verbose = 0;
 end
 
-LoadedFiles = [];
+LoadedFiles = {};
 F = 0;
 
 if nargin >= 3,
   F = length(File);
   for j = 1:length(File),
     LoadedFiles{j} = lower(File(j).Filename);
+    if isempty(LoadedFiles{j}),
+      LoadedFiles{j} = '';                     % use empty string
+    end
   end
 end
 
@@ -56,7 +59,7 @@ if nargin == 5,
   else
     keep = [];
     for j=1:length(FullList),
-      if issorted([PDBStart(1:4); FullList{j}(1:4)],'rows'),
+      if issorted([lower(PDBStart(1:4)); lower(FullList{j}(1:4))],'rows'),
         keep = [keep j];
       end
     end
@@ -74,7 +77,12 @@ for f = 1:length(FullList),                       % loop through PDB list
     if isempty(i),                                  % if PDB not loaded,
       NewF = zGetNTData(FullList{f},0,Verbose); %   load it
       if ReadCode ~= 3,
-        File(F+1) = NewF;
+        if F == 0,
+          clear File
+          File(1) = NewF;
+        else
+          File(F+1) = NewF;
+        end
       end
       clear NewF;
       F = length(File);

@@ -40,7 +40,7 @@ for c = 1:M,                                   % loop through candidates
 
  for i = 1:N,                                  % loop through nucleotides
   NT = Cand(i);                                % current nucleotide
-  a = zWriteNucleotidePDB(fid,NT,a,c,R,Sh);
+  a = zWriteNucleotidePDB(fid,NT,a,c,R',Sh);
  end
 end
 
@@ -54,6 +54,8 @@ fid = fopen([Search.SaveName '-Cand-Superimposed.pdb'],'w');       % open for wr
 
 a = 1;                                         % atom number
 
+VP.Sugar = 1;
+
 for c = 1:M,                                   % loop through candidates
  f     = Search.Candidates(c,N+1);             % file number, this candidate
  Cand  = File(f).NT(Search.Candidates(c,1:N)); % current candidate
@@ -61,7 +63,9 @@ for c = 1:M,                                   % loop through candidates
 
  for i = 1:N,                                  % loop through nucleotides
   NT = Cand(i);                                % current nucleotide
-  a = zWriteNucleotidePDB(fid,NT,a,0,R,Sh);
+  a = zWriteNucleotidePDB(fid,NT,a,0,R',Sh);
+%  zPlotOneNTRotated(NT,VP,R',Sh);
+  hold on
  end
 end
 

@@ -32,7 +32,7 @@ else
   if (L == 2),                                % two-nucleotide motif
 
     R = Model(1).Rot * Cand(1).Rot';
-    S = CandWeightedCenter;
+    S = Cand(1).Center;
     E = [];
 
   else                                        % more than two nucleotides

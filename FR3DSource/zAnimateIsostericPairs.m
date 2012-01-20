@@ -1,3 +1,5 @@
+% zAnimateIsostericPairs makes bmp's that can be combined together into animated gif's of various basepairs, to show isostericity between them
+
 
 load PairExemplars
 
@@ -60,8 +62,9 @@ for j = 1:length(Pairs),
      if ~isempty(E),
       if E.Class == Pairs{j}(2),
 
-       fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
-       zListPairData(E.Pair,1);
+       Pair = zClassifyPair(E.NT1,E.NT2);
+       fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
+       zListPairData(Pair,1);
 
 % display the exemplar pair ---------------------------------------------
 
@@ -102,7 +105,7 @@ for j = 1:length(Pairs),
     Image = getframe;
     Image.cdata = Image.cdata(1:(end-1),2:end,:);
     P = frame2im(Image);
-    filename = ['Animation/' ViewParam.AnimationFilename num2str(j+10) '.bmp'];
+    filename = [ViewParam.AnimationFilename num2str(j+10) '.bmp'];
     imwrite(P,filename, 'bmp');
 
 end

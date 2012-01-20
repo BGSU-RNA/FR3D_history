@@ -123,6 +123,8 @@ for k = 1:length(Numb)                      % loop through nucleotide numbers
     for j = (m+1):mm,
       allchains{j} = ch;
     end
+  elseif strcmpi(Numb{k},'all'),
+    ind = 1:length(File.NT);                  % all nucleotides
   elseif any(Numb{k}(1) == 'bdefhijklmnopqrstvwxyz') && isfield(File.NT(1),'Hierarchy'),
     c = 1;                        % counter for number of indices found
     newind = [];

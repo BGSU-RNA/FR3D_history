@@ -29,11 +29,13 @@ for f = 1:length(File),
 
   HText{4} = '<p>Each pair is listed twice.  For instance, if A108 G130 tSH is listed, then so is G130 A108 tHS.  The order in which the edges are listed still corresponds to the base which is using that edge.  Similarly with stacking.  The chain is indicated in parentheses.';
 
-  HText{5} = '<p>Classification of basepairs and base stacking is done using the program FR3D developed by the <A href="http://rna.bgsu.edu">Bowling Green State University RNA group</a>, including Neocles Leontis, Craig L. Zirbel, Jesse Stombaugh, Ali Mokdad, and Michael Sarver.';
+  HText{5} = '<p>Starting from hairpin loops, basepairs are classified as Nested if they do not cross any previously established Nested cWW pairs.  If they do, the Range indicates the degree to which they cross.  It is the maximum, over all nested cWW pairs crossed, of the minimum number of nucleotides the pair would need to move to no longer cross the cWW pair.';
 
-  HText{6} = '<p>Please write to Craig L. Zirbel at <img src="http://www-math.bgsu.edu/z/cz.gif" align="absbottom"> with questions or comments.<hr>';
+  HText{6} = '<p>Classification of basepairs and base stacking is done using the program FR3D developed by the <A href="http://rna.bgsu.edu">Bowling Green State University RNA group</a>, including Neocles Leontis, Craig L. Zirbel, Jesse Stombaugh, Ali Mokdad, and Michael Sarver.';
 
-  HText{7} = '<pre>';
+  HText{7} = '<p>Please write to Craig L. Zirbel at <img src="http://www-math.bgsu.edu/z/cz.gif" align="absbottom"> with questions or comments.<hr>';
+
+  HText{8} = '<pre>';
 
 % --------------------------------------------- Produce interaction list
 
@@ -53,12 +55,10 @@ for f = 1:length(File),
       r = '';
       if (File(f).Range(i,j(k)) == 0) && abs(E(i,j(k))) < 15,
         r = 'Nested';
-      elseif (File(f).Range(i,j(k)) <= 10) && abs(E(i,j(k))) < 15,
-        r = 'Local';
-      elseif File(f).Range(i,j(k)) > 10,
-        r = 'Long-range';
+      elseif File(f).Range(i,j(k)) > 0,
+        r = sprintf('Range %4d', File(f).Range(i,j(k)));
       end
-      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %10s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0),r);
+      IText{c} = sprintf('%s%4s(%s) - %s%4s(%s) - %5s - %s', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain, zEdgeText(File(f).Edge(i,j(k)),0),r);
 
       InterType(c) = abs(File(f).Edge(i,j(k)));
 
@@ -89,7 +89,9 @@ for f = 1:length(File),
 
   Diagram = ['<a href="' FN '_circular_diagram.pdf"> <img src="' FN '_circular_diagram.png" alt="Click for high resolution pdf" width = "615" > </a>'];
 
-  DiagramText = '<p>Circular basepair diagram in Nussinov style.  Click the diagram for a high-resolution PDF version.  Dark blue chords indicate nested Watson-Crick basepairs, cyan indicates nested non-Watson-Crick basepairs, red indicates non-nested Watson-Crick basepairs, green indicates non-nested non-Watson-Crick basepairs, and yellow indicates long-range stacking interactions.';
+  DiagramText = '<p>Circular basepair diagram in Nussinov style.  Click the diagram for a high-resolution PDF version.';
+
+%  Dark blue chords indicate nested Watson-Crick basepairs, cyan indicates nested non-Watson-Crick basepairs, red indicates non-nested Watson-Crick basepairs, green indicates non-nested non-Watson-Crick basepairs, and yellow indicates long-range stacking interactions.
 
   fprintf(fid,'<table border="1">\n<tr>\n<th>Circular interaction diagram</th>\n<th>RNA 3D structure</th>\n</tr>\n');
 
@@ -188,29 +190,6 @@ for f = 1:length(File),
   clear IText HText 
 
 end
-
-
-% ----------------------------------------------- Create circular diagram
-
-%  figure(1)
-  clf
-  E = fix(abs(File(f).Edge));
-  B = E .* (E > 0) .* (E < 24);                 % pairs and stacks
-  S = File(f).Range;
-  zCircularDiagram(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),1);
-
-  saveas(gcf,[mypath FN '_circular_diagram.png'],'png');
-  [X,map] = imread([mypath FN '_circular_diagram.png']);
-  Y = X(30:830,210:1030,:);
-  imwrite(Y,[mypath FN '_circular_diagram.png']);
-
-  clf
-  zCircularDiagram(File(f), triu(B), (B==1).*(S==0) + 2*(B>1).*(B<14).*(S==0) + 3*(B==1).*(S>0) + 4*(B > 1).*(B < 14) .*(S>0) + 5*(B > 20) .* (B < 25) .* (S > 10),0.1);
-  saveas(gcf,[mypath FN '_circular_diagram.pdf'],'pdf');
-
-% ----------------------------------------------- Write PDB file
-
-  zWritePDB(File(f),[mypath FN '_RNA.pdb']);
 
 return
 

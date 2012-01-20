@@ -111,10 +111,15 @@ if ~isempty(Candidates),                         % some candidate(s) found
      end
    end
 
- else
+ elseif Query.NumNT > 2,
   A = [Candidates sum(Candidates')'];        % compute sum of indices
   N = Query.NumNT;                           % number of nucleotides
-  [y,i] = sortrows(A,[N+1 N+2 1:N]);         % sort by this sum
+  [y,i] = sortrows(A,[N+1 N+2 1:N]);         % sort by file, then this sum
+  Candidates = Candidates(i,:);              % put all permutations together
+  Discrepancy = (1:length(Candidates(:,1)))';% helps identify candidates
+ else
+  N = Query.NumNT;                           % number of nucleotides
+  [y,i] = sortrows(Candidates,[N+1 1 2]);
   Candidates = Candidates(i,:);              % put all permutations together
   Discrepancy = (1:length(Candidates(:,1)))';% helps identify candidates
  end

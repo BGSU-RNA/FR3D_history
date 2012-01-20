@@ -36,6 +36,7 @@ else
     for f = 1:max(Candidates(:,N+1)),            % loop through files
       Search.File(f).Edge = sparse(zeros(1,1));
       Search.File(f).BasePhosphate = sparse(zeros(1,1));
+      Search.File(f).Range = sparse(zeros(1,1));
     end
   
     for i = 1:s,
@@ -55,6 +56,8 @@ else
           Search.File(f).Edge(k,j) = File(f).Edge(k,j);
           Search.File(f).BasePhosphate(j,k) = File(f).BasePhosphate(j,k);
           Search.File(f).BasePhosphate(k,j) = File(f).BasePhosphate(k,j);
+          Search.File(f).Range(j,k) = File(f).Range(j,k);
+          Search.File(f).Range(k,j) = File(f).Range(k,j);
         end
       end
   
@@ -74,5 +77,15 @@ else
        end
       end
     end
+  elseif ~isfield(Search,'CandidateFilenames'),
+    List = {};
+    fprintf('Attempting to convert filenames and lists to current format\n');
+    for j=1:length(Search.Filenames),
+      if strfind(Search.Filenames{j},'_list'),
+        fprintf('If %s has changed or is no longer present, this may fail!\n',Search.Filenames{j});
+      end
+      List = [List; zReadPDBList(Search.Filenames{j},1)];
+    end
+    Search.CandidateFilenames = List;
   end
 end

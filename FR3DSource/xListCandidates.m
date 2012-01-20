@@ -14,8 +14,6 @@
 
 function [Text] = xListCandidates(Search,NumToOutput,WheretoOutput,Param)
 
-
-
 File        = Search.File;
 Query       = Search.Query;
 Candidates  = Search.Candidates;
@@ -202,6 +200,18 @@ for i=1:min(s,NumToOutput),
     SA = {'A', 'S'};
     Text{i+t} = [Text{i+t} sprintf('%c', SA{1+File(f).NT(Candidates(i,1)).Syn})];
     Text{i+t} = [Text{i+t} sprintf('%c', SA{1+File(f).NT(Candidates(i,2)).Syn})];
+    if isfield(File,'Range'),
+      ii = Candidates(i,1);
+      jj = Candidates(i,2);
+      if (File(f).Range(ii,jj) == 0) && abs(File(f).Edge(ii,jj)) < 15,
+        r = ' Nested';
+      elseif File(f).Range(ii,jj) > 0,
+        r = sprintf(' Range %4d', full(File(f).Range(ii,jj)));
+      else
+        r = '';
+      end
+      Text{i+t} = [Text{i+t} r];
+    end
   end
 
 end

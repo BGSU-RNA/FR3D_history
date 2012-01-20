@@ -1,5 +1,4 @@
-
-
+% dNeedlemanWunsch(seq1,seq2,p,d) aligns sequences seq1 and seq2 using probability p of base conservation and gap penalty d
 
 function [matches,align1,align2,s1,s2] = NeedlemanWunsch(seq1,seq2,p,d)
 
@@ -25,20 +24,21 @@ for i = 1:M,
   tracematrix(1,i+1) = 1;
 end
 
+S1 = seq1'*ones(1,M);
+S2 = ones(N,1)*seq2;
+
+S = log(p)*(S1==S2) + log((1-p))*(S1~=S2) - log(pa*pb);
+
 for i = 1:N,
   for j = 1:M,
-    if seq1(i) == seq2(j),
-      pab = p;
-    else
-      pab = 1-p;
-    end
-    s = log(pab) - log(pa*pb);
-    [a,b] = max([nwmatrix(i+1,j)-d nwmatrix(i,j+1)-d nwmatrix(i,j)+s]);
+    [a,b] = max([nwmatrix(i+1,j)-d nwmatrix(i,j+1)-d nwmatrix(i,j)+S(i,j)]);
     nwmatrix(i+1,j+1) = a;                % max value
     tracematrix(i+1,j+1) = b;             % which direction the max is from
   end
-  [a,b] = max(nwmatrix(i+1,:));
+%  [a,b] = max(nwmatrix(i+1,:));          % doesn't do anything?
 end
+
+score = nwmatrix(N,M);
 
 %round(nwmatrix)
 %tracematrix
@@ -86,5 +86,5 @@ seq2 = 'wwwwabcdefghijklm';
 p = .995;                        % probability an A stays an A
 d = 2;                         % gap penalty
 
-[m,a,b,s,t] = nw(seq1,seq2,p,d)
+[m,a,b,s,t] = dNeedlemanWunsch(seq1,seq2,p,d)
 [s;t]

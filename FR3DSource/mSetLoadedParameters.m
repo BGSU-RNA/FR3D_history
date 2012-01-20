@@ -2,14 +2,16 @@
 
 Query=Search.Query;
 
-s=get(handles.SearchPDBs,'String');
-ss=get(handles.QueryPDB,'String');
+s  = get(handles.SearchPDBs,'String');
+ss = get(handles.QueryPDB,'String');
 
 v=[];
 
 for i=1:length(Search.Filenames)
     ff = find(strcmp(upper(s),upper(Search.Filenames{i})));
-    v=[v ff(1)];
+    if ~isempty(ff),
+      v=[v ff(1)];
+    end
 end
 set(handles.SearchPDBs,'Value',v);
 

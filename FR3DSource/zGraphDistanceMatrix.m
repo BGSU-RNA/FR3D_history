@@ -1,6 +1,6 @@
 % zClusterGraph(D,Lab,W) treats D as the distances between instances with labels given by Lab.  It re-orders the instances to group them into clusters, and puts nearby clusters next to one another.  Then it displays the distances graphically.  W is the number of characters of Lab to use.  pp is an optional user-supplied ordering vector.
 
-function [p] = zClusterGraph(D,Lab,W,pp,Table)
+function [void] = zClusterGraph(D,Lab,W,Table)
 
 [s,t] = size(D);
 
@@ -22,53 +22,22 @@ if nargin < 3,
 end  
 
 if nargin < 4,
-  pp = [];
-end
-
-if nargin < 5,
   Table = 0;
 end
 
-% ----------------------------------------- Cluster analysis
-
-d = diag(D);                                   % save diagonal for later
-
-for i = 1:length(D(:,1)),
-  D(i,i) = 0;                                  % set diagonal to zero
-end
-
-Y = squareform(full(D));                       % convert to a vector
-Z = linkage(Y,'average');                      % compute cluster tree
-
 % ------------------------------------------ Print table
-
-DD = full(D);
-p = zOrderGroups(Y,Z,DD);               % put instances in order
-
-if ~isempty(pp),
-  p = pp;                               % use user-supplied ordering
-end
-
-DDD = DD(p,p);                          % re-order according to p
-d = d(p);                               % re-order diagonal too
-
-for i = 1:length(DDD),
-  DDD(i,i) = d(i);
-end
-
-[s,t] = size(DDD);
 
 if Table == 1,
   fprintf('                             ');
   for j=1:t,
-    w = min(length(Lab{p(j)}), 6);
-    fprintf('%6s', Lab{p(j)}(1:w));
+    w = min(length(Lab{j}), 6);
+    fprintf('%6s', Lab{j}(1:w));
   end
   fprintf('\n');
   for i=1:s,
-    fprintf('%24s ', Lab{p(i)}(1:28));
+    fprintf('%24s ', Lab{i}(1:28));
     for j= 1:t,
-      fprintf('%5.2f ', DDD(i,j));
+      fprintf('%5.2f ', D(i,j));
     end
     fprintf('\n');
   end
@@ -77,12 +46,12 @@ end
 
 % ------------------------------------------ Display graph of isodiscrepancies
 
-DDDD = zeros(s+1,t+1);           % pad with zeros
-DDDD(1:s,1:t) = DDD;
+DD = zeros(s+1,t+1);           % pad with zeros
+DD(1:s,1:t) = D;
 
-pcolor(real(DDDD))
+pcolor(real(DD))
 
-%pcolor(2*floor(DDDD/2))
+%pcolor(2*floor(DD/2))
 
 shading flat
 axis ij
@@ -95,8 +64,17 @@ view(2)
 %caxis([0 16]);
 %colorbar('location','eastoutside');
 
+if Table > 0,
+  for i = 1:s,
+    for j = 1:s,
+      tt = sprintf('%3.1f',DD(i,j));
+      text(i+0.5,j+0.5,tt,'HorizontalAlignment','Center');
+    end
+  end
+end
+
 for i = 1:t,
-  SLab{i} = Lab{i}(1:W(1));
+  SLab{i} = Lab{i}(1:min(length(Lab{i}),W(1)));
 end
 
 if length(W) > 1,
@@ -106,7 +84,7 @@ if length(W) > 1,
 end
 
 if (length(Lab) < 20) || (NoLabel == 1),
-  FS = 12;
+  FS = 10;
 elseif length(Lab) < 50,
   FS = 8;
 elseif length(Lab) < 80,
@@ -121,18 +99,20 @@ else
   FS = 0.5;
 end
 
+FS = 8;
+
 if length(W) > 1,
   set(gca,'XTick',(1:s)+0.5)
-  set(gca,'XTickLabel',SSLab(p),'FontSize',FS)
+  set(gca,'XTickLabel',SSLab,'FontSize',FS)
 else
   XFS = min(6,FS);
   for i = 1:t,
-    text(i+0.5,t+1,SLab{p(i)},'Rotation',90,'HorizontalAlignment','right','FontSize',XFS);
+    text(i+0.5,t+1,SLab{i},'Rotation',90,'HorizontalAlignment','right','FontSize',XFS);
   end
   set(gca,'XTickLabel',[])
 end
 
 set(gca,'YTick',(1:s)+0.5)
-set(gca,'YTickLabel',SLab(p),'FontSize',FS)
+set(gca,'YTickLabel',SLab,'FontSize',FS)
 
 %set(gca,'OuterPosition',[0.1 0.1 1.1 1.1]); % doesn't help with pdf file!

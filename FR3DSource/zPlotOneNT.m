@@ -50,10 +50,13 @@ gray = 0.5*[1 1 1];
 if isfield(ViewParam,'Color'),
   if length(ViewParam.Color) == 3,
     col = ViewParam.Color;
-    bc  = gray;
   end
-else
-  bc = [0 0 0];
+end
+
+if strcmp(LS,'-.'),
+  col = 0.7*col;
+  gray = 0.7*gray;
+  LS = '-';
 end
 
 bc = gray;

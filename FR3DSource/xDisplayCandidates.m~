@@ -178,7 +178,7 @@ while stop == 0,
   end
   m = q(find(Search.Marked));
   plot(m+0.5,m+0.5,'w.');
-%  axis(ax);
+  axis(ax);
   title(['Discrepancies between candidates, ordered by ' OrderText{Order}]);
   colormap('default');
   map = colormap;
@@ -357,7 +357,7 @@ while stop == 0,
       figure(99)
       pt = get(gca,'CurrentPoint')
 
-      if abs(pt(1,1)-pt(1,2)) > Limit/20,           % clicked off the diagonal
+      if abs(pt(1,1)-pt(1,2)) > L/15,           % clicked off the diagonal
         Search.Marked = 0 * Search.Marked;      % unmark all candidates
         a = sort(pt(1,[1 2]));
         j = p(max(1,floor(a(1))):min(L,floor(a(2))));      % 
@@ -385,14 +385,9 @@ while stop == 0,
     fprintf('If some are not available, Larger Neighborhood will crash\n');
     [File,FIndex] = zAddNTData(Search.CandidateFilenames,2,FullFile);
     for f = 1:length(File),
-      if ~isfield(File,'Distance'),
-        File(f).Distance = [];
-      end
-      if isempty(File(f).Distance) && ~isempty(File(f).NumNT),
-       if (File(f).NumNT > 0),
+      if isempty(File(f).Distance) && (File(f).NumNT > 0),
         c = cat(1,File(f).NT.Center); % nucleotide centers
         File(f).Distance = zMutualDistance(c,16); % compute distances < 16 Angstroms
-       end
       end
     end
     FullFile = [];

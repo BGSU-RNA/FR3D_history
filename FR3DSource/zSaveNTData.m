@@ -20,7 +20,14 @@ for f=1:length(Files),
   File.Filename = upper(File.Filename);
 
   if File.NumNT >= 0,
-   File = zSmallVersion(File);
+   File.Pair = [];
+   File.CI   = [];
+   File.SizeCode = 1;
+
+   for n=1:length(File.NT),
+     File.NT(n).Loc = [];
+   end
+
    save([pwd filesep 'PrecomputedData' filesep File.Filename '.mat'],'File');
    if Verbose > 0,
      fprintf('Saved %s\n', [File.Filename '.mat']);

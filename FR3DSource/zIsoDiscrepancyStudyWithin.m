@@ -2,10 +2,10 @@
 % instances of each basepair family
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2);   % load PDB data
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2,[],1);   % load PDB data
   File = File(SIndex);
 else
-  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2,File); % add PDB data if needed
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',2,File,1); % add PDB data if needed
   File = File(SIndex);
 end                       
 

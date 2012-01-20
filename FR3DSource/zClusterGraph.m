@@ -29,34 +29,15 @@ if nargin < 5,
   Table = 0;
 end
 
-% ----------------------------------------- Cluster analysis
-
-d = diag(D);                                   % save diagonal for later
-
-for i = 1:length(D(:,1)),
-  D(i,i) = 0;                                  % set diagonal to zero
+if isempty(pp),
+  p = zOrderbySimilarity(D);              % put instances in a useful order
+else
+  p = pp;                                 % use user-supplied ordering
 end
 
-Y = squareform(full(D));                       % convert to a vector
-Z = linkage(Y,'average');                      % compute cluster tree
+DDD = D(p,p);                            % re-order according to p
 
 % ------------------------------------------ Print table
-
-DD = full(D);
-p = zOrderGroups(Y,Z,DD);               % put instances in order
-
-if ~isempty(pp),
-  p = pp;                               % use user-supplied ordering
-end
-
-DDD = DD(p,p);                          % re-order according to p
-d = d(p);                               % re-order diagonal too
-
-for i = 1:length(DDD),
-  DDD(i,i) = d(i);
-end
-
-[s,t] = size(DDD);
 
 if Table == 1,
   fprintf('                             ');

@@ -117,10 +117,6 @@ if strcmp(class(File1),'char'),
   File1 = zGetNTData(File1name,0);
 end
 
-if nargin == 1,
-  NTList1 = 1:File1.NumNT;                  % display them all
-end
-
 % if NTList1 is a cell array of numbers, look up the indices
 
 if strcmp(class(NTList1),'char'),
@@ -168,10 +164,21 @@ L = min([L length(Indices1) length(Indices2)]);
 % ---------------- Align nucleotides, if desired
 
 if L == 0,
-  Bases1 = cat(2,File1.NT(Indices1).Base);
-  Bases2 = cat(2,File2.NT(Indices2).Base);
+  if strcmp(class(NTList1),'cell') && length(NTList1) > 1,
+    Indices11 = zIndexLookup(File1,NTList1{1});
+    Bases1 = cat(2,File1.NT(Indices11).Base);
+  else
+    Bases1 = cat(2,File1.NT(Indices1).Base);
+  end
 
-  [m,a,b] = nw(Bases1, Bases2, 0.99, 2);  % align bases from the two lists
+  if strcmp(class(NTList1),'cell') && length(NTList1) > 1,
+    Indices21 = zIndexLookup(File2,NTList2{1});
+    Bases2 = cat(2,File1.NT(Indices21).Base);
+  else
+    Bases2 = cat(2,File1.NT(Indices2).Base);
+  end
+
+  [m,a,b] = dNeedlemanWunsch(Bases1, Bases2, 0.99, 2);  % align bases from the two lists
   
   L = length(a);
   I1 = Indices1(a);                   % indices to superimpose

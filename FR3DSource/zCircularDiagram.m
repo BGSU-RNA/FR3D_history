@@ -1,36 +1,60 @@
-% zCircularDiagram(Edge,Color) plots the basepairs in Edge using Color as
-% chords of a circle
+% zCircularDiagram(File,Thickness) plots the pairwise interactions in File
+% using colored chords around a unit circle.  Thickness controls the
+% thickness of the lines, for different graphic output formats.
 
-function [void] = zCircularDiagram(File,Edge,Color,Thickness)
+% zCircularDiagram('1s72') will load the file and display the diagram.
+
+% Helpful suggestions for how to save the figure as a graphic file:
+%  clf
+%  zCircularDiagram(File(f),1);
+%  saveas(gcf,[mypath FN '_circular_diagram.png'],'png');
+%  [X,map] = imread([mypath FN '_circular_diagram.png']);
+%  Y = X(30:830,210:1030,:);
+%  imwrite(Y,[mypath FN '_circular_diagram.png']);
+
+%  clf
+%  zCircularDiagram(File(f),0.1);
+%  saveas(gcf,[mypath FN '_circular_diagram.pdf'],'pdf');
+
+function [void] = zCircularDiagram(File,Thickness)
 
 if nargin < 2,
-  Edge = File.Edge;
-end
-
-if nargin < 3,
-  Color = sparse(zeros(size(Edge)));
-  Color(1,1) = 1;
-end
-
-if nargin < 4,
   Thickness = 1;
 end
 
-[i,j] = find(Edge);
+if strcmp(class(File),'char'),
+  Filename = File;
+  File = zGetNTData(Filename,0);
+end
+
+E  = fix(abs(File.Edge));
+B  = E .* (E > 0) .* (E < 24);                 % pairs and stacks
+R  = File.Range;
+
+Edge = triu(B);                         % which pairs of bases to display
+
+Color = (B==1).*(R==0) + 2*(B>1).*(B<14).*(R==0) + 3*(B==1).*(R>0) + 4*(B > 1).*(B < 14) .*(R>0) + 5*(B > 20) .* (B < 25);
+                                        % disjoint possibilities
+
+BP = abs(File.BasePhosphate);           % 
+BP = (BP > 0) .* (BP < 100);            % exclude near BP and self interactions
+
+[i,j,c] = find(triu(Color));
+[ii,jj,cc] = find(6*BP);                % handle this separately, don't add
+k = find(ii ~= jj);                     % eliminate self interactions
+
+i = [i; ii(k)];
+j = [j; jj(k)];
+c = [c; cc(k)];
 
 if length(i) > 0,
 
-for k = 1:length(i),
-  c(k) = Color(i(k),j(k));
-end
-
-[y,k] = sort(-abs(c));           % sort by decreasing color
-i = i(k);
-j = j(k);
-
 [s,t] = size(Edge);
 
-tp = -6.2;
+% ---------------------------------- Draw the outside circle
+% ---------------------------------- Later, break the circle for chains
+
+tp = -6.2;                           % this value of 2pi leaves a gap
 theta = 0:-0.01:tp;
 plot(cos(theta), sin(theta),'k');
 hold on
@@ -41,6 +65,9 @@ if s > 1000,
 elseif s > 500,
   step = 20;
   sstep = 5;
+elseif s > 300,
+  step = 10;
+  sstep = 2;
 elseif s > 100,
   step = 5;
   sstep = 1;
@@ -50,6 +77,8 @@ else
 end
 
 kk = 1;
+
+% ----------------------------------------- Put nucleotide numbers outside
 
 for k = 1:s,
   kkk = str2num(File.NT(k).Number);
@@ -76,21 +105,30 @@ for k = 1:s,
 
 end
 
+% ---------------------------------------- Draw the interactions in color
 
-map = colormap;
-
-colorletter = 'bcrgymbcrgymbcrgymbcrgym';
+[y,k] = sort(-abs(c));               % sort by decreasing color, for overlap
+i = i(k);
+j = j(k);
+c = c(k);
 
 for k = 1:length(i),
-%  c   = 1 + fix(63*(Color(i(k),j(k)))/max(max(Color)));
-  if Color(i(k),j(k)) > 0,
-    c = colorletter(Color(i(k),j(k)));
-
-    plot([cos(i(k)*tp/s) cos(j(k)*tp/s)], [sin(i(k)*tp/s) sin(j(k)*tp/s)],c,'LineWidth',Thickness);
+  if c(k) == 6,
+    zUnitCircleArc([cos((i(k)+0.2)*tp/s) cos((j(k)-0.2)*tp/s)], [sin((i(k)+0.2)*tp/s) sin((j(k)-0.2)*tp/s)],c(k),Thickness);
+  else
+    zUnitCircleArc([cos(i(k)*tp/s) cos(j(k)*tp/s)], [sin(i(k)*tp/s) sin(j(k)*tp/s)],c(k),Thickness);
   end
 end
-axis square
-axis([-1.2 1.2 -1.2 1.2]);
+axis equal
+axis([-1.2 1.2 -2 1.2]);
 axis off
+
+text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
+text(-1.2,-1.4,'Dark blue chords indicate nested Watson-Crick basepairs');
+text(-1.2,-1.5,'Red chords indicate non-nested Watson-Cricky basepairs');
+text(-1.2,-1.6,'Cyan chords indicate nested non-Watson-Crick basepairs');
+text(-1.2,-1.7,'Green chords indicate non-nested non-Watson-Crick basepairs');
+text(-1.2,-1.8,'Yellow chords indicate stacking interactions');
+text(-1.2,-1.9,'Magenta chords indicate base-phosphate interactions');
 
 end

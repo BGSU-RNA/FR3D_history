@@ -1,4 +1,4 @@
-% zPairCountert loops through the molecules in File and counts how
+% zPairCounter loops through the molecules in File and counts how
 % many instances of each pair type and each category occur, displaying the
 % output in a table
 
