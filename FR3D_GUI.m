@@ -375,22 +375,17 @@ end
 function DisplayCandidates_Callback(hObject, eventdata, handles)
 
 Search=handles.Search;
-if isfield(handles,'SIndex')
+if isfield(handles,'File')
     File=handles.File;
-    SIndex=handles.SIndex;
-
-    xDisplayCandidates(File(SIndex),Search);
-
-else %If data is loaded from saved search results
+    [File,SIndex]=zAddNTData(Search.Filenames,0,File);
+else
     [File,SIndex]=zAddNTData(Search.Filenames,0);
-    handles.File=File;
-    handles.SIndex=SIndex;
-    guidata(hObject, handles);
-
-    xDisplayCandidates(File(SIndex),Search);   %%%%%ALERT: SIndex here is not correct?
 end
-%xGroupCandidates(File(SIndex),Search);  % doesn't work very well yet!
 
+handles.File=File;
+handles.SIndex=SIndex;
+guidata(hObject, handles);
+xDisplayCandidates(File(SIndex),Search);
 
 
 function ListCandidates_Callback(hObject, eventdata, handles)

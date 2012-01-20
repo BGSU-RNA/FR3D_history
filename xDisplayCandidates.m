@@ -42,6 +42,7 @@ if ~isfield(Search,'Disc'),
   Search.DiscComputed = sparse(zeros(1,L));
   if Model.Geometric > 0,
     Search.Disc(:,1) = Search.Discrepancy;
+    Search.Disc(1,1) = 0;
     Search.DiscComputed(1,1) = 1;
   end
 end

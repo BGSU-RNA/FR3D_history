@@ -1,44 +1,30 @@
 % xGroupCandidates clusters sequences and displays groups together
 
-function [Search] = xGroupCandidates(File,Search,NumGroups)
+function [Search] = xGroupCandidates(File,Search)
 
-if nargin < 3,
-  NumGroups = min(ceil(length(Candidates)/2),8);
-end
-
-Search = xMutualDiscrepancy(File,Search);
+N      = Search.Query.NumNT;
+Search = xMutualDiscrepancy(File,Search);      % compute discrepancy matrix
 Done   = find(Search.DiscComputed);            % ones already computed
 
-[Group,Group2] = pCluster(Dist);
-
-[y,i] = sort(Group2(NumGroups,:));
-
-% ----------------------------------- Form into groups
-
-fprintf('Candidates grouped according to mutual discrepancy, %4d groups\n', NumGroups);
-
-for g = 1:NumGroups,
-  fprintf('\n');
-  j = find(Group(NumGroups,i) == g);
-
-  for k = 1:length(j),
-    g = i(j(k));
-    f = Candidates(g,N+1);
-    fprintf('%15s', File(f).Filename);
-    if Query.Geometric > 0,
-      fprintf('%11.4f',Search.Discrepancy(g));
+for i=1:length(Done),
+  f = Search.Candidates(Done(i),N+1);          % file number
+  b = File(f).NT(Search.Candidates(Done(i),1)).Base;
+  n = File(f).NT(Search.Candidates(Done(i),1)).Number;
+  n = sprintf('%4s',n);
+  if Search.Query.Geometric > 0,
+      if isfield(Search,'AvgDisc'),
+        d = sprintf('%6.4f',Search.AvgDisc(Done(i)));
+      else
+        d = sprintf('%6.4f',Search.Discrepancy((Done(i))));
+      end
+    else
+      d = sprintf('%5d',Search.Discrepancy(Done(i))); % orig candidate number
     end
-    for jj=1:N
-      fprintf('%3s',File(f).NT(Candidates(g,jj)).Base);    
-      fprintf('%4s',File(f).NT(Candidates(g,jj)).Number);    
-    end
-    if N == 2,
-      fprintf('   C1*-C1*: %8.4f', norm(File(f).NT(Candidates(g,1)).Sugar(1,:) - ...
-                            File(f).NT(Candidates(g,2)).Sugar(1,:)));
-    end
-    fprintf('\n');
-  end
+  Lab{i} = [b n ' ' num2str(d)];
 end
 
-xDisplayCandidates(File,S,1);
-
+D = Search.Disc(Done,Done);                    % mutual distances to consider
+Y = squareform(full(D));                       % convert to a vector
+Z = linkage(Y,'average');                      % compute cluster tree
+figure(25)
+H = dendrogram(Z,0,'colorthreshold',0.2,'orientation','left','labels',Lab);
