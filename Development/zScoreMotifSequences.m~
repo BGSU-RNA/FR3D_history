@@ -1,0 +1,35 @@
+
+function [scores] = zScoreMotifSequences(codes,Edge,BPh)
+
+% -------------------------------- score all possible sequences for basepairs
+
+scores = ones(4^N,1);                    % place to store all scores
+
+for p = 1:N,
+  for q = 1:N,                              % loop through interactions
+    if abs(Edge(p,q)) > 0 && abs(Edge(p,q)) < 13,  % basepair
+      IS = pIsoScore(Edge(p,q),codes(1,p),codes(1,q),method); % use most common seq
+
+
+      for s = 1:(4^N),                      % loop through all sequences
+        scores(s,1) = scores(s,1) * IS(allcodes(s,p),allcodes(s,q));
+      end
+    end
+  end
+end
+
+% -------------------------------- score all possible sequences for BPh
+
+scores(:,2) = scores(:,1);                  % place to store all scores
+
+for p = 1:N,                                      % loop through bases
+  if abs(BPh(p,q)) > 0 && abs(BPh(p,q)) < 13,  % basepair
+    
+    Q = pBPhSpecificity(BPh(p,q));             % use most common seq
+
+    for s = 1:(4^N),                      % loop through all sequences
+      scores(s,2) = scores(s,2) * Q(allcodes(s,p));
+    end
+  end
+end
+

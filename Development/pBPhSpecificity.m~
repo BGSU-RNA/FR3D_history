@@ -2,10 +2,6 @@
 
 function [Q] = pBPhSpecificity(bph,bp)
 
-if nargin < 2,
-  bp = 1;
-end
-
 Code = [1 1 1 1 2 2 2 2 2 3 3 3 3 3 4 4 4 2 3]; % which base makes which BPh
 
 Q = 0.10*ones(4,1);

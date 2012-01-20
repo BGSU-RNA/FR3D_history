@@ -49,7 +49,7 @@ for a = 1:N,                                    % first NT of possible BPh
     e = fix(e);                                 % round subcategories
 
     if max(abs(e)) > 0 && min(abs(e)) < 30,     % there was some bp interaction
-  e
+%  e
       BPh(a,b) = mode(e);                    % use the most common one
   % a more sophisticated method for determining the consensus is needed
   % count how many times each one occurs, giving maybe 0.5 for near

@@ -1,0 +1,17 @@
+
+load PDBInfo
+
+[a,b] = size(t);
+
+Equiv = sparse(a,a);
+
+for i = 1:a,
+  if strcmp(t{i,1},t{j,10}),
+    Equiv(i,j) = 1;
+  end
+  for j = (i+1):a,
+    if strcmp(t{i,10},t{j,10}),
+      Equiv(i,j) = 1;
+    end
+  end
+end
