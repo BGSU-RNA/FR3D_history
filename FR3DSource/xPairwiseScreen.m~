@@ -188,56 +188,50 @@ end
 
 % --------- Screen according to the nucleotide mask
 
-if isfield(Query,'OKCodes'),
-  if (min(Query.OKCodes{p}) == 0) | (min(Query.OKCodes{q}) == 0),
-    if (min(Query.OKCodes{p}) == 1) & (min(Query.OKCodes{q}) == 0),
-      k = find(Query.OKCodes{q}(Codes(j)));
-    elseif (min(Query.OKCodes{p}) == 0) & (min(Query.OKCodes{q}) == 1),
-      k = find(Query.OKCodes{p}(Codes(i)));
-    else
-      k = find(Query.OKCodes{p}(Codes(i)) .* Query.OKCodes{q}(Codes(j)));
-    end
-
-    i = i(k); 
-    j = j(k);
-    d = d(k);
+if (min(Query.OKCodes{p}) == 0) | (min(Query.OKCodes{q}) == 0),
+  if (min(Query.OKCodes{p}) == 1) & (min(Query.OKCodes{q}) == 0),
+    k = find(Query.OKCodes{q}(Codes(j)));
+  elseif (min(Query.OKCodes{p}) == 0) & (min(Query.OKCodes{q}) == 1),
+    k = find(Query.OKCodes{p}(Codes(i)));
+  else
+    k = find(Query.OKCodes{p}(Codes(i)) .* Query.OKCodes{q}(Codes(j)));
   end
+
+  i = i(k); 
+  j = j(k);
+  d = d(k);
 end
 
 % --------- Screen according to configuration (syn or anti)
 
-if isfield(Query,'Config'),
-  if length(Query.Config{p}) > 0,
-    switch Query.Config{p}
-      case 'syn'
-        k = find(cat(1,File.NT(i).Syn) == 1);
-      case 'anti'
-        k = find(cat(1,File.NT(i).Syn) == 0);
-      otherwise
-        k = 1:length(i);
-    end
-
-    i = i(k);
-    j = j(k);
-    d = d(k);
+if length(Query.Config{p}) > 0,
+  switch Query.Config{p}
+    case 'syn'
+      k = find(cat(1,File.NT(i).Syn) == 1);
+    case 'anti'
+      k = find(cat(1,File.NT(i).Syn) == 0);
+    otherwise
+      k = 1:length(i);
   end
+
+  i = i(k);
+  j = j(k);
+  d = d(k);
 end
 
-if isfield(Query,'Config'),
-  if length(Query.Config{q}) > 0,
-    switch Query.Config{q}
-      case 'syn'
-        k = find(cat(1,File.NT(j).Syn) == 1);
-      case 'anti'
-        k = find(cat(1,File.NT(j).Syn) == 0);
-      otherwise
-        k = 1:length(j);
-    end
-
-    i = i(k);
-    j = j(k);
-    d = d(k);
+if length(Query.Config{q}) > 0,
+  switch Query.Config{q}
+    case 'syn'
+      k = find(cat(1,File.NT(j).Syn) == 1);
+    case 'anti'
+      k = find(cat(1,File.NT(j).Syn) == 0);
+    otherwise
+      k = 1:length(j);
   end
+
+  i = i(k);
+  j = j(k);
+  d = d(k);
 end
 
 % --------- Screen according to pairwise distance in model

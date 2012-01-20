@@ -8,6 +8,16 @@
 
 function [Disc,R,MM,CM,A] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 
+
+
+UseAsCenter = 2;
+
+OrientationCriterion = 2;
+
+
+
+
+
 % if File1 is a text string (filename), load the file
 
 if strcmp(class(File1),'char'),
@@ -93,12 +103,29 @@ if (L == 2) && (length(LocationWeight == L)),     % two-nucleotide motif
 
 elseif (length(LocationWeight) == L), % more than two nucleotides, use bases
 
-  ModelCenters = cat(1,Model.Center);
+  switch UseAsCenter,
+  case 1,
+    ModelCenters = cat(1,Model.Center);
+  case 2,
+    ModelCenters = [];
+    for i = 1:L,
+      ModelCenters = [ModelCenters; Model(i).Fit(1,:)];
+    end
+  end
+
+  switch UseAsCenter,
+  case 1,
+    CandiCenters = cat(1,Candi.Center);
+  case 2,
+    CandiCenters = [];
+    for i = 1:L,
+      CandiCenters = [CandiCenters; Cand(i).Fit(1,:)];
+    end
+  end
 
   ModelWeightedCenter = LocationWeight * ModelCenters / L;
   MCC                 = ModelCenters-ones(L,1)*ModelWeightedCenter;
 
-  CandiCenters = cat(1,Cand.Center);
   CMean = LocationWeight * CandiCenters / L;
   CC = CandiCenters - ones(L,1) * CMean;  % subtract mean
   
@@ -108,12 +135,23 @@ elseif (length(LocationWeight) == L), % more than two nucleotides, use bases
 
   n = 1;                                    % nucleotide number for angles
   v = 4 * AngleWeight.^2;                   % precompute a little
-  
-  while (n <= L),
-    angbytwo = acos(min(1,sqrt(trace(R*Cand(n).Rot*(Model(n).Rot)')+1)/2));
-    A(n) = angbytwo;
-    S   = S + (angbytwo^2)*v(n);
-    n   = n + 1;
+
+  switch OrientationCriterion
+  case 1,
+    while (n <= L),
+      angbytwo = acos(min(1,sqrt(trace(R*Cand(n).Rot*(Model(n).Rot)')+1)/2));
+      A(n) = angbytwo;
+      S   = S + (angbytwo^2)*v(n);
+      n   = n + 1;
+    end
+  case 2,
+    while (n <= L),
+      g1 = Model(n).Fit(1,:) - Model(n).Sugar(1,:);
+      g2 = R*(Cand(n).Fit(1,:)  - Cand(n).Sugar(1,:))';
+      angbytwo = acos(min(1,(g1*g2)/(norm(g1)*norm(g2))));
+      S = S + (angbytwo^2)*v(n);
+      n = n + 1;
+    end
   end
 
   Disc = sqrt(S)/L;

@@ -1,21 +1,20 @@
 % xDiscrepancy(Model,Cand) calculates the discrepancy between Model and 
 % Cand, which is an array of NT's.
-% As soon as the discrepancy exceeds Model.RelCutoff, the calculation stops.
-% The current sum is returned as a negative discrepancy, shifted to
-% record when the calculation stopped.
 
 % Model and Cand are two lists of indices or nucleotide numbers
 
 function [Disc,R,MM,CM,A] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 
-
-
 UseAsCenter = 2;
 
 OrientationCriterion = 2;
 
-
-
+%figure(1)
+%clf
+%zDisplayNT(File1,Model);
+%figure(2)
+%clf
+%zDisplayNT(File2,Cand);
 
 
 % if File1 is a text string (filename), load the file
@@ -137,22 +136,40 @@ elseif (length(LocationWeight) == L), % more than two nucleotides, use bases
   v = 4 * AngleWeight.^2;                   % precompute a little
 
   switch OrientationCriterion
-  case 1,
+  case 1,                                   % geometric discrepancy
     while (n <= L),
       angbytwo = acos(min(1,sqrt(trace(R*Cand(n).Rot*(Model(n).Rot)')+1)/2));
       A(n) = angbytwo;
       S   = S + (angbytwo^2)*v(n);
       n   = n + 1;
     end
-  case 2,
+  case 2,                                   % isodiscrepancy
     while (n <= L),
       g1 = Model(n).Fit(1,:) - Model(n).Sugar(1,:);
       g2 = R*(Cand(n).Fit(1,:)  - Cand(n).Sugar(1,:))';
       angbytwo = acos(min(1,(g1*g2)/(norm(g1)*norm(g2))));
-      S = S + (angbytwo^2)*v(n);
+
+      baseang = acos(Model(n).Rot(:,3)' * R * Cand(n).Rot(:,3)) * 180 / pi;
+
+      penalty = 15 * exp((baseang-90)*15/90) / (1 + exp((baseang-90)*15/90));
+
+%fprintf('Base %d angle %7.4f penalty %7.4f ', n, baseang, penalty);
+
+      S = S + (angbytwo^2)*v(n) + penalty^2;
       n = n + 1;
     end
   end
+
+%figure(3)
+%clf
+%baseang = 0:180;
+%penalty = 15 * exp((baseang-90)/9) ./ (1 + exp((baseang-90)/9));
+%plot(baseang,penalty/3)
+%ylabel('Penalty');
+%xlabel('Angle between normal vectors'); 
+
+
+%fprintf('\n');
 
   Disc = sqrt(S)/L;
 

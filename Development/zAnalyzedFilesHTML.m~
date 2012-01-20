@@ -19,8 +19,6 @@ end
 
 zBackboneCodes;                           % load conformation codes
 
-
-
 for f = 1:length(File),
  if length(File(f).NT) > 1,
   clear chainoffset
