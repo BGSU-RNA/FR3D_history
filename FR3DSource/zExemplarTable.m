@@ -443,19 +443,19 @@ end
   
 return
 
-zExemplarTable(1,3.5,0);
-zExemplarTable(2,3.5,0);
-zExemplarTable(3,3.5,0);
-zExemplarTable(4,3.5,0);
-zExemplarTable(5,3.5,0);
-zExemplarTable(6,3.5,0);
-zExemplarTable(7,3.5,0);
-zExemplarTable(8,3.5,0);
-zExemplarTable(9,3.5,0);
-zExemplarTable(10,3.5,0);
-zExemplarTable(11,3.5,0);
-zExemplarTable(12,3.5,0);
-zExemplarTable(13,3.5,0);
+zExemplarTable(1,3.5,0,0);
+zExemplarTable(2,3.5,0,0);
+zExemplarTable(3,3.5,0,0);
+zExemplarTable(4,3.5,0,0);
+zExemplarTable(5,3.5,0,0);
+zExemplarTable(6,3.5,0,0);
+zExemplarTable(7,3.5,0,0);
+zExemplarTable(8,3.5,0,0);
+zExemplarTable(9,3.5,0,0);
+zExemplarTable(10,3.5,0,0);
+zExemplarTable(11,3.5,0,0);
+zExemplarTable(12,3.5,0,0);
+zExemplarTable(13,3.5,0,0);
 zExemplarTable([1:12],3.5,0);
 zExemplarTable([1 5],3.5,0);
 zExemplarTable(1:6,3.5,0);

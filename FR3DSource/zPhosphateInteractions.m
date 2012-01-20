@@ -27,8 +27,8 @@ File(f).BasePhosphate = sparse(zeros(File(f).NumNT));
 % -------- First screening of base pairs ------------------------------------ 
 
 DistCutoff = 16;                                % max distance for interaction
-%[i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance >= 0)); 
-[i,j] = find(((File(f).Distance == 0))); 
+[i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance >= 0)); 
+%[i,j] = find(((File(f).Distance == 0))); 
                                                 % screen by C-C distance
                                                 % allow self interactions
 
@@ -133,8 +133,8 @@ if Verbose > 1,
 fprintf('Classifying base-phosphate interactions took %8.2f minutes\n', (cputime-t)/60);
 
 figure(5)
-hist(sdist,30);
-max(sdist)
+%hist(sdist,30);
+%max(sdist)
 
 for v = 1:4,
   figure(v)
