@@ -71,7 +71,7 @@ for i=1:length(NT)
     end
 end
 
-set(handles.IsSynText,'Visible','on');
+set(handles.ConfigText,'Visible','on');
 set(handles.NTmaskText,'Visible','on');
 set(handles.MaxDistText,'Visible','on');
 set(handles.InteractionText,'Visible','on');

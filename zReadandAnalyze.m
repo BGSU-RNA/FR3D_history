@@ -225,6 +225,8 @@ while i < length(NTNUMBER),                 % go through all atoms
     NT(n).Sugar = Sugar;
   end
 
+  NT(n).Syn = 0;                              % we'll compute this later
+
   n = n + 1;                                  % next nucleotide index
 end                                           % end while i < ... loop
 
@@ -282,6 +284,16 @@ File.CI        = sparse(NumNT,NumNT);
 File.Inter     = sparse(NumNT,NumNT);
 File.Edge      = sparse(NumNT,NumNT);
 File.Modified  = 1;
+
+% Calculate configuration (syn or anti) -------------------------------------
+
+SynList = mSynList(File);
+
+j = find(SynList);
+
+for k=1:length(j),
+  File.NT(j(k)).Syn = 1;
+end
 
 %zSaveNTData(File);
 

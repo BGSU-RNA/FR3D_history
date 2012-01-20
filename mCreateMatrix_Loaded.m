@@ -2,9 +2,9 @@
 
 %%%%%%Create the basepair matrix (and delete extra ones) for determining
 %%%%%%Query.Diff, Query.Edges, Query.Diagonal
-%%%%%%Query.isSyn added
+%%%%%%Query.Config added
 for i=1:12
-    h=findobj('Tag',strcat('isSyn',num2str(i)));
+    h=findobj('Tag',strcat('Config',num2str(i)));
     delete(h);
 end
 for i=1:length(NT)
@@ -12,16 +12,16 @@ for i=1:length(NT)
     if isfield(Search.Query,'Config'),
       switch Search.Query.Config{i}
         case 'anti' 
-          PreviousIsSyn(i) = 2;
+          PreviousConfig(i) = 2;
         case 'syn'  
-          PreviousIsSyn(i) = 3;
+          PreviousConfig(i) = 3;
         otherwise   
-          PreviousIsSyn(i) = 1;
+          PreviousConfig(i) = 1;
       end
     else
-      PreviousIsSyn(i) = 1;
+      PreviousConfig(i) = 1;
     end
-    handles.isSyn(i) = uicontrol('Tag',strcat('isSyn',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.755) .054 .04],'Background',[1 1 1],'String',str,'Value',PreviousIsSyn(i));
+    handles.Config(i) = uicontrol('Tag',strcat('Config',num2str(i)),'Style','popupmenu','Units','normalized','Position',[(0.25+0.057*i) (0.755) .054 .04],'Background',[1 1 1],'String',str,'Value',PreviousConfig(i));
 end
 
 for i=1:12
@@ -90,7 +90,7 @@ for i=1:length(NT)
     end
 end
 
-set(handles.IsSynText,'Visible','on');
+set(handles.ConfigText,'Visible','on');
 set(handles.NTmaskText,'Visible','on');
 set(handles.MaxDistText,'Visible','on');
 set(handles.InteractionText,'Visible','on');

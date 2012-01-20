@@ -3,17 +3,29 @@
 %and also looks in the folder <PrecomputedData> for files with extensions .mat
 %Then it removes all extensions and makes a unified sorted list with no repetitions
 
+% Extended to search Matlab's path for PDB files and to use the native
+% file separator rather than \  - CLZ 2006-07-18
 
-x=ls('PDBFiles/*.pdb*'); %Beta, this includes *.pdbs
-y=ls('PrecomputedData/*.mat');
+clear s temp
 
-z=strvcat(x,y);
-z=sortrows(z);
+z = ls(['PrecomputedData' filesep '*.mat']);
+
+p = path;
+c = [0 strfind(p,';') length(p)+1];
+for i=1:length(c)-1,
+  y = ls([p(c(i)+1:c(i+1)-1) filesep '*.pdb']);
+  z = strvcat(z,y);
+end
 
 if ~isempty(z)
     for i=1:length(z(:,1))
-        temp{i}=regexprep(z(i,:),'.pdb*|.mat| ','');
+        temp{i}=regexprep(z(i,:),'.pdb|.mat| ','');
+        temp{i}=regexprep(temp{i},'PDBFiles','');
+        temp{i}=regexprep(temp{i},'PrecomputedData','');
+        temp{i}=regexprep(temp{i},filesep,'');
     end
+
+    temp = sort(temp);
 
     s{1}=temp{1};
     count=2;

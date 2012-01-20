@@ -23,10 +23,24 @@ if length(str) > 0,
   str    = regexprep(str,'=,','=');         % replace 
   str    = regexprep(str,'d','');           % replace d by nothing
   str    = regexprep(str,'D','');           % replace D by nothing
-  str    = regexprep(str,'>>','>,>');       % first denotes sign
-  str    = regexprep(str,'<>','<,>');       % first denotes sign
-  str    = regexprep(str,'><','>,<');       % first denotes sign
-  str    = regexprep(str,'<<','<,<');       % first denotes sign
+
+  lt = strfind(str,'>');
+  for i=length(lt):-1:1,
+    if any(str(lt(i)+1) == 'gl=<>'),
+      str = [str(1:lt(i)) ',' str(lt(i)+1:length(str))];    
+    end
+  end
+
+str
+
+  lt = strfind(str,'<');
+  for i=length(lt):-1:1,
+    if any(str(lt(i)+1) == 'gl=<>'),
+      str = [str(1:lt(i)) ',' str(lt(i)+1:length(str))];    
+    end
+  end
+
+str
 
   commas = strfind(str,',');                % find locations of commas
   lim    = [0 commas length(str)+1];        % locations of tokens

@@ -69,11 +69,20 @@ for f=1:length(Filenames),
     ClassifyCode = 1;
   end
 
+  if ~isfield(File.NT(1),'Syn'),
+    SynList = mSynList(File);
+    for k=1:length(File.NT),
+      File.NT(k).Syn = SynList(k);
+    end
+    ClassifyCode = 1;
+ end
+
+  File = orderfields(File);
+
   if ((ReadCode > 0) | (ClassifyCode > 0)) & (File.NumNT > 0),
     File.Modified = 0;
     zSaveNTData(File);
   end
 
-  File     = orderfields(File);
   Files(f) = File;
 end

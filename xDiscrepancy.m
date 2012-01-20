@@ -95,10 +95,11 @@ else                                        % more than two nucleotides
   S = LocationWeight * sum(((MCC - CC*R').^2)')';  % distances between centers
 
   n = 1;                                    % nucleotide number for angles
+  v = 4 * AngleWeight.^2;                   % precompute a little
   
   while (n <= L),
-    ang = zAngleOfRotation(R*Cand(n).Rot*(Model(n).Rot)');
-    S   = S + (ang^2)*AngleWeight(n)^2;
+    angbytwo = acos(min(1,sqrt(trace(R*Cand(n).Rot*(Model(n).Rot)')+1)/2));
+    S   = S + (angbytwo^2)*v(n);
     n   = n + 1;
   end
 

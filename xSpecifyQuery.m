@@ -37,6 +37,60 @@ end
 
 switch Query.Name
 
+% ---------------------------------- Searches from FR3D paper by Sarver et al
+
+case 'Sarcin5Geo'
+  Query.Description    = 'Sarcin five nucleotide geometric';
+  Query.Filename       = '1s72';
+  Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
+  Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
+  Query.DiscCutoff     = 0.5;
+
+case 'Sarcin5Symb'
+  Query.Description    = 'Sarcin five nucleotide symbolic';
+  Query.Edges{1,2}     = 'tHS';
+  Query.Edges{3,5}     = 'cHS';
+  Query.Edges{3,4}     = 'tWH';
+  Query.MaxDiff(5,3)   = 2;
+  Query.MaxDiff(3,1)   = 2;
+  Query.MaxDiff(4,2)   = 2;
+
+case 'Sarcin7Mixed'
+  Query.Description    = 'Sarcin seven nucleotide mixed';
+  Query.Filename       = '1s72';
+  Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703'};
+  Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0'};   % all in the 23S
+  Query.Edges{3,4}     = 'tWH';
+  Query.DiscCutoff     = 0.5;       
+  Query.ExcludeOverlap = 0;
+
+case 'Sarcin9Mixed'
+  Query.Description    = 'Sarcin nine nucleotide mixed';
+  Query.Filename       = '1s72';
+  Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703' '2690' '2704'};
+  Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0' '0' '0'};% all in the 23S
+  Query.Edges{3,4}     = 'tWH';
+  Query.DiscCutoff     = 0.5;
+  Query.ExcludeOverlap = 1;
+
+case 'KinkTurnCentral'
+  Query.Description    = 'Kink-turn central base mixed';
+  Query.Filename       = '1s72';
+  Query.NTList         = {'80' '97' '81' '93' '94' '98'};
+  Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
+  Query.Edges{1,2}     = 'tHS';
+  Query.DiscCutoff     = 0.7;  
+  Query.ExcludeOverlap = 1;
+
+case 'KinkTurnClosing'
+  Query.Description    = 'Kink-turn closing base pair mixed';
+  Query.Filename       = '1s72';
+  Query.NTList         = {'80' '97' '81' '93' '100' '77'};
+  Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
+  Query.Edges{1,2}     = 'tHS';
+  Query.DiscCutoff     = 0.9;    
+  Query.ExcludeOverlap = 1;
+
 case 'GNRA4NonSeq'
   Query.Description    = 'GRNA hairpin without sequential constraint';
   Query.Filename       = '1s72';
@@ -58,22 +112,6 @@ case 'GNRA4Seq'
   Query.MaxDiff(1,4)   = 6;
   Query.ExcludeOverlap = 1;
 
-case 'Sarcin5Geo'
-  Query.Description    = 'Sarcin five nucleotide geometric';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'2694' '2701' '2693' '2702' '2692'};
-  Query.ChainList      = {'0' '0' '0' '0' '0'};   % all in the 23S
-  Query.DiscCutoff     = 0.5;
-
-case 'Sarcin5Symb'
-  Query.Description    = 'Sarcin five nucleotide symbolic';
-  Query.Edges{1,2}     = 'tHS';
-  Query.Edges{3,5}     = 'cHS';
-  Query.Edges{3,4}     = 'tWH';
-  Query.MaxDiff(5,3)   = 2;
-  Query.MaxDiff(3,1)   = 2;
-  Query.MaxDiff(4,2)   = 2;
-
 case 'GNRA5'
   Query.Description    = 'GRNA hairpin 5 nucleotide';
   Query.Filename       = '1s72';
@@ -87,47 +125,10 @@ case 'GNRA5'
   Query.MaxDiff(2,4)   = 4;
   Query.ExcludeOverlap = 1;
 
-case 'KinkTurnCentral'
-  Query.Description    = 'Kink-turn central base mixed';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'80' '97' '81' '93' '94' '98'};
-  Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
-  Query.Edges{1,2}     = 'tHS';
-  Query.DiscCutoff     = 0.7;  
-  Query.ExcludeOverlap = 1;
-
-case 'KinkTurnClosing'
-  Query.Description    = 'Kink-turn closing base pair mixed';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'80' '97' '81' '93' '100' '77'};
-  Query.ChainList      = {'0' '0' '0' '0' '0' '0'};   % all in the 23S
-  Query.Edges{1,2}     = 'tHS';
-  Query.DiscCutoff     = 0.9;    
-  Query.ExcludeOverlap = 1;
-
-case 'Sarcin7Mixed'
-  Query.Description    = 'Sarcin seven nucleotide mixed';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703'};
-  Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0'};   % all in the 23S
-  Query.Edges{3,4}     = 'tWH';
-  Query.DiscCutoff     = 0.5;       
-  Query.ExcludeOverlap = 0;
-
-case 'Sarcin9Mixed'
-  Query.Description    = 'Sarcin nine nucleotide mixed';
-  Query.Filename       = '1s72';
-  Query.NTList         = {'2694' '2701' '2693' '2702' '2692' '2691' '2703' '2690' '2704'};
-  Query.ChainList      = {'0' '0' '0' '0' '0' '0' '0' '0' '0'};% all in the 23S
-  Query.Edges{3,4}     = 'tWH';
-  Query.DiscCutoff     = 0.5;
-  Query.ExcludeOverlap = 1;
-
+% -------------------------------------------- Additional searches
 
 case 'Basepair'
   Query.Edges{1,2}  = 'cWH';
-%  Query.MaxDiff = [5];
-%  Query.MinDiff = [5];
   Query.Diff{1,2} = '> <1000';
 
 case 'GNRA4NonSeq'
@@ -176,11 +177,9 @@ case 'cWW-noncWW-cWW'
   Query.MaxDiff(4,5)   = 1;
   Query.MaxDiff(5,6)   = 1;
 
-
-
 end
 
-% Explanation of mask codes:
+% List of nucleotide mask codes:
 % A-A
 % C-C
 % G-G
