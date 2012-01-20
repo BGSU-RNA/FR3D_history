@@ -28,7 +28,7 @@
 %  7 = explanatory text
 %  8 = leave gaps in diagram for breaks in nucleotide chain
 
-function [void] = zCircularDiagram(File,Thickness,View)
+function [Tally] = zCircularDiagram(File,Thickness,View)
 
 if nargin < 2,
   Thickness = 1;
@@ -71,114 +71,7 @@ j = [j; jj(k)];
 c = [c; cc(k)];
 
 if length(i) > 0,
-
-N = length(File.NT);
-
-% ------------------------------------- Determine where to plot each NT
-
-A = zeros(1,N);           % angle around circle for nucleotides
-A(1) = 1;
-
-if View(8) == 1,
-  spaces = [1 4 8 12];
-else
-  spaces = [1 0 0 12];
-end
-
-nc = [1];                                % new chain starting
-for t = 1:(N-1),
-  A(t+1) = A(t) + spaces(1);
-  if File.Covalent(t,t+1) == 0,
-    A(t+1) = A(t+1) + spaces(2);
-  end
-  if (File.NT(t).Chain ~= File.NT(t+1).Chain),
-    A(t+1) = A(t+1) + spaces(3);
-    nc = [nc t+1];
-  end
-end
-A(end+1) = A(end) + spaces(4);
-mA = max(A);
-d = find(diff(A) > 1);                  % locations of jumps in A
-d = [0 d];                              % prepend for the first nucleotide
-
-A = A * (-2*pi) / mA;                   % convert A to radians
-
-% ---------------------------------- Draw the outside circle
-
-for m = 1:(length(d)-1),
-  theta = [A(d(m)+1):-0.01:A(d(m+1)) A(d(m+1))];
-  plot(cos(theta),sin(theta),'k');
-  hold on
-end
-
-for n = 1:length(nc),
-  theta = A(nc(n));
-
-  if cos(theta) > 0,
-    angle = 180*theta/pi;
-    ha    = 'left';
-    va    = 'top';
-  else
-    angle = 180*(theta - pi)/pi;
-    ha    = 'right';
-    va    = 'bottom';
-  end
-
-  text(1.11*cos(theta), 1.11*sin(theta), ['Chain ' File.NT(nc(n)).Chain], 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', va, 'FontSize', 6);
-
-end
-
-if N > 1000,
-  step  = 50;
-  sstep = 10;
-elseif N > 500,
-  step = 20;
-  sstep = 5;
-elseif N > 300,
-  step = 10;
-  sstep = 2;
-elseif N > 100,
-  step = 5;
-  sstep = 1;
-else
-  step = 1;
-  sstep = 1;
-end
-
-kk = 1;
-
-flag = 0;
-for k = 1:N,
-  kkk = str2num(File.NT(k).Number);
-  if ~isempty(kkk),                               % it's really a number
-    kk = kkk;
-    flag = 0;                                     % OK to use next w/ letter
-  else                                            % it has a letter in it
-    kkk = str2num(File.NT(k).Number(1:(end-1)));  % omit last character
-    if ~isempty(kkk),
-      kk = kkk;                                   % use this for display
-      flag = 1;                                   % but only once
-    end
-  end
-  theta = A(k);
-  if cos(theta) > 0,
-    angle = 180*theta/pi;
-    ha    = 'left';
-  else
-    angle = 180*(theta - pi)/pi;
-    ha    = 'right';
-  end
-
-  if (mod(kk,sstep) == 0) && (mod(kk,step) ~= 0) && (Thickness < 1) && (flag == 0),
-    plot([cos(theta) 1.02*cos(theta)], [sin(theta), 1.02*sin(theta)],'k');
-    text(1.04*cos(theta), 1.04*sin(theta), File.NT(k).Number,'FontSize',4, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
-  end
-  if mod(kk,step) == 0 && (flag == 0),
-    plot([cos(theta) 1.04*cos(theta)], [sin(theta), 1.04*sin(theta)],'k');
-    text(1.11*cos(theta), 1.11*sin(theta), File.NT(k).Number, 'Rotation', angle, 'HorizontalAlignment', ha, 'VerticalAlignment', 'middle');
-  end
-
-end
+  A = zNumberCircularDiagram(File,View,Thickness,1);
 
 % ---------------------------------------- Draw the interactions in color
 
@@ -244,33 +137,40 @@ if View(7) > 0,
 
   text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
 
+  cww = length(find(c == 1));
+  Tally(1) = cww;
+  noncww = length(find(c == 2));
+  Tally(2) = noncww;
+  nonnestcww = length(find(c == 3));
+  Tally(3) = nonnestcww;
+  nonnestnoncww = length(find(c == 4));
+  Tally(4) = nonnestnoncww;
+  stack = length(find(c == 5));
+  Tally(5) = stack;
+  bph = length(find(c == 6));
+  Tally(6) = bph;
+
   if View(1) > 0,
-    cww = length(find(c == 1));
     text(-1.3,-1.4,['Dark blue chords indicate the ' num2str(cww) ' nested Watson-Crick basepairs']);
   end
 
-  if View(3) > 0,
-    nonnestcww = length(find(c == 3));
-    text(-1.3,-1.5,['Red chords indicate the ' num2str(nonnestcww) ' non-nested Watson-Crick basepairs']);
-  end
-
   if View(2) > 0,
-    noncww = length(find(c == 2));
     text(-1.3,-1.6,['Cyan chords indicate the ' num2str(noncww) ' nested non-Watson-Crick basepairs']);
   end
 
+  if View(3) > 0,
+    text(-1.3,-1.5,['Red chords indicate the ' num2str(nonnestcww) ' non-nested Watson-Crick basepairs']);
+  end
+
   if View(4) > 0,
-    nonnestnoncww = length(find(c == 4));
     text(-1.3,-1.7,['Green chords indicate the ' num2str(nonnestnoncww) ' non-nested non-Watson-Crick basepairs']);
   end
 
   if View(5) > 0,
-    stack = length(find(c == 5));
     text(-1.3,-1.8,['Yellow chords indicate the ' num2str(stack) ' stacking interactions']);
   end
 
   if View(6) > 0,
-    bph = length(find(c == 6));
     text(-1.3,-1.9,['Magenta chords indicate the ' num2str(bph) ' base-phosphate interactions']);
   end
 end

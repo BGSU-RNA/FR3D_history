@@ -97,6 +97,7 @@ end
 
 % File.Edge(i,i) = F.Edge;                  % substitute consensus
 F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
+F.Crossing = zeros(N,N);                    % small enough, pretend none
 
 %Node = pMakeNodes(File,NTNumber,LastNTNumber,Truncate);
 Node = pMakeNodes(F,1,N,Truncate);          % make the SCFG/MRF model

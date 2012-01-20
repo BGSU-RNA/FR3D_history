@@ -1,20 +1,10 @@
 % zAlignmentDiagram takes an alignment of the NTs in File(1) and File(2) and produces three circular diagrams.  The first two show the interactions in File(1) and File(2), with nucleotides spaced around the circle so that nucleotides in the same location are aligned.  The third circular diagram shows the 
 
-% File = zAddNTData({'2avy','1j5e'});
+function [Tally] = zAlignmentDiagram(File,Aligned1,Aligned2,View)
 
-function [void] = zAlignmentDiagram(File,Aligned1,Aligned2)
-
-%Aligned1 = [3 4 5 7 8 10];
-%Aligned2 = [3 4 5 9 10 15];
-
-%Aligned1 = [1 2 3];
-%Aligned2 = [1 2 5];
-
-%Aligned1 = [10:500 length(File(1).NT)];
-%Aligned2 = [10:500 length(File(2).NT)];
-
-%Aligned1 = [ind2' length(File(1).NT)];
-%Aligned2 = [ind1' length(File(2).NT)];
+if nargin < 4,
+  View = 1;
+end
 
 % R1 is a function from the indices of File(1) to the row of the alignment
 
@@ -90,18 +80,26 @@ NewFile(2).Crossing(R2,R2) = File(2).Crossing;
 NewFile(2).BasePhosphate(R2,R2) = File(2).BasePhosphate;
 NewFile(2).Covalent(R2,R2) = File(2).Covalent;
 
+% ------------------------------------ Decide what to display
+
+if View > 0,
+  ViewList = [1 1 1 1 1 1 1 0];
+else
+  ViewList = [0 0 0 0 0 0 1 0];
+end
+
 % ------------------------------------ Show interactions in File(1)
 
 figure(1)
 clf
-zCircularDiagram(NewFile(1),0.5,[1 1 1 1 1 1 1 0]);
+zCircularDiagram(NewFile(1),0.5,ViewList);
 saveas(gcf,[NewFile(1).Filename '_alignment.pdf'],'pdf');
 
 % ------------------------------------ Show interactions in File(1)
 
 figure(2)
 clf
-zCircularDiagram(NewFile(2),0.5,[1 1 1 1 1 1 1 0]);
+zCircularDiagram(NewFile(2),0.5,ViewList);
 saveas(gcf,[NewFile(2).Filename '_alignment.pdf'],'pdf');
 
 % ------------------------------------ Show interactions in File(1) also in 2
@@ -112,7 +110,7 @@ Comp = NewFile(1);
 Comp.Filename = [Comp.Filename ' inferred from ' NewFile(2).Filename];
 Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) == fix(abs(NewFile(2).Edge)));
 Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) == fix(abs(NewFile(2).BasePhosphate/100)));
-zCircularDiagram(Comp,0.5,[1 1 1 1 1 1 1 0]);
+zCircularDiagram(Comp,0.5,ViewList);
 saveas(gcf,[NewFile(1).Filename '-' NewFile(2).Filename '_alignment_conserved.pdf'],'pdf');
 
 % ------------------------------------ Show interactions in File(2) also in 1
@@ -123,7 +121,7 @@ Comp = NewFile(2);
 Comp.Filename = [Comp.Filename ' inferred from ' NewFile(1).Filename];
 Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) == fix(abs(NewFile(2).Edge)));
 Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) == fix(abs(NewFile(2).BasePhosphate/100)));
-zCircularDiagram(Comp,0.5,[1 1 1 1 1 1 1 0]);
+Tally = zCircularDiagram(Comp,0.5,ViewList);
 saveas(gcf,[NewFile(2).Filename '-' NewFile(1).Filename '_alignment_conserved.pdf'],'pdf');
 
 % ------------------------------------ Show interactions in File(1) also in 2
@@ -134,7 +132,7 @@ Comp = NewFile(1);
 Comp.Filename = [Comp.Filename ' not inferred'];
 Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) ~= fix(abs(NewFile(2).Edge)));
 Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) ~= fix(abs(NewFile(2).BasePhosphate/100)));
-zCircularDiagram(Comp,0.5,[1 1 1 1 1 1 1 0]);
+zCircularDiagram(Comp,0.5,ViewList);
 saveas(gcf,[NewFile(1).Filename '-' NewFile(2).Filename '_alignment_not_conserved.pdf'],'pdf');
 
 % ------------------------------------ Show interactions in File(2) also in 1
@@ -145,6 +143,6 @@ Comp = NewFile(2);
 Comp.Filename = [Comp.Filename ' not inferred'];
 Comp.Edge  = Comp.Edge .* (fix(abs(NewFile(1).Edge)) ~= fix(abs(NewFile(2).Edge)));
 Comp.BasePhosphate  = Comp.BasePhosphate .* (fix(abs(NewFile(1).BasePhosphate/100)) ~= fix(abs(NewFile(2).BasePhosphate/100)));
-zCircularDiagram(Comp,0.5,[1 1 1 1 1 1 1 0]);
+zCircularDiagram(Comp,0.5,ViewList);
 saveas(gcf,[NewFile(2).Filename '-' NewFile(1).Filename '_alignment_not_conserved.pdf'],'pdf');
 

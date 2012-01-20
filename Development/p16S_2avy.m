@@ -3,22 +3,16 @@
 
 File = zAddNTData({'2avy','1j5e'});
 
-F = File(1);
-
-nMin = 1;
-nMax = length(File(1).NT);
-
-F = File(1);
-
-%F.Edge = F.Edge .* (F.Range <= 10);
-
-% zSecondaryStructure(F,nMin,nMax);
-
-Node = pMakeNodes(F,nMin,nMax);
-
+Node = pMakeNodes(File(1));
 pWriteJavaNodeFile(File(1),Node,4,'16S_from_2avy.txt');
 
-%Node = pShiftNodeIndices(Node,nMin);
+F = xAnnotateWithKnownMotifs(File(1),1);
+NodeM = pMakeNodes(F);
+pWriteJavaNodeFile(F,NodeM,4,'16S_from_2avy_with_motifs.txt');
+
+JAR3D('16S_sequence_from_2avy_1j5e.fasta','16S_from_2AVY_with_motifs.txt');
+
+% ------------------------------------------------ Start diagnostics
 
 S = pTheoreticalAlignment(Node,1);
 
