@@ -66,6 +66,9 @@ function [ind] = LookUpOne(File,Numbers,N,Chain)
     elseif length(p) > 1 & length(Chain) == 0,% two matches, no chain specified
       ind = [ind p];
       fprintf('Multiple matches found for %s in %s, consider specifying a chain\n', N, File.Filename);
+      for a = 1:length(ind),
+        fprintf('Nucleotide %5s Chain %5s Index %5d\n', File.NT(ind(a)).Number, File.NT(ind(a)).Chain, ind(a));
+      end
     elseif length(Chain) > 0,                    % chain specified
       c = 0;
       for j = 1:length(p),

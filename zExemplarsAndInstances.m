@@ -13,6 +13,8 @@
 % zDisplayExemplars(1:16,1)   all paircodes, category 1
 % zDisplayExemplars(1:16,-12:18) all paircodes, all categories
 
+% 1-AA 5-AC 6-CC 7-GC 9-AG 11-GG 13-AU 14-CU 15-GU 16-UU
+
 function [void] = zExemplarsAndInstances(File,Paircode,Category)
 
 % load exemplars -------------------------------------

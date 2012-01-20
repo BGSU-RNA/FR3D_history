@@ -306,5 +306,9 @@ else
   File.Inter     = sparse(NumNT,NumNT);
   File.Edge      = sparse(NumNT,NumNT);
   File.Modified  = 0;
+  File.Pair      = [];
+  File.ClassVersion = 0;
+  File.Header    = [];
 
+  File = orderfields(File);
 end

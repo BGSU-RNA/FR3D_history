@@ -41,7 +41,7 @@ end
 E = abs(fix(File.Edge));                   % don't distinguish subcategories
 
 if nargin < 4,
- Basepairs = (E < 15) .* (E ~= 0); % basepairing only
+ Basepairs = (E < 15) .* (E ~= 0);         % basepairing only
  for a = 1:N,                              % loop through nucleotides
   k = find(Basepairs(a,:));                % find indices of interacting bases
   [y,L] = sort(E(a,k));                    % sort by interaction category
@@ -56,7 +56,7 @@ if length(Interact{a}.Categ) > 0,          % if a interacts with something,
   b = Interact{a}.Index(1);                % get index
   c = Interact{a}.Categ(1);                % and category of interaction
   if (b < a) & (c == 1),                   % canonical pair with lower index
-    a = b;                                 % swap a and b
+%    a = b;                                 % swap a and b
   end
 end
 
@@ -83,8 +83,8 @@ while (a < B) & (a <= N), % while not the end of the loop,
         fprintf('\nJunction\n\n');
         fprintf('Loop 1 - Nucleotides %s to %s, length %3d\n',File.NT(a).Number,File.NT(b).Number,b+1-a);
         zSecondaryStructure(File,a,b,Interact);
-        fprintf('Loop 2 - Nucleotides %s to %s, length %3d\n',File.NT(b+1).Number,File.NT(BB).Number,BB-b);
-        zSecondaryStructure(File,b+1,BB,Interact);
+        fprintf('Loop 2 - Nucleotides %s to %s, length %3d\n',File.NT(b+1).Number,File.NT(BB-1).Number,BB-b);
+        zSecondaryStructure(File,b+1,BB-1,Interact);
 
         return
       end
