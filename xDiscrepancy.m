@@ -6,7 +6,7 @@
 
 % Model and Cand are two list of indices or nucleotide numbers
 
-function [Disc] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
+function [Disc,R] = xDiscrepancy(File1,Model,File2,Cand,LocationWeight,AngleWeight)
 
 L = length(Cand);
 
@@ -79,6 +79,8 @@ if (L == 2),                                % two-nucleotide motif
   v    = AngleWeight(1);
 
   Disc = (sqrt(t1*t1' + (v^2)*ang1^2) + sqrt(t2*t2' + (v^2)*ang2^2))/4;
+
+  R = eye(2);                               % not really how to rotate them
 
 else                                        % more than two nucleotides
 
