@@ -117,8 +117,18 @@ for ca = 1:length(Category),
        plotted(pc2) = 1;
 
        B(m) = E;                                % store this exemplar
-       Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' num2str(E.Pair.Class,'%3.1f')];
+       Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' num2str(E.Pair.Class,'%3.1f') ' ' E.Filename ' ' num2str(E.Count)];
        m = m + 1;
+
+       if any(Category(ca) == [1 2 7 9 11 12]) && (E.NT1.Code == E.NT2.Code),
+         B(m) = E;                              % store again
+         B(m).NT1 = E.NT2;
+         B(m).NT2 = E.NT1;
+         B(m).Pair.Edge = -E.Pair.Edge;
+         Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Pair.Edge) ' ' num2str(B(m).Pair.Class,'%3.1f') ' ' B(m).Filename ' ' num2str(B(m).Count) ];
+         m = m + 1;
+       end
+
 
       end
     end
@@ -167,6 +177,14 @@ Z = linkage(Y,'average');                      % compute cluster tree
 figure(fix(Category(ca))+13)
 [H,T,p] = dendrogram(Z,0,'colorthreshold',threshold,'orientation','left','labels',Lab);
 h = gcf;
+hh = gca;
+if length(Lab) > 80,
+  set(hh,'FontSize',3);
+elseif length(Lab) > 40,
+  set(hh,'FontSize',6);
+else
+  set(hh,'FontSize',8);
+end
 orient landscape
 print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
 
@@ -190,6 +208,8 @@ for i=2:g,
 end
 
 % ----------------------------------------- Display basepairs by IsoDisc
+
+return
 
 fprintf('Comparison of basepairs, lowest IsoDiscrepancy first\n')
 
