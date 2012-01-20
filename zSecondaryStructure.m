@@ -38,12 +38,14 @@ else
   LastIndex = N;
 end
 
+E = abs(fix(File.Edge));                   % don't distinguish subcategories
+
 if nargin < 4,
- Basepairs = (abs(File.Inter) < 15) .* (File.Inter ~= 0); % basepairing only
+ Basepairs = (E < 15) .* (E ~= 0); % basepairing only
  for a = 1:N,                              % loop through nucleotides
   k = find(Basepairs(a,:));                % find indices of interacting bases
-  [y,L] = sort(abs(File.Inter(a,k)));      % sort by interaction category
-  Interact{a}.Categ = File.Inter(a,k(L));  % store categories
+  [y,L] = sort(E(a,k));                    % sort by interaction category
+  Interact{a}.Categ = E(a,k(L));           % store categories
   Interact{a}.Index = k(L);                % store indices of interacting bases
  end
 end
@@ -76,8 +78,8 @@ while (a < B) & (a <= N), % while not the end of the loop,
 
       % ---------------------------------- Check for junction
 
-      if (sum(sum(File.Inter((b+1):(BB-1),(b+1):(BB-1)) == 1)) > 0) & ...
-         (sum(sum(File.Inter((a+1):(b-1),(a+1):(b-1))   == 1)) > 0),
+      if (sum(sum(E((b+1):(BB-1),(b+1):(BB-1)) == 1)) > 0) & ...
+         (sum(sum(E((a+1):(b-1),(a+1):(b-1))   == 1)) > 0),
         fprintf('\nJunction\n\n');
         fprintf('Loop 1 - Nucleotides %s to %s, length %3d\n',File.NT(a).Number,File.NT(b).Number,b+1-a);
         zSecondaryStructure(File,a,b,Interact);
@@ -90,7 +92,7 @@ while (a < B) & (a <= N), % while not the end of the loop,
       % ---------------------------------- Check for insertions on right
 
       if (b < B-1),
-        if sum(sum(File.Inter((b+1):(B-1),(b+1):(B-1)) == 1)) == 0,
+        if sum(sum(E((b+1):(B-1),(b+1):(B-1)) == 1)) == 0,
           for e = (B-1):-1:(b+1),
             fprintf('           %1s%4s', File.NT(e).Base, File.NT(e).Number);
             if length(Interact{e}.Categ) > 0,
@@ -110,8 +112,8 @@ while (a < B) & (a <= N), % while not the end of the loop,
 
       % ---------------------------------- Check if b is out of sequence
 
-      if ((sum(sum(File.Inter((a+1):(b-1),(a+1):(b-1)) == 1)) == 0) & ...
-          (sum(sum(File.Inter((a+1):B,    (a+1):B)     == 1))  > 0)) | ...
+      if ((sum(sum(E((a+1):(b-1),(a+1):(b-1)) == 1)) == 0) & ...
+          (sum(sum(E((a+1):B,    (a+1):B)     == 1))  > 0)) | ...
          (b > B),
         fprintf('%1s%4s',File.NT(a).Base,File.NT(a).Number); % display a
         fprintf('           ');       % move to next column
