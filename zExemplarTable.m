@@ -161,6 +161,8 @@ for a = 1:length(B),
     cp = abs(norm(B(a).NT2.Sugar(1,:) - B(a).NT1.Sugar(1,:)) ...
            - norm(B(b).NT2.Sugar(1,:) - B(b).NT1.Sugar(1,:)));
 
+    % calculate isodiscrepancy
+
     D(a,b) = sqrt((4*ang)^2 + (t1*t1' + t2*t2')/2 + (3*cp)^2);
     D(b,a) = D(a,b);
 
