@@ -24,7 +24,7 @@ VP.Grid      = 1;                % add a grid to the graph
 VP.FontSize  = 10;               % will use Matlab's default unless overridden
 VP.Rotation  = eye(3);
 VP.Shift     = zeros(1,3);
-VP.LabelBases = 1;
+VP.LabelBases = 10;
 
 if nargin == 2,
   ViewParam = VP;

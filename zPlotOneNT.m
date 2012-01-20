@@ -132,7 +132,7 @@ end
 
 end
 
-if LB == 1,
-  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',12);
-%  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',12);
+if LB > 0,
+  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
+%  text(X(1,1)+0.5,X(1,2),X(1,3)+1.5,[NT.Base NT.Number],'fontweight','bold','FontSize',LB);
 end

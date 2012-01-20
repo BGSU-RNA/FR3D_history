@@ -29,6 +29,7 @@ if Model.Geometric == 0,
   f              = Search.Candidates(1,N+1);
   Model.Indices  = double(Search.Candidates(1,1:N));
   Model.NT       = File(f).NT(Model.Indices);
+  Model.LocWeight= ones(1,Model.NumNT);
   Model          = xPrecomputeForDiscrepancy(Model);
   Model.Filename = '';
 end

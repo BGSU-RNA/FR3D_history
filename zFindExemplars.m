@@ -86,9 +86,10 @@ for j = 1:length(pcodes),
     for k = 1:L,                   % Very slow nested loop
       for m = (k+1):L,
   
-        Pair1 = File(SP(k).Filenum).Pair(SP(k).PairIndex);
-        Pair2 = File(SP(m).Filenum).Pair(SP(m).PairIndex);
+%        Pair1 = File(SP(k).Filenum).Pair(SP(k).PairIndex);
+%        Pair2 = File(SP(m).Filenum).Pair(SP(m).PairIndex);
 %        PD(k,m) = zPairDiscrepancy(Pair1,Pair2);  % does this match FR3D?
+
         f1 = SP(k).Filenum;
         f2 = SP(m).Filenum;
         Model = [File(f1).Pair(SP(k).PairIndex).Base1Index ...
