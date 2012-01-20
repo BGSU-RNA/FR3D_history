@@ -405,8 +405,12 @@ Search=handles.Search;
 if isfield(handles,'File')
     File=handles.File;
     [File,SIndex]=zAddNTData(Search.Filenames,0,File);
+[1 SIndex]
+Search.Filenames
 else
     [File,SIndex]=zAddNTData(Search.Filenames,0);
+[2 SIndex]
+Search.Filenames
 end
 
 handles.File=File;
@@ -419,21 +423,23 @@ function ListCandidates_Callback(hObject, eventdata, handles)
 Search=handles.Search;
 
 if isfield(handles,'SIndex')
-File=handles.File;
-SIndex=handles.SIndex;
-xListCandidates(File(SIndex),Search,Inf);
-%winopen(OUT) %%OUT is not outputted by the above function
-%winopen('Query_51_Results.txt')
+  File=handles.File;
+  SIndex=handles.SIndex;
+[3 SIndex]
+Search.Filenames
+  xListCandidates(File(SIndex),Search,Inf);
+  %winopen(OUT) %%OUT is not outputted by the above function
+  %winopen('Query_51_Results.txt')
 else %If data is loaded from saved search results
-    [File,SIndex]=zAddNTData(Search.Filenames,0);
-    handles.File=File;
-    handles.SIndex=SIndex;
-    guidata(hObject, handles);
+  [File,SIndex]=zAddNTData(Search.Filenames,0);
+[4 SIndex]
+Search.Filenames
+  handles.File=File;
+  handles.SIndex=SIndex;
+  guidata(hObject, handles);
     
-    xListCandidates(File(SIndex),Search,Inf);   %%%%%ALERT: SIndex here is not correct?
+  xListCandidates(File(SIndex),Search,Inf);
 end
-%xGroupCandidates(File(SIndex),Search);  % doesn't work very well yet!
-
 
 
 % --- Executes on selection change in Overlap.

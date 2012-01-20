@@ -30,10 +30,12 @@ if nargin < 2,
   ReadCode = 0;
 end
 
+JustRead = 0;
+
 if nargin < 3,                            % no data already loaded
   File = zGetNTData(FullList{1},ReadCode);
-  FullList = FullList(2:end);             % remove first filename
-  Index(1) = 1;                           
+  JustRead = 1;
+  Index(1) = 1;
 end
 
 for j = 1:length(File),
@@ -51,7 +53,7 @@ for f = 1:length(FullList),                       % loop through PDB list
     Index(f) = F;                                 %   point to it
   else                                            % but if PDB has been loaded
     Index(f) = i(1);                              %   point to first instance
-    if ReadCode > 0,                              % reanalyze
+    if ((ReadCode > 0) && (JustRead == 0)) || length(File(i(1)).NT) == 0,
       File(Index(f)) = zGetNTData(File(Index(f)).Filename,ReadCode);
     end
   end

@@ -290,8 +290,6 @@ if length(File.NT) > 0,
   end
 end
 
-%zSaveNTData(File);
-
 else
 
   fprintf('Could not open file %s.pdb\n', Filename);
@@ -309,6 +307,11 @@ else
   File.Pair      = [];
   File.ClassVersion = 0;
   File.Header    = [];
+  File.Info.Resolution = [];
+  File.Info.Type       = '';
+  File.Info.RNA        = '';
+  File.Info.Species    = '';
+  File.Info.LigandsAndComments = '';
 
   File = orderfields(File);
 end

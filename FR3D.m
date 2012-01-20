@@ -23,6 +23,15 @@ else
   [File,SIndex] = zAddNTData(Filenames,0,File); % add PDB data if needed
 end                           % SIndex tells which elements of File to search
 
+% ------------------------------------------- Store actual filenames
+%                                             rather than list name(s)
+
+clear Filenames
+
+for i = 1:length(SIndex),
+  Filenames{i} = File(SIndex(i)).Filename;
+end
+
 % ------------------------------------------- Construct details of search ---
 
 if isfield(Query,'Filename'),                % if query motif is from a file

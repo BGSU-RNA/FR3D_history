@@ -17,8 +17,8 @@ if exist('PairExemplars.mat','file') > 0,
       File(f).Pair(p).Classes   = c(1:3);
       File(f).Pair(p).Distances = d(1:3);
     end
-    fprintf('Updated %10s\n', File(f).Filename);
-    zSaveNTData(File(f));
+%    fprintf('Updated %10s\n', File(f).Filename);
+%    zSaveNTData(File(f));
   end
 else
   for p = 1:length(File.Pair),                  % fill in fictitious distances
