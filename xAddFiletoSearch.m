@@ -12,13 +12,29 @@ N           = Query.NumNT;
 if (s==0),
   Search.CandidateFilenames{1} = '';
   Search.File(1).Filename = '';
-
 else
 
 for i = 1:s,
   f = double(Candidates(i,N+1));        % file number for this candidate
   Search.CandidateFilenames{f} = Search.Filenames{f};
 end
+
+[y,p] = sort(double(Candidates(1,1:N)));    % put in increasing order
+
+if isfield(Query,'MaxDiffMat'),
+  MaxDiff = diag(Query.MaxDiffMat(p,p),1);
+else
+  MaxDiff = Inf*ones(1,N-1);
+end
+
+% ---------------------------- Calculate maximum gaps between cand. nucleotides
+
+maxinsert = zeros(1,N-1);
+for c = 1:s,
+  maxinsert = max(maxinsert,abs(diff(double(Candidates(c,1:N))))-1);
+end
+
+% ---------------------------- Add nucleotide information
 
 if ~isempty(File),
   for f = 1:max(Candidates(:,N+1)),
@@ -42,6 +58,24 @@ if ~isempty(File),
         Search.File(f).Edge(k,j) = File(f).Edge(k,j);
       end
     end
+
+    % include intervening nucleotides, if only a few
+
+    for n = 1:(N-1),                      
+      if (MaxDiff(n) < Inf) | (maxinsert(n) < 5),   % if only few insertions
+      if Indices(n+1) - Indices(n) > 1,             % increasing order
+        for i = (Indices(n)+1):(Indices(n+1)-1),
+          Search.File(f).NT(i) = File(f).NT(i);
+        end
+      elseif Indices(n+1) - Indices(n) < -1,        % decreasing order
+        for i = (Indices(n)-1):-1:(Indices(n+1)+1),
+          Search.File(f).NT(i) = File(f).NT(i);
+        end
+      end
+      end
+    end
+
+
   end
 end
 

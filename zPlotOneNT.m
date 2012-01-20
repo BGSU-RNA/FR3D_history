@@ -26,6 +26,12 @@ else
   LB = 0;
 end
 
+if isfield(ViewParam,'LabelSugar'),
+  LSugar = ViewParam.LabelSugar;
+else
+  LSugar = 0;
+end
+
 switch NT.Code
   case 1,
     col = [1 0 0];   % A is red 
@@ -113,8 +119,7 @@ end
 scatter3(X(1,1),X(1,2),X(1,3),28,col,'filled');   % glycosidic atom
 
 if Sugar == 1,
-
-if length(NT.Sugar(:,1)) == 12,   % for some reason, some have 9
+ if length(NT.Sugar(:,1)) == 12,   % for some reason, some have 9
   Z = [NT.Sugar; NT.Fit(1,:)];
 
   k = [13 1 7 6 8 9 10 12]; 
@@ -128,8 +133,15 @@ if length(NT.Sugar(:,1)) == 12,   % for some reason, some have 9
   plot3(Z(k,1),Z(k,2),Z(k,3),'k','LineWidth',2,'LineStyle',LS);
   k = [2 1]; 
   plot3(Z(k,1),Z(k,2),Z(k,3),'k','LineWidth',2,'LineStyle',LS);
-end
 
+
+  if LSugar > 0,
+    A = {'C1*','C2*','O2*','C3*','O3*','C4*','O4*','C5*','O5*','P','O1P','O2P'};
+    for j=1:12,
+      text(Z(j,1)+0.5,Z(j,2),Z(j,3), A{j},'fontweight','bold','FontSize',LSugar);
+    end
+  end
+ end
 end
 
 if LB > 0,

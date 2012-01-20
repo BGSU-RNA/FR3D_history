@@ -13,6 +13,7 @@ function [void] = zDisplayNT(File,NTList,ViewParam)
 % set default values
 
 VP.Sugar     = 0;
+VP.LabelSugar= 0;
 VP.az        = 51;
 VP.el        = 14;
 VP.LineStyle = '-';              % default - thick solid lines
@@ -37,6 +38,10 @@ end
 
 if isfield(ViewParam,'Sugar'),
   VP.Sugar = ViewParam.Sugar;
+end
+
+if isfield(ViewParam,'LabelSugar'),
+  VP.LabelSugar = ViewParam.LabelSugar;
 end
 
 if isfield(ViewParam,'ConnectSugar'),
