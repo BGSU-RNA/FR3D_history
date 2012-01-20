@@ -53,6 +53,8 @@ for j = 1:length(pcodes),
  CLE = CLE(find(CLE));               % leave out empty entries
  for row = 1:length(CLE),
 
+if fix(abs(CLE(row))) == 13,
+
   % specify criteria for selection of pairs ----------------------------------
 
   Param.Paircode = pc;
@@ -94,15 +96,15 @@ for j = 1:length(pcodes),
       end
     end
 
-%dists = nonzeros(PD);
-%clf
-%hist(dists,30)
-%pause
+    %dists = nonzeros(PD);
+    %clf
+    %hist(dists,30)
+    %pause
 
-bigm = max(max(PD));
-if bigm > 4,
-  fprintf('%6.2f maximum pair discrepancy\n',bigm);
-end
+    bigm = max(max(PD));
+    if bigm > 4,
+      fprintf('%6.2f maximum pair discrepancy\n',bigm);
+    end
 
     PD = PD + PD';
 
@@ -137,7 +139,9 @@ end
   
   end
 
- save('PairExemplars','Exemplar');
+  save('PairExemplars','Exemplar');
+
+end
 
  end
 end

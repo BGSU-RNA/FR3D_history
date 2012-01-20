@@ -34,7 +34,7 @@ L = length(Filenames);
 NumPlots     = (L^2 - L)/2;
 
 stop         = 0;
-w            = 18;                          % row of alignment to start at
+w            = 16;                          % row of alignment to start at
 neighborhood = 1;
 sugar        = 1;
 fontsize     = 8;
@@ -117,7 +117,7 @@ end
 
 VP.Plot = 1;                          % plot the bases
 stop = 0;
-w = 1;
+w = 16;
 
 while stop == 0,                            
 

@@ -32,7 +32,11 @@ c = max(1,N*6-12);
 for i=1:c,
   fprintf(' ');
 end
-fprintf('     Chains\n');
+fprintf('   Chains');
+if N == 2,
+  fprintf(' Pair data');
+end
+fprintf('\n');
 
 for i=1:s,
   if (i <= NumToOutput),
@@ -62,8 +66,8 @@ for i=1:s,
       NT1 = File(f).NT(Candidates(i,1));
       NT2 = File(f).NT(Candidates(i,2));
       Edge  = full(File(f).Edge(Candidates(i,1),Candidates(i,2)));
-      fprintf('%s ', zEdgeText(Edge));
-      fprintf('%4.1f ', Edge);
+      fprintf(' %s ', zEdgeText(Edge));
+      fprintf('%7.1f ', Edge);
       SA = {'A', 'S'};
 %SA{1}
 %      1+File(f).NT(Candidates(i,1).Syn)

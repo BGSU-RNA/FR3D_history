@@ -45,7 +45,7 @@ end
       s  = -1;
       sh2 = (M2.Fit(1,:)-M1.Fit(1,:)) * M1.Rot;   % vector shift from 1 to 2
       Pair2 = zAnalyzePair(M1,M2,CL,Exemplar,sh2);%put other base at origin
-      if abs(Pair2.Class) < 15,              % some sort of base pairing
+      if abs(Pair2.Class) < 24,              % some known interaction
         Pair = Pair2;                        % matched with M2 at origin
       else                                   % other interaction, like stacking
         Pair.Class = Pair2.Class;            % original order, use 2nd class

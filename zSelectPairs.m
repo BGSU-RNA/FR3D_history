@@ -132,7 +132,7 @@ for f = 1:length(File),                   % Loop through each file
     case 42, inbox = [-12 12 -12 12 -5 -2  0   1.1 -95 275];
     case 43, inbox = [-12 12 -12 12 -5 -2 -1.1 0   -95 275];
     case 44, inbox = [-12 12 -12 12 -2  2 -1.1 1.1 -95 275];
-    case 45, inbox = [-12 12 -12 12 -2  2 -1.1 1.1 -95 275];
+    case 45, inbox = [-12 12 -12 12 -1  1 -1.1 1.1 -95 275];
     case 50, inbox = Param.Inbox;
   end
 
@@ -154,7 +154,7 @@ for f = 1:length(File),                   % Loop through each file
      & ((Param.Category(j) > 43) | ((abs(p.Gap) > 2.0) & (p.MinDist < 3.5))) ...
      & ((Param.Category(j) ~= 44) | (abs(p.Gap) < 1.2)) ...
      & ((Param.Category(j) ~= 45) | ((abs(p.Gap) < 1.0) & (p.MinDist < 3) ...
-                                  & (abs(p.Normal(3)) > 0.7) & (p.Class == 30))), ...
+                                  & (abs(p.Normal(3)) > 0.7) & (abs(p.Class) >= 30))), ...
      keep = 1;
     end
   end

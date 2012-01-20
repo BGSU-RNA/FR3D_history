@@ -1,4 +1,4 @@
-% zAnalyzePairFast(N1,N2,CL) computes distances, angles, and classification
+% zAnalyzePair(N1,N2,CL) computes distances, angles, and classification
 % codes.
 
 function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
@@ -102,12 +102,28 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
         end
       end
 
-      if ((length(Pair.Hydrogen) == 4) && (goodhydrogens >= 3)) ...
-         || ((length(Pair.Hydrogen) == 3) && (goodhydrogens >= 2)) ...
-         || ((length(Pair.Hydrogen) < 3) && (goodhydrogens == length(Pair.Hydrogen)))
-        % don't reject it
-      else
-        a = 30.3;
+      if goodhydrogens < length(Pair.Hydrogen),  % missing hydrogen bond
+        gh = length(Pair.Hydrogen);              % required number
+
+        if (length(Pair.Hydrogen) == 4),
+          gh = 3;
+        elseif (length(Pair.Hydrogen) == 3),
+          gh = 2;
+        end
+
+        if (fix(abs(a)) == 13) && (Pair.Paircode == 1)
+          gh = 0;
+        elseif (fix(a) == 13) && (Pair.Paircode == 5)
+          gh = 0;
+        elseif (fix(a) == -13) && (Pair.Paircode == 5)
+          gh = 1;
+        elseif (fix(abs(a)) == 13) && (Pair.Paircode == 6)
+          gh = 1;
+        end
+     
+        if goodhydrogens < gh,
+          a = 30.3;                              % reject this pair
+        end
       end
     else
 
@@ -157,7 +173,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
   % --------------------------- check hydrogen bonds if nearest exemplar
   % --------- is a basepair, even if this pair is far from that exemplar
 
-  if (length(Pair.Hydrogen) == 0) & (abs(Pair.Classes(1)) < 14),
+  if (abs(a) >= 14) && (abs(Pair.Classes(1)) < 14),
     Pair.Hydrogen = zCheckHydrogen(N1,N2,Pair.Classes(1));
   end
 

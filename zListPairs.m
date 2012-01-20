@@ -24,7 +24,7 @@ for i = 1:length(ListItems),
     case 11, Header = [Header ' C1*-C1*'];
     case 12, Header = [Header '    Gap'];
     case 13, Header = [Header ' MinDist'];
-    case 14, Header = [Header '  Class'];
+    case 14, Header = [Header '   Class'];
     case 15, Header = [Header '   Hand'];
     case 16, Header = [Header ' N.Exem'];
     case 17, Header = [Header '  EDist'];
@@ -76,7 +76,7 @@ for k=1:length(SP)
                  a = [a p.Gap];
         case 13, fprintf('%8.2f',p.MinDist);
                  a = [a p.MinDist];
-        case 14, fprintf('%7.2f',p.Class);
+        case 14, fprintf('%8.2f',p.Class);
         case 15, fprintf('%7.2f',SP(k).HandClass);
         case 16, fprintf('%7.2f',p.Classes(1));
         case 17, fprintf('%7.2f',p.Distances(1));
@@ -89,13 +89,18 @@ for k=1:length(SP)
                  end
         case 19, fprintf('%6.1f',p.StackingOverlap);
         case 21, fprintf('%7.2f',SP(k).PairDisc);
-        case 22, fprintf('%6.2f',File(f).Info.Resolution);
-      end
+        case 22, if isfield(File(f),'Info'),
+                   fprintf('%6.2f',File(f).Info.Resolution);
+                 else
+                   fprintf('      ');
+                 end
     end
-    fprintf('\n')
- end
+  end
+  fprintf('\n')
 
   M = [M; a];
+end
+
 
  if mod(k,30) == 0,
    fprintf('Press return to continue, enter q to quit ');

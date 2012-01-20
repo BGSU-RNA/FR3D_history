@@ -114,7 +114,7 @@ for ca = 1:length(Category),
        rotate3d on
        plotted(pc2) = 1;
 
-      if (E.Count >= 4) && (fix(E.Class) == E.Class),
+      if (E.Count >= 1) % && (fix(E.Class) == E.Class),
        B(m) = E;                                % store this exemplar
        Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Pair.Edge) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
        m = m + 1;

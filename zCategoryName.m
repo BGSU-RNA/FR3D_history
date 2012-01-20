@@ -25,6 +25,7 @@ switch fix(a),
   case  12, n = 'tSS trans Sugar edge / Sugar edge (second base dominant)';
   case -12, n = 'tSS trans Sugar edge / Sugar edge (first base dominant)';
   case  13, n = 'bif bifurcated cis Watson-Crick / Watson-Crick';
+  case -13, n = 'bif bifurcated cis Watson-Crick / Watson-Crick';
   case  14, n = 'mis miscellaneous hand classification';
   case  21, n = 's35 second base faces up, above first';
   case -21, n = 's53 second base faces up, below first';
@@ -38,7 +39,7 @@ switch fix(a),
   case  42, n = 'potential stacking below, second base facing up';
   case  43, n = 'potential stacking below, second base facing down';
   case  44, n = 'potential pairing';
-  case  45, n = 'potential pairing, computer classification 30';
+  case  45, n = 'potential pairing, no computer classification';
   case  50, n = 'in given box';
   case  51, n = 'near a pair you specify';
   otherwise, n = 'unknown';

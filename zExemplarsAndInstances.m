@@ -2,8 +2,8 @@
 % representatives for interactions involving pairs with the given Paircode
 % and interaction Category
 
-% zDisplayExemplars(Paircode,Category), where Paircode and Category can be
-% vectors, will loop through all possible Paircode, Category pairs from the
+% Paircode and Category can be
+% vectors.  It will loop through all possible Paircode, Category pairs from the
 % two vectors.  If a certain category has subcategories, like 1, 1.1, and
 % 1.2, it will loop through all of those.
 
@@ -39,16 +39,12 @@ function [void] = zExemplarsAndInstances(File,Paircode,Category)
 
 for pc = 1:length(Paircode),
  for ca = 1:length(Category),
-   if fix(Category(ca)) == Category(ca),
-     row = find(fix(cat(1,Exemplar(:,Paircode(pc)).Class)) == Category(ca));
-   else
-     row = find(cat(1,Exemplar(:,Paircode(pc)).Class) == Category(ca));
-   end
-   for su = 1:length(row),
+   for row = 1:length(Exemplar(:,Paircode(pc))),
 
-     E = Exemplar(row(su),Paircode(pc));
+     E = Exemplar(row,Paircode(pc));
+
      if ~isempty(E),
-
+      if fix(E.Class) == Category(ca),
        fprintf('%s%s %s %s%s %s Category %3.1f\n',E.NT1.Base,E.NT1.Number,E.Pair.EdgeText,E.NT2.Base,E.NT2.Number,E.Filename,E.Class);
        zListPairData(E.Pair,1);
 
@@ -266,6 +262,7 @@ pause
        pause
 
       end
+     end
     end
   end
 end

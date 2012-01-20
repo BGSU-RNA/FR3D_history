@@ -237,7 +237,6 @@ a = 1;                                         % atom number
 
 for i=1:length(Indices1(1:L))
   a = zWriteNucleotidePDB(fid,File1.NT(Indices1(i)),a,0,R,CC1);
-  a = a + 1;
 end
 
 fclose(fid);

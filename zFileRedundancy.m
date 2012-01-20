@@ -14,12 +14,15 @@ end
 B = [];
 
 for j = 1:length(i),
-  fprintf('%5s has %4d nucleotides, %5d pairs, ', File(i(j)).Filename, A(j,1), A(j,2));
-  if isempty(File(i(j)).Info.Resolution),
-    fprintf('resolution  ????');
-  else
-    fprintf('resolution %5.2f', File(i(j)).Info.Resolution);
-  end
+ fprintf('%5s has %4d nucleotides, %5d pairs, ', File(i(j)).Filename, A(j,1), A(j,2));
+ if isempty(File(i(j)).Info.Resolution),
+   fprintf('resolution  ????');
+ else
+   fprintf('resolution %5.2f', File(i(j)).Info.Resolution);
+ end
+
+ if A(j,1) > 0,
+
   B = [];
   for k = 1:A(j,1),
     B = [B File(i(j)).NT(k).Base];
@@ -50,6 +53,9 @@ for j = 1:length(i),
   fprintf('\n');
 
   PreviousB = B;
+ else
+  fprintf('\n');
+ end
 end
 
 

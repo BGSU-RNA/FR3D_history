@@ -10,8 +10,6 @@ end
 
 if File.NumNT > 0,
 
-fprintf('Classifying interactions\n')
-
 t = cputime;
 
 CL = zClassLimits;                              % read ClassLimits matrix
@@ -31,7 +29,7 @@ k = find(i<j);                                  % look at each pair only once
 i = i(k);                                       % reduce list of indices
 j = j(k);                                       % reduce list of indices
 
-fprintf('Found %5d bases within %2d Angstroms from 3d structure\n', length(i), DistCutoff);
+fprintf('Classifying %5d pairs of bases for interactions\n', length(i));
 
 % -------- Screen and analyze base pairs ------------------------------------ 
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 
@@ -86,16 +84,16 @@ if pc > 1,                                         % if pairs were found
   B = cat(1, File.Pair(:).Base2Index);
   C = min(A,B);
 
-  [y,i] = sort(C);
+  [y,ii] = sort(C);
 
-  File.Pair = File.Pair(i);                         % order by lower base index
+  File.Pair = File.Pair(ii);                       % order by lower base index
 else
   File.Pair = [];
 end
 
-fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
+%fprintf('Found %5d pairs that are possibly interacting\n', pc-1);
 
-fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(pc-1)/(cputime-t));
+fprintf('Classification took %4.2f minutes, or %4.0f classifications per minute\n', (cputime-t)/60, 60*(length(i))/(cputime-t));
 
 else                                                % no nucleotides
   File.Pair = [];

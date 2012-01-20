@@ -33,7 +33,7 @@ if nargin > 0,
 else                        % change the following line to change the query!
   Query.Name = 'StackedPair'; 
   Query.Name = 'Sarcin5Geo';
-  Query.Name = 'BasepairGeometric';
+  Query.Name = 'BasepairGeometric2';
 end
 
 switch Query.Name
@@ -133,6 +133,12 @@ case 'BasepairGeometric'
   Query.Filename   = '1s72';
   Query.NTList     = {'804' '809'};
   Query.DiscCutoff = 0.4;
+
+case 'BasepairGeometric2'
+  Query.Filename   = '1u6b';
+  Query.NTList     = {'59','85'};
+  Query.DiscCutoff = 0.5;
+  Query.SearchFiles    = {'Nonredundant_list'};
 
 case 'Basepair'
   Query.Edges{1,2}     = 'cWW AG';
