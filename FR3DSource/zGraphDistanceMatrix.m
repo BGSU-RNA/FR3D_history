@@ -79,7 +79,7 @@ end
 
 if length(W) > 1,
   for i = 1:t,
-    SSLab{i} = Lab{i}(1:W(2));
+    SSLab{i} = Lab{i}(1:min(length(Lab{i}),W(2)));
   end
 end
 
@@ -104,6 +104,7 @@ FS = 8;
 if length(W) > 1,
   set(gca,'XTick',(1:s)+0.5)
   set(gca,'XTickLabel',SSLab,'FontSize',FS)
+%  xticklabel_rotate
 else
   XFS = min(6,FS);
   for i = 1:t,

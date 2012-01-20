@@ -6,7 +6,7 @@
 % load LIB00014_IL_tSH-tSH-tHS-tHS.mat
 % pMakeModelFromSearchSaveFile(Search,'IL',1);
 
-function [Node] = pMakeModelFromSearchSaveFile(Search,Type,Verbose)
+function [Node,Truncate] = pMakeModelFromSearchSaveFile(Search,Type,Verbose)
 
 if nargin < 3,
   Verbose = 0;
@@ -15,7 +15,7 @@ end
 % ----------------------------------- Load Search from filename, if applicable
 
 if strcmp(class(Search),'char'),
-  load(['SearchSaveFiles' filesep Search],'Search','-mat');
+  load(['MotifLibrary' filesep Search],'Search','-mat');
 end
 
 % ----------------------------------- Gather basic information about the search
@@ -28,6 +28,8 @@ f = Search.Candidates(:,N+1);           % file numbers of motifs
 File = Search.File(f(1));               % file of query motif
 NTNumber = double(Search.Candidates(1,1));     % index of first NT
 LastNTNumber = double(Search.Candidates(1,N)); % index of last NT
+
+
 
 % ----------------------------------- Find locations of truncations
 
@@ -94,7 +96,7 @@ if Verbose > 0,
 end
 
 % File.Edge(i,i) = F.Edge;                  % substitute consensus
-F.NT = File.NT(Search.Candidates(1,1:N));
+F.NT = File.NT(Search.Candidates(1,1:N));   % use the first candidate as model
 
 %Node = pMakeNodes(File,NTNumber,LastNTNumber,Truncate);
 Node = pMakeNodes(F,1,N,Truncate);          % make the SCFG/MRF model
@@ -130,7 +132,7 @@ for n = 1:length(Node),
   case 'Basepair'
     a = Node(n).LeftIndex;                   % which NT of the query motif
     b = Node(n).RightIndex;                  % right NT of the query motif
-    Score = pConsensusPairSubstitution(a,b,f,Search.File,F,Node(n).Delete,L,Search);
+    Score = pConsensusPairSubstitution(a,b,f,Search.File,F,Node(n).Delete,L,Search,Verbose);
 
 %fprintf('Original substitution probabilities\n');
 %Node(n).SubsProb
@@ -178,9 +180,11 @@ for n = 1:length(Node),
     for ii = 1:length(Node(n).IBases(:,1)),
       a = Indices(Node(n).IBases(ii,1));
       b = Indices(Node(n).IBases(ii,2));
-      Score = pConsensusPairSubstitution(a,b,f,Search.File,F,0,L,Search);
+      Score = pConsensusPairSubstitution(a,b,f,Search.File,F,0,L,Search,Verbose);
       Node(n).SubsProb(:,:,ii) = Score;
-      fprintf('\n');
+      if Verbose > 0,
+        fprintf('\n');
+      end
     end  
 
   case 'Junction'

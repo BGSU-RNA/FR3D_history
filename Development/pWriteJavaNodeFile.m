@@ -3,7 +3,9 @@
 % NumChar tells it how large to make letter and pair distributions, what to
 % add for * hairpins, for example
 
-function [void] = pWriteNodesForJava(File,Node,NumChar,Filename)
+% pWriteNodesForJava(File,Node,4,'Ecoli_16S_with_motifs.txt')
+
+function [void] = pWriteJavaNodeFile(File,Node,NumChar,Filename)
 
 if nargin < 3,
   NumChar = 4;
@@ -108,6 +110,9 @@ for n=1:length(Node),
 
       Indices = [Node(n).LeftIndex(Node(n).Left) ...
                  Node(n).RightIndex(Node(n).Right)];
+
+n
+Node(n)
 
       for i = 1:length(Node(n).IBases(:,1)),
         Text = [Text sprintf('Interaction  | Interacting Bases ')];

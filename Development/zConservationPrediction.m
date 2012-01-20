@@ -10,6 +10,8 @@ Filenames = {'2AVY','2AW4'};
 
 %File = zAddNTData(Filenames);
 
+%File = zAttachAlignment(File,1);
+
 % xAnnotate
 
 Data = [];

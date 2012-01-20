@@ -13,12 +13,14 @@ nMin = 1;
 nMax = length(File(FIndex).NT);
 
 F = File(FIndex);
-F.Edge = F.Edge .* (F.Range <= 10);
+
+%F.Edge = F.Edge .* (F.Range <= 10);
 
 % zSecondaryStructure(F,nMin,nMax);
 
 Node = pMakeNodes(F,nMin,nMax);
-Node = pShiftNodeIndices(Node,nMin);
+
+%Node = pShiftNodeIndices(Node,nMin);
 
 S = pTheoreticalAlignment(Node,1);
 
@@ -42,3 +44,16 @@ fprintf('%s\n', S{2});
 fprintf('\n');
 
 pWriteJavaNodeFile(File(FIndex),Node,4,'16S_from_2avy.txt');
+
+figure(1)
+clf
+zCircularDiagram(File,0.2,[1 1 1 1 0 0 0]);
+saveas(gcf,'2avy_circular_basepairs.pdf','pdf');
+
+figure(2)
+clf
+FF = File;
+Node(1).Edge(File.NumNT,File.NumNT) = 0;
+FF.Edge = sparse(Node(1).Edge + Node(1).Edge');
+zCircularDiagram(FF,0.2,[1 1 1 1 0 0 0]);
+saveas(gcf,'2avy_circular_SCFG_basepairs.pdf','pdf');

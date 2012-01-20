@@ -102,8 +102,9 @@ for ff = 1:length(File),
        for n = 1:(t-1),
         clear Mot
         Mot.Name = strrep(MotifName,'.mat','');
-        Mot.Index = n;
+        Mot.Index = m;
         Mot.Number = MotifNumber;
+        Mot.Indices = Candidates(c,1:(t-1));
         if isempty(File(ff).Nucl(Candidates(c,n)).Motif),
           L = 0;
         else

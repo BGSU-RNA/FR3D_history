@@ -1,10 +1,16 @@
 
-function [Candidates, Discrepancy] = xReduceOverlap(Candidates, Discrepancy)
+function [Candidates, Discrepancy] = xReduceOverlap(Candidates, Discrepancy, Verbose)
+
+if nargin < 3,
+  Verbose = 0;
+end
 
 N = length(Candidates(1,:)) - 1;                 % number of nucleotides
 
-%fprintf('%6d candidates after %2d exclusions\n', length(Candidates(:,1)),0);
-drawnow
+if Verbose > 0,
+  fprintf('%6d candidates after %2d exclusions\n', length(Candidates(:,1)),0);
+  drawnow
+end
 
 a = 1;
 
@@ -13,7 +19,9 @@ for a=1:N,
     
   [Candidates, Discrepancy] = xExcludeOverlap2(Candidates, Discrepancy, i);
 
-%  fprintf('%6d candidates after %2d exclusions\n', length(Candidates(:,1)),a);
+  if Verbose > 0,
+    fprintf('%6d candidates after %2d exclusions\n', length(Candidates(:,1)),a);
+  end
 
   drawnow
 end

@@ -1,13 +1,23 @@
-% xExcludeOverlap(Candidates) removes candidates which overlap with one
-% another, leaving only the one that occurs first in the list
+% xExcludeRedundantCandidates(Candidates,Discrepancy,Limit) removes candidates which are redundant with each other because they occur in redundant chains
 
-function [Candidates,Discrepancy] = xExcludeOverlap(Candidates,Discrepancy,Limit)
+function [Candidates,Discrepancy] = xExcludeOverlap(File,Candidates,Discrepancy,Limit)
 
 N      = length(Candidates(1,:)) - 1;  % number of nucleotides
 
 OK     = zeros(size(Candidates(:,1))); % rows of Candidates which are kept
 OK(1)  = 1;                            % keep the first; lowest discrepancy
 NumOK  = 1;                            % counter for number kept
+
+Filenums = unique(Candidates(:,N+1));  % file numbers which occur
+
+for i = 1:length(Filenums),
+  f = Filenums(i);
+  r = find(Candidates(:,N+1) == f);    % candidates from the same file
+  
+  for k = 1:N,
+    
+
+
 
 for i = 2:length(Candidates(:,1)),     % 
   AddCand = 1;                         % default is to add this one

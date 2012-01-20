@@ -16,7 +16,7 @@
 %  zCircularDiagram(File(f),0.1);
 %  saveas(gcf,[mypath FN '_circular_diagram.pdf'],'pdf');
 
-%  zCircularDiagram(File,1,[1 1 0 0 0 1]);
+%  zCircularDiagram(File,1,[1 1 0 0 0 1 1]);
 
 %  View tells what to display
 %  1 = nested cWW
@@ -25,6 +25,8 @@
 %  4 = non-nested non-cWW
 %  5 = stack
 %  6 = BPh
+%  7 = explanatory text
+%  8 = leave gaps in diagram for breaks in nucleotide chain
 
 function [void] = zCircularDiagram(File,Thickness,View)
 
@@ -33,7 +35,11 @@ if nargin < 2,
 end
 
 if nargin < 3,
-  View = [1 1 1 1 1 1];
+  View = [1 1 1 1 1 1 1 1];
+end
+
+while length(View) < 8,
+  View = [View 1];
 end
 
 if strcmp(class(File),'char'),
@@ -73,18 +79,24 @@ N = length(File.NT);
 A = zeros(1,N);           % angle around circle for nucleotides
 A(1) = 1;
 
+if View(8) == 1,
+  spaces = [1 4 8 12];
+else
+  spaces = [1 0 0 12];
+end
+
 nc = [1];                                % new chain starting
 for t = 1:(N-1),
-  A(t+1) = A(t) + 1;
+  A(t+1) = A(t) + spaces(1);
   if File.Covalent(t,t+1) == 0,
-    A(t+1) = A(t+1) + 4;
+    A(t+1) = A(t+1) + spaces(2);
   end
   if (File.NT(t).Chain ~= File.NT(t+1).Chain),
-    A(t+1) = A(t+1) + 8;
+    A(t+1) = A(t+1) + spaces(3);
     nc = [nc t+1];
   end
 end
-A(end+1) = A(end) + 12;
+A(end+1) = A(end) + spaces(4);
 mA = max(A);
 d = find(diff(A) > 1);                  % locations of jumps in A
 d = [0 d];                              % prepend for the first nucleotide
@@ -226,12 +238,41 @@ axis equal
 axis([-1.2 1.2 -2 1.2]);
 axis off
 
-text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
-text(-1.2,-1.4,'Dark blue chords indicate nested Watson-Crick basepairs');
-text(-1.2,-1.5,'Red chords indicate non-nested Watson-Crick basepairs');
-text(-1.2,-1.6,'Cyan chords indicate nested non-Watson-Crick basepairs');
-text(-1.2,-1.7,'Green chords indicate non-nested non-Watson-Crick basepairs');
-text(-1.2,-1.8,'Yellow chords indicate stacking interactions');
-text(-1.2,-1.9,'Magenta chords indicate base-phosphate interactions');
+if View(7) > 0,
+
+% Color = (B==1).*(C==0) + 2*(B>1).*(B<14).*(C==0) + 3*(B==1).*(C>0) + 4*(B > 1).*(B < 14) .*(C>0) + 5*(B > 20) .* (B < 25);
+
+  text(-1.2,1.2,File.Filename,'HorizontalAlignment','Left');
+
+  if View(1) > 0,
+    cww = length(find(c == 1));
+    text(-1.3,-1.4,['Dark blue chords indicate the ' num2str(cww) ' nested Watson-Crick basepairs']);
+  end
+
+  if View(3) > 0,
+    nonnestcww = length(find(c == 3));
+    text(-1.3,-1.5,['Red chords indicate the ' num2str(nonnestcww) ' non-nested Watson-Crick basepairs']);
+  end
+
+  if View(2) > 0,
+    noncww = length(find(c == 2));
+    text(-1.3,-1.6,['Cyan chords indicate the ' num2str(noncww) ' nested non-Watson-Crick basepairs']);
+  end
+
+  if View(4) > 0,
+    nonnestnoncww = length(find(c == 4));
+    text(-1.3,-1.7,['Green chords indicate the ' num2str(nonnestnoncww) ' non-nested non-Watson-Crick basepairs']);
+  end
+
+  if View(5) > 0,
+    stack = length(find(c == 5));
+    text(-1.3,-1.8,['Yellow chords indicate the ' num2str(stack) ' stacking interactions']);
+  end
+
+  if View(6) > 0,
+    bph = length(find(c == 6));
+    text(-1.3,-1.9,['Magenta chords indicate the ' num2str(bph) ' base-phosphate interactions']);
+  end
+end
 
 end

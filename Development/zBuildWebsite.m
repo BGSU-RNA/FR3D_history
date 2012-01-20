@@ -2,6 +2,7 @@
 WhatToWrite = [0 1 0 0 0];           % which pieces to write right now
 WhatToWrite = [1 1 1 1 1];           % which pieces to write right now
 WhatToWrite = [1 0 0 0 0];           % which pieces to write right now
+WhatToWrite = [0 2 0 0 0];           % which pieces to write right now
 
 % WhatToWrite(1)  - html pages
 % WhatToWrite(2)  - circular diagram
@@ -88,18 +89,18 @@ for f = 1:length(Names),
   end
 end
 
-break
-
 % ------------------------------------------------- Write index files
 
-DN = [pwd filesep 'Web' filesep 'AnalyzedStructures' filesep FN];
+DN = [pwd filesep 'Web' filesep 'AnalyzedStructures'];
 
 if ~(exist(DN) == 7),        % if directory doesn't yet exist
   mkdir(DN);
 end
 
+fid = fopen([DN filesep 'full_list.txt'],'w');
 
+for i = 1:length(t(:,1)),
+  fprintf(fid,'%s\n', t{i,1});
+end
 
-
-fid = fopen([DN 'short_list.html'],'w');
-
+fclose(fid);

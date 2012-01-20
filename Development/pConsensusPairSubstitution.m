@@ -1,6 +1,6 @@
 % pConsensusPairSubstitution(a,b,f,File,F,Delete,L,Search) looks at the letter pairs corresponding to nucleotides a and b of the query motif in Search, 
 
-function [Score] = pConsensusPairSubstitution(a,b,f,File,F,Delete,L,Search)
+function [Score] = pConsensusPairSubstitution(a,b,f,File,F,Delete,L,Search,Verbose)
 
 method = 2;
 
@@ -26,7 +26,9 @@ end
   NT1 = File(f(c)).NT(i);               % retrieve the first nucleotide
   NT2 = File(f(c)).NT(j);               % retrieve the second nucleotide
 
-  fprintf('File %4s has %s%4s and %s%4s making %4s; consensus is %4s\n', File(f(c)).Filename, NT1.Base, NT1.Number, NT2.Base, NT2.Number, zEdgeText(File(f(c)).Edge(i,j)), zEdgeText(F.Edge(a,b)));
+  if Verbose > 0,
+    fprintf('File %4s has %s%4s and %s%4s making %4s; consensus is %4s\n', File(f(c)).Filename, NT1.Base, NT1.Number, NT2.Base, NT2.Number, zEdgeText(File(f(c)).Edge(i,j)), zEdgeText(F.Edge(a,b)));
+  end
 
   newScore = pIsoScore(F.Edge(a,b),NT1.Base,NT2.Base,method,ExemplarIDI,ExemplarFreq);
                                              % use consensus edge

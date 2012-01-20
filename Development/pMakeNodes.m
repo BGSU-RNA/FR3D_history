@@ -2,13 +2,17 @@
 
 function [Node] = pMakeNodes(File,NTNumber,LastNTNumber,Truncate,Interact,Node,n)
 
+if nargin < 2,
+  NTNumber = 1;
+end
+
 load PairExemplars
 
 Verbose = 1;
 
 method = 2;                       % method for assigning pair subst probs
 
-cdepth  = 7;                      % how far to look ahead for a cluster
+cdepth  = 10;                      % how far to look ahead for a cluster
 jcdepth = 4;                      % how far to look for a junction cluster
 
 if nargin < 4,
@@ -54,12 +58,15 @@ N = length(File.NT);                       % number of nucleotides in File
 E = abs(fix(File.Edge));                   % don't distinguish subcategories
 G = E .* (E < 13) .* (E ~= 0);             % consider basepairing only
                                            % don't consider bifurcated now
+H = G .* (File.Crossing == 0);             % nested pairs only
 
-if nargin == 2,
+if nargin <3,
   LastNTNumber = N;
 elseif strcmp(class(LastNTNumber),'cell'),
   LastNTNumber = zIndexLookup(File,LastNTNumber);
 end
+
+% ------------------------------------------ Store indices of interacting bases
 
 if nargin < 5,
  for a = 1:N,                              % loop through nucleotides
@@ -70,6 +77,7 @@ if nargin < 5,
  end
 end
 
+% ------------------------------------------ Set up initial values of counters
 a  = NTNumber;                             % first index; current index
 A  = a;                                    % previous interacting base on left
 AA = a;                                    % previous cWW base on left
@@ -92,6 +100,28 @@ Node(n).LeftIndex = a;
 Node(n).RightIndex= B;
 Node(n).Insertion = [];                    % make sure this field exists
 Node(n).id        = '';                    % make sure this field exists
+Node(n).leftLengthDist = [];
+Node(n).leftLetterDist = [];
+Node(n).rightLengthDist = [];
+Node(n).rightLetterDist = [];
+Node(n).LeftLetter = '';
+Node(n).RightLetter = '';
+Node(n).Comment = '';
+Node(n).NumLoops = [];
+Node(n).Edge = [];
+Node(n).Delete = [];
+Node(n).SubsProb = [];
+Node(n).Z = [];
+Node(n).MiddleIndex = [];
+Node(n).P = [];
+Node(n).PIns = [];
+Node(n).subtype = [];
+Node(n).Left = [];
+Node(n).Right = [];
+Node(n).InsertionComment = '';
+Node(n).IBases = [];
+Node(n).InteractionComment = '';
+
 
                                            % probe for insertions
 while sum(G(a,a+1:B)) == 0,                % no interaction w/in this loop
@@ -118,11 +148,11 @@ if Verbose > 0,
   fprintf('%3d Initial %s:%s and %s:%s\n', n, File.NT(Node(n).LeftIndex).Number, File.NT(a).Number, File.NT(Node(n).RightIndex).Number, File.NT(B).Number);
 end
 
-% -----------------------------
+% ---------------------------------------------------------------------------
 
 EndLoop = 0;                               % flag for the end of the loop
 
-while (EndLoop == 0) & (a <= N),           % while not the end of the loop,
+while (EndLoop == 0) & (a <= LastNTNumber), % while not the end of the loop,
 
   b = Interact{a}.Index(1);                % index of what a interacts with
 
@@ -139,20 +169,27 @@ while (EndLoop == 0) & (a <= N),           % while not the end of the loop,
 
     % ---------------------------------- Check for junction
 
-    % check to see if a and b are now in a new loop with cWW's
+    % check to see if a and b are now in a new nested loop
 
-    r = a;
-    s = b;
-    t = b+1;
-    u = B;
+    r = a;                               % leftmost index of a cWW
+    rr= a;                               % start of current loop
 
+    while sum(H(r,(r+1):B) > 0) == 0 && r < B,
+                                         % if r does not make a nested pair,
+      r = r + 1;
+    end
+    
+    s = Interact{r}.Index(1);            % what it interacts with
+    t = s+1;                             % next after that
+    u = B;                               % end of current known loop
+
+%[r s t u]
 %[File.NT(a).Number ' ' File.NT(b).Number ' ' File.NT(B).Number]
 %[a b B]
 
-
-    if (sum(sum(G(t:u,t:u) == 1))         > 0) && ...
-       (sum(sum(G(a+1:b-1,a+1:b-1) == 1)) > 0),
-                    % there are helices between a and b and between b+1 and B
+    if (sum(sum(H(t:u,t:u) == 1)) > 0) && ...
+       (sum(sum(H(r:s,r:s) == 1)) > 0),
+                    % there are helices between r and s and between t and u
 
       C1 = full(sum(sum(G(r:r+jcdepth,t:t+jcdepth))));   % junction cluster 1-3
       C2 = full(sum(sum(G(r:r+jcdepth:u-jcdepth:u))));   % junction cluster 1-4
@@ -162,6 +199,9 @@ while (EndLoop == 0) & (a <= N),           % while not the end of the loop,
 %[C1 C2 C3 C4]
 
       % ------------------ Remove junction clusters --------------------
+      % Note:  this is only happening between the two loops identified so
+      % far, but there may be more loops, and between them these interactions
+      % are not being removed!
 
       if C1 > 0,
         G(r:r+jcdepth,t:t+jcdepth) = 0*G(r:r+jcdepth,t:t+jcdepth);
@@ -185,16 +225,36 @@ while (EndLoop == 0) & (a <= N),           % while not the end of the loop,
 
         junc = [];                          % indices where loops start & end
 
-        while (sum(sum(G((r+1):(s-1),(r+1):(s-1)) == 1)) > 0) && ...
-              (sum(sum(G((s+1):(u),(s+1):(u)) == 1)) > 0),
+        while (sum(sum(H((r+1):(s-1),(r+1):(s-1)) > 0)) > 0) && ...
+              (sum(sum(H((s+1):(u),(s+1):(u)) > 0)) > 0),  % still two loops
 
-          while (sum(G(s,(s+1):(u))) == 0) && (s < u),
-            s = s + 1;
+          % probe for start of next block of nested pairs, 
+          % s+1 to t-1 is junction strand
+          while sum(H(t,(t+1):B) > 0) == 0 && t < u,
+                                         % if t does not make a nested pair,
+            t = t + 1;
           end
-          junc = [junc; [r s-1]];           % store limits of this loop
 
-          r = s;                            % move to next loop
-          s = Interact{r}.Index(1);        
+          % decide which loop gets the strand between the loops
+          % these are the indices that it could interact with in a cluster
+
+          rrr = unique([rr:min(r+cdepth,s) max(rr,s-cdepth):s]);
+          ttt = unique([t:min(t+cdepth,u) max(Interact{t}.Index(1)-cdepth,t):u]);
+
+          % here the criterion is simple, just choose whichever has the
+          % larger number of interactions.  But it would be better yet to
+          % split the loop, as with 556:567 in 2avy
+
+          if sum(sum(G(rrr,(s+1):(t-1))>0)) >= sum(sum(G((s+1):(t-1),ttt))),
+            junc = [junc; [rr t-1]];           % store limits of this loop
+          else
+            junc = [junc; [rr s]];
+          end
+
+          r  = junc(end,2) + 1;           % NT after the first loop ends
+          rr = r;                         % copy of that, for probing forward
+          s  = Interact{t}.Index(1);      % the far side of the next loop
+          t  = s + 1;                     % one beyond that
         end
 
         junc = [junc; [r u]];             % store limits of this last loop
@@ -403,6 +463,8 @@ end
         Node(n).SubsProb = pIsoScore(File.Edge(a,b),Node(n).LeftLetter, ...
                                  Node(n).RightLetter,method,ExemplarIDI,ExemplarFreq);
 
+        Node(1).Edge(a,b) = File.Edge(a,b);
+
         L = Node(n).lpar(1,1);
         R = Node(n).rpar(1,1);
         X = 0:10;     
@@ -588,6 +650,8 @@ end
 
             Node(n).SubsProb(:,:,K) = pIsoScore(File.Edge(i1,i2), ...
        File.NT(i1).Code, File.NT(i2).Code,method,ExemplarIDI,ExemplarFreq);
+
+            Node(1).Edge(i1,i2) = File.Edge(i1,i2);
             K  = K + 1;
         end
 
@@ -607,6 +671,8 @@ end
 
             Node(n).SubsProb(:,:,K) = pIsoScore(File.Edge(i1,i2), ...
          File.NT(i1).Code, File.NT(i2).Code,method,ExemplarIDI,ExemplarFreq);
+
+            Node(1).Edge(i1,i2) = File.Edge(i1,i2);
             K  = K + 1;
         end
 
@@ -626,10 +692,12 @@ end
 
             Node(n).SubsProb(:,:,K) = pIsoScore(File.Edge(i1,i2), ...
      File.NT(i1).Code, File.NT(i2).Code,method,ExemplarIDI,ExemplarFreq);
+            Node(1).Edge(i1,i2) = File.Edge(i1,i2);
             K  = K + 1;
         end
 
         a = aa + 1;                           % current base on left
+                                              % skip over rest of cluster
         B = bb - 1;                           % current base on right
 
       end                                          % basepair or cluster
@@ -780,7 +848,61 @@ end
     EndLoop = 1;
   end
 
-end                                       % while loop
+  % ---------------------------------------- Insert motif model when needed
+
+  if isfield(File,'Nucl'),
+    if ~isempty(File.Nucl(a).Motif),
+      fprintf('Current node is %d\n', n);
+      Node(n)
+      fprintf('Nucleotide %s%s is part of motif %s\n', File.NT(a).Base, File.NT(a).Number, File.Nucl(a).Motif.Name);
+
+      File.Nucl(a).Motif(1)
+
+      ModelIndex = File.Nucl(a).Motif(1).Index;
+
+      Indices = File.Nucl(a).Motif(1).Indices;
+
+      [y,p] = sort(Indices);               % some IL's are rotated 180 degrees
+
+      [MotifNode,Truncate] = pMakeModelFromSearchSaveFile(File.Motifs(ModelIndex).Name,0,0);
+      Truncate
+
+if ModelIndex == -9,
+  keyboard
+end
+
+      MotifNode = MotifNode(2:end);        % omit Initial node; awkward
+      if ~strcmp(MotifNode(end).type,'Hairpin'),
+        MotifNode = MotifNode(1:(end-1));  % remove artificial hairpin from IL
+      end
+
+      for nn = 1:length(MotifNode),
+% MotifNode(nn)
+        Node(n+nn) = MotifNode(nn);
+        Node(n+nn).nextnode = n+nn+1;
+        Node(n+nn).LeftIndex = Node(n+nn).LeftIndex + a - 1;
+        Node(n+nn).RightIndex = B - Node(n+nn).RightIndex + 1;
+        Node(n+nn).Comment = [' // Node from model: ' File.Motifs(ModelIndex).Name ' for nucleotide ' File.NT(a).Base num2str(File.NT(a).Number) ' ' Node(n+nn).Comment];
+
+%        Node(n+nn)
+      end
+
+      n = n + length(MotifNode);
+
+      if strfind(File.Motifs(ModelIndex).Name,'_HL'),
+        EndLoop = 1;
+      else
+        % reset counters to move just beyond the current motif
+        % because of how internal loops can be rotated 180 degrees,
+        % we need to look at the ends of each strand 
+        B = max(File.Nucl(a).Motif(1).Indices([Truncate - 1 end])) - 1;
+        a = min(File.Nucl(a).Motif(1).Indices([Truncate - 1 end])) + 1;
+      end
+
+    end
+  end
+
+end                                       % while (EndLoop == 0) & (a <= N),
 
 % ---------------------------------- Poisson distribution for lengths -------
 
