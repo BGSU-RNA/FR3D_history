@@ -79,6 +79,9 @@ if Reclassify > 0,
     p.Filename = File(f).Filename;
     p.C1pC1p   = zDistance(Ni.Sugar(1,:),Nj.Sugar(1,:));  % C1' - C1' distance
     p.Resol    = File(f).Info.Resolution;
+    if isempty(p.Resol)
+      p.Resol = NaN;
+    end
 
     if ~isempty(p),
       Pair(pc) = p;                                % store this pair

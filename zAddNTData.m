@@ -65,6 +65,7 @@ F = length(File);
 
 for i = 1:length(Index),             
   if Index(i) == 0,
+    File(F+1).Filename = 'Fictitious';
     File(F+1).NumNT = 0;               % create a fictitious file
     Index(i) = F+1;                    % point to the fictitious file
   end

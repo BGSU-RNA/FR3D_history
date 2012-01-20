@@ -35,6 +35,12 @@ end
   NT.Fit = Q;
   zPlotOneNT(NT,VP);
 
+  H = [13 9 14 10];
+
+  Z = [Q(H(code),:); Q(1,:)];
+  k = [1 2]; 
+  plot3(Z(k,1),Z(k,2),Z(k,3),'Color',0.5*[1 1 1],'LineWidth',2,'LineStyle','-');
+
   if textoption > 0,
     hold on
 

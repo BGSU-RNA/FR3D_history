@@ -13,12 +13,9 @@ for f = 1:length(File),
 
 % -------- First screening of base pairs ------------------------------------ 
 
-DistCutoff = 15;                                % max distance for interaction
+DistCutoff = 16;                                % max distance for interaction
 [i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance > 0)); 
                                                 % screen by C-C distance
-k = find(abs(i-j) > 1);
-i = i(k);                                       % exclude sequential pairs
-j = j(k);
 
 % -------- Screen and analyze base pairs ------------------------------------ 
 % 1-AA  2-CA  3-GA  4-UA  5-AC  6-CC  7-GC  8-UC 

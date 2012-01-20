@@ -87,7 +87,7 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   % ---------- Eliminate bad hydrogen bonds
 
-  if (abs(a) < 14),                             % planar interaction
+  if (abs(a)<14) && (abs(a) - fix(abs(a)) < 0.5),% standard planar interaction
     if (length(Pair.Hydrogen) > 0),             % with hydrogens to check
       goodhydrogens = 0;
       for h = 1:length(Pair.Hydrogen),

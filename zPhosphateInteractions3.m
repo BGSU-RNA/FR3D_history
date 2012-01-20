@@ -13,7 +13,7 @@ for f = 1:length(File),
 
 % -------- First screening of base pairs ------------------------------------ 
 
-DistCutoff = 15;                                % max distance for interaction
+DistCutoff = 16;                                % max distance for interaction
 [i,j] = find((File(f).Distance < DistCutoff).*(File(f).Distance > 0)); 
                                                 % screen by C-C distance
 k = find(abs(i-j) > 1);
@@ -43,7 +43,7 @@ for k = 1:length(i),                            % loop through possible pairs
   o2 = (S - N1.Center) * N1.Rot;
   P = 'O5'; S = N2.Sugar( 9,:);
   o5 = (S - N1.Center) * N1.Rot;
-  P = 'O3'; S = N3.Sugar( 5,:);
+  P = 'O3'; S = N2.Sugar(13,:);
   o3 = (S - N1.Center) * N1.Rot;
 
   P = 'All';
@@ -91,7 +91,7 @@ for v = 1:4,
   rotate3d on
   axis equal
   view(2)
-  saveas(gcf,['PhosphateInteractions_' P '_' L{v} '.pdf'],'pdf')
-  saveas(gcf,['PhosphateInteractions_' P '_' L{v} '.fig'],'fig')
+%  saveas(gcf,['PhosphateInteractions_' P '_' L{v} '.pdf'],'pdf')
+  saveas(gcf,['Phosphate Interactions\PhosphateInteractions_' P '_' L{v} '.fig'],'fig')
 
 end
