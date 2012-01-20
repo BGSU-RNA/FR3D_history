@@ -18,9 +18,10 @@ goal = 'stacks';
 bp = 1;
 goal = 'basepairs';
 
-%clear SubsData
-%clear SubsMatrices
-%clear Counts
+if 0 > 1,
+ clear SubsMatrices
+ clear Counts
+end
 
 SubsMatrices{max(i),max(j)} = [];
 

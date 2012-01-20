@@ -1,5 +1,7 @@
 % Produce a text output in N3 format of the FR3D-classified interactions in the given RNA molecule
 
+% File = zAddNTData('1J1U');
+
 % function [T] = zTextRNAOAssertions(File)
 
 clear T

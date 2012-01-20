@@ -170,7 +170,7 @@ for i=1:min(s,NumToOutput),
       for j=(k+1):length(Indices),
         C1 = File(f).NT(Indices(k)).Code;
         C2 = File(f).NT(Indices(j)).Code;
-        Text{i+t} = [Text{i+t} sprintf('%6s', zEdgeText(File(f).Edge(Indices(k),Indices(j)),0,C1,C2))];
+        Text{i+t} = [Text{i+t} sprintf('%6s', zEdgeText(File(f).Edge(Indices(k),Indices(j)),1,C1,C2))];
       end
     end
     

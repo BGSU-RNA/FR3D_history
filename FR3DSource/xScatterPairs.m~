@@ -24,6 +24,7 @@ else
   ppp = 1:L;                                         % default ordering
 end
 
+
 if exist('PairExemplars.mat','file') > 0,
   load('PairExemplars','Exemplar');
 else
@@ -90,8 +91,6 @@ if Reclassify > 0,
     if isempty(p.Resol)
       p.Resol = NaN;
     end
-
-    p.CenterCenter = (Ni.Center-Nj.Center)*Ni.Rot; % vector shift, center to ce
 
     if ~isempty(p),
       Pair(pc) = p;                                % store this pair
@@ -267,42 +266,6 @@ xlabel('Perpendicular to glycosidic bond');
 ylabel('Parallel to glycosidic bond');
 zlabel('Vertical with respect to first base');
 
-% ------------------------------------- Plot base centers -------------
-
-if exist('centercenter.txt','file') > 0,
-
-figure(44)
-clf
-
-%set(gcf,'Renderer','OpenGL');     % fast rotation
-%set(gcf,'Renderer','zbuffer')
-%set(gcf,'Renderer','painters')
-
-for k = 1:length(Pair),                              % Loop through pairs
-  p      = Pair(k);
-  c(k)   = Color(k);
-  e(k,:) = -p.CenterCenter;                           % center-center vector
-
-  if ViewParam.Normal == 1,
-    v = p.Normal/3;                                      % add normal vector
-    plot3([e(k,1) e(k,1)+v(1)], [e(k,2) e(k,2)+v(2)], [e(k,3) e(k,3)+v(3)], 'b');
-    hold on
-  end
-end
-
-scatter3(e(:,1),e(:,2),e(:,3),18*ones(size(c)),c,'filled')
-
-if max(modcode) == min(modcode),                 % all have same first base
-  zPlotStandardBase(modcode,0,1);                % plot center at the origin
-  Lett = 'ACGU';  
-  Title =[Lett(modcode) ' base center at the origin, center of second base shown by dots'];
-else
-  Title = ['center of second base shown by dots'];
-end
-view(2)
-axis equal
-end
-
 %----------------------------------------------------- Plot angle and normal
 figure(ViewParam.FigNum + 1)
 clf
@@ -410,7 +373,6 @@ end
 
 
 end
-
 % ---------------------------------------------------- Display the menu
 
   k=menu('Scatterplot controls',...

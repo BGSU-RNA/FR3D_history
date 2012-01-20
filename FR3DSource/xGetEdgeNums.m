@@ -275,6 +275,7 @@ end
 
 for i=1:length(lim)-1                    % loop through tokens
   Token = str(lim(i)+1:lim(i+1)-1);     % extract next token
+
   if Token(1) == '~',                   % this token, opposite of usual sense
     Token = Token(2:length(Token));
     Reverse = 1;
@@ -295,8 +296,24 @@ for i=1:length(lim)-1                    % loop through tokens
   newBP2   = [];
   CP       = 0;
   nCP      = 0;
+  bb       = 0;
 
-  if isempty(EdgeNum)                      % Token IS a string
+  if ~isempty(EdgeNum)                      % Token IS a string
+
+    if any (fix(abs(EdgeNum)) == [1 2 7 8]),
+      EdgeNum = [EdgeNum -EdgeNum];
+    end
+
+    if Near > 0,
+      NearEdgeNum = [];
+      for j = 1:length(EdgeNum),
+        e = EdgeNum(j);
+        NearEdgeNum = [NearEdgeNum sign(e) * (100 + abs(e))];
+      end
+      EdgeNum = NearEdgeNum;
+    end
+
+  else
     edg  = find(strcmp(EdgeStr,Token));    % case sensitive
     edgi = find(strcmpi(EdgeStr,Token));   % case insensitive
     pair = find(strcmpi(Pairs,Token));     % case insensitive

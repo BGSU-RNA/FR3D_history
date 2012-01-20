@@ -11,23 +11,51 @@ else
   D = File.Distance;
 end
 
+% --------- Check to see if subcategories are being used for this pair
+
+subcat = 0;
+
+if isfield(Query,'EdgeNums'),
+  for n = 1:length(Query.EdgeNums{p,q}),
+    if fix(Query.EdgeNums{p,q}(n)) ~= Query.EdgeNums{p,q}(n),
+      subcat = 1;
+    end
+  end
+end
+
+if isfield(Query,'ExcludeEdges'),
+  for n = 1:length(Query.ExcludeEdges{p,q}),
+    if fix(Query.ExcludeEdges{p,q}(n)) ~= Query.ExcludeEdges{p,q}(n),
+      subcat = 1;
+    end
+  end
+end
+
 % --------- Screen according to interaction between nucleotides
 
 if isfield(Query,'EdgeNums'),           % if screening by edges, incl stacking
   if length(Query.EdgeNums{p,q} > 0),
     E = sparse(zeros(size(D)));
     for i=1:length(Query.EdgeNums{p,q}),
-      E = E + (fix(File.Edge) == Query.EdgeNums{p,q}(i));
+      if subcat == 0,
+        E = E + (fix(File.Edge) == Query.EdgeNums{p,q}(i));
+      else
+        E = E + (File.Edge == Query.EdgeNums{p,q}(i));
+      end
     end
     D = D .* (E > 0);                         % include only those that match
   end
 end
-    
+
 if isfield(Query,'ExcludeEdges'),                 % if excluding by edges
   if length(Query.ExcludeEdges{p,q} > 0),
     E = sparse(zeros(size(D)));
     for i=1:length(Query.ExcludeEdges{p,q}),
-      E = E + (fix(File.Edge) == Query.ExcludeEdges{p,q}(i));
+      if subcat == 0,
+        E = E + (fix(File.Edge) == Query.ExcludeEdges{p,q}(i));
+      else
+        E = E + (File.Edge == Query.ExcludeEdges{p,q}(i));
+      end
     end
     D = D .* (E == 0);
   end
