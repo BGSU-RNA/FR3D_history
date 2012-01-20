@@ -173,13 +173,16 @@ case 'StackedPair'
   Query.Diff{1,2}      = '> <5';
   Query.Diff{4,3}      = '< <5';
   Query.Edges{1,4}     = 'cWW';
-  Query.Edges{2,3}     = 'tSH';
+  Query.Edges{2,3}     = 'cWW';
   Query.Edges{1,2}     = 'stack';
+  Query.Edges{3,4}     = 'stack';
+  Query.Mask           = 'GGNN';
 
 case 'Stack'
   Query.Description    = 'Two stacked bases';
   Query.Mask           = 'AA';
   Query.Edges{1,2}     = 'stack';
+  Query.SearchFiles    = {'1s72'};
 
 case 'StackedOncWW'
   Query.Description    = 'What stacks on a cWW?';

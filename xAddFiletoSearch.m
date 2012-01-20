@@ -31,6 +31,7 @@ if ~isempty(File),
     Search.CandidateFilenames{f} = File(f).Filename;
     Search.File(f).Filename = File(f).Filename;
     Search.File(f).NumNT    = File(f).NumNT;
+    Search.File(f).Info     = File(f).Info;
 
     Indices = Candidates(i,1:N);               % indices of nucleotides
 

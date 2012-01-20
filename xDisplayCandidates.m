@@ -111,6 +111,7 @@ while stop == 0,
     ii = i;
   end
   i = ii;
+  i = min(i,length(Display));
 
   figure(i)
   [az,el]=view;                          % get current view (orientation)
@@ -205,7 +206,11 @@ while stop == 0,
       xAlignCandidates(File(FIndex),Search,1)
 
     case 15
-      xScatterPairs(Search,1,2)
+      ViewParam.Color  = 6;
+      ViewParam.FigNum = length(Display)+1;
+      ViewParam.Normal = 0;
+      ViewParam.ClassLimits = 1;
+      xScatterPairs(Search,1,2,ViewParam);
 
     case 16                                     % quit Display
       if exist('fidOUT','var')
