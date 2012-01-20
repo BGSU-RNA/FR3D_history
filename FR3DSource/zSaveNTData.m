@@ -13,6 +13,8 @@ for f=1:length(Files),
     mkdir('PrecomputedData');
   end
 
+  File.Filename = upper(File.Filename);
+
   if File.NumNT >= 0,
 
    if File.SizeCode == 1,

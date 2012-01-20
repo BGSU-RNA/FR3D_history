@@ -6,7 +6,7 @@
 
 % Subcat = 1, include subcategories, Subcat = 0, don't
 
-function [Y,Z,DD] = zExemplarTable(Category,threshold,Subcat,Order)
+function [Y,Z,DD] = zExemplarTable(Category,threshold,Subcat)
 
 if nargin < 1,
   Category = 1;
@@ -106,8 +106,8 @@ for ca = 1:length(Category),
        F.NT(1) = E.NT1;
        F.NT(2) = E.NT2;
        F.Filename = E.Filename;
-       zDisplayNT(F,[1 2],ViewParam);
-       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
+%       zDisplayNT(F,[1 2],ViewParam);
+%       zPlotHydrogenBonds(E.NT1,E.NT2,E.Class,E.NT1.Rot,E.NT1.Fit(1,:));
 
        view(2)
        grid off
@@ -123,9 +123,11 @@ for ca = 1:length(Category),
        rotate3d on
        plotted(pc2) = 1;
 
+
       if (E.Count >= 1),
        B(m) = E;                                % store this exemplar
        Lab{m} = [E.NT1.Base E.NT2.Base zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',E.Pair.Class) ' ' E.Filename ' ' sprintf('%4d',E.Count)];
+       Cat{m} = upper(zEdgeText(E.Class,Subcat,E.NT1.Code,E.NT2.Code));
        m = m + 1;
 
        % ------- AA, CC, GG, UU pairs are not very symmetric, so store twice
@@ -137,6 +139,7 @@ for ca = 1:length(Category),
          B(m).NT2 = E.NT1;
          B(m).Class = -E.Class;
          Lab{m} = [B(m).NT1.Base B(m).NT2.Base zEdgeText(B(m).Class,Subcat,E.NT1.Code,E.NT2.Code) ' ' sprintf('%5.1f',B(m).Pair.Class) ' ' B(m).Filename ' ' sprintf('%4d',B(m).Count) ];
+         Cat{m} = upper(zEdgeText(B(m).Class,Subcat,E.NT1.Code,E.NT2.Code));
          m = m + 1;
        end
       end
@@ -162,44 +165,28 @@ j = 1;
 for a = 1:length(B),
   for b = (a+1):length(B),
 
-    R1 = B(a).NT2.Rot' * B(a).NT1.Rot;
-    R2 = B(b).NT1.Rot' * B(b).NT2.Rot;
-
-    ang = zAngleOfRotation(R1 * R2);
-
-    t1 = (B(a).NT2.Sugar(1,:) - B(a).NT1.Sugar(1,:))*B(a).NT1.Rot - (B(b).NT2.Sugar(1,:) - B(b).NT1.Sugar(1,:))*B(b).NT1.Rot;
-    t2 = (B(a).NT1.Sugar(1,:) - B(a).NT2.Sugar(1,:))*B(a).NT2.Rot - (B(b).NT1.Sugar(1,:) - B(b).NT2.Sugar(1,:))*B(b).NT2.Rot;
-
-    cp = abs(norm(B(a).NT2.Sugar(1,:) - B(a).NT1.Sugar(1,:)) ...
-           - norm(B(b).NT2.Sugar(1,:) - B(b).NT1.Sugar(1,:)));
-
     % calculate isodiscrepancy
 
-    D(a,b) = sqrt((4*ang)^2 + (t1*t1' + t2*t2')/2 + (3*cp)^2);
+    D(a,b) = zIsoDiscrepancy(B(a).NT1,B(a).NT2,B(b).NT1,B(b).NT2);
     D(b,a) = D(a,b);
 
-    G(j,:) = [6*ang sqrt(t1*t1') sqrt(t2*t2') 3*cp a b D(a,b)];
+    RD(a,b) = zIsoDiscrepancy(B(a).NT1,B(a).NT2,B(b).NT2,B(b).NT1);
+    RD(b,a) = RD(a,b);               % reverse order, for family distance
+
     j = j + 1;
 
   end
 end
 
-% ----------------------------------------- Cluster analysis and graph
+% ----------------------------------------- Cluster analysis
 
 Y = squareform(full(D));                       % convert to a vector
-
-DD = full(D);
-
 Z = linkage(Y,'average');                      % compute cluster tree
+
+% ----------------------------------------- Display dendrogram
+
 figure(fix(Category(ca))+13)
 [H,T,p] = dendrogram(Z,0,'colorthreshold',threshold,'orientation','left','labels',Lab);
-
-p
-
-for j =1:length(Lab),
-  fprintf('%s ', Lab{j}(1:2));
-end
-fprintf('\n');
 
 h = gcf;
 hh = gca;
@@ -210,13 +197,13 @@ elseif length(Lab) > 40,
 else
   set(hh,'FontSize',8);
 end
-orient landscape
+%orient landscape
 %print(h,'-depsc2',['Isostericity\ClusterIsoDisc' zEdgeText(Category)]);
 
+% ------------------------------------------ Print table of isodiscrepancies
 
-% ------------------------------- Print table of isodiscrepancies
-
-p = zOrderGroups(Y,Z,DD);
+DD = full(D);
+p = zOrderGroups(Y,Z,DD);               % put instances in order
 
 DDD = DD(p,p);                          % re-order according to p
 [s,t] = size(DDD);
@@ -230,19 +217,26 @@ else
   end
   fprintf('\n');
 end
-fprintf('               ');
+fprintf('                      ');
 for j=1:t,
-  fprintf('%6s ', Lab{p(j)}(1:6));
+  fprintf('%6s', Lab{p(j)}(1:6));
 end
 fprintf('\n');
+
 for i=1:s,
-  fprintf('%24s ', Lab{p(i)});
+  Text{i} = sprintf('%24s ', Lab{p(i)});
   for j= 1:t,
-    fprintf('%5.2f ', DDD(i,j));
+    Text{i} = [Text{i} sprintf('%5.2f ', DDD(i,j))];
   end
-  fprintf('\n');
 end
+
+for i = 1:s,
+  fprintf('%s\n', Text{i});
+end
+
 fprintf('\n');
+
+% ------------------------------------------ Display graph of isodiscrepancies
 
 DDDD = zeros(s+1,t+1);
 DDDD(1:s,1:t) = DDD;
@@ -292,8 +286,45 @@ set(gca,'YTickLabel',SLab(p),'FontSize',FS)
 saveas(gcf,['Isostericity' filesep Title '.pdf'],'pdf');
 saveas(gcf,['Isostericity' filesep Title '.png'],'png');
 
+% ----------------------------------------- Calculate avg dist btw families
+
+Fam{1}  = 'cWW';
+Fam{2}  = 'tWW';
+Fam{3}  = 'cWH';
+Fam{4}  = 'tWH';
+Fam{5}  = 'cWS';
+Fam{6}  = 'tWS';
+Fam{7}  = 'cHH';
+Fam{8}  = 'tHH';
+Fam{9}  = 'cHS';
+Fam{10} = 'tHS';
+Fam{11} = 'tSS';
+Fam{12} = 'cSS';
+
+MeanD = [];
+
+minD = min(D,RD);
+
+for p = 1:12,
+  i = find(ismember(Cat,upper(Fam{p})));
+  if ~isempty(i),
+    for q = 1:12,
+      j = find(ismember(Cat,upper(Fam{q})));
+      if ~isempty(j),
+%        MeanD(p,q) = mean(mean(minD(i,j)));
+        MeanD2(p,q) = mean(mean(D(i,j)));
+        MeanD3(p,q) = mean(mean(RD(i,j)));
+        MeanD(p,q)  = min(MeanD2(p,q),MeanD3(p,q));
+      end
+    end
+  end
+end
+
+zClusterGraph(MeanD,Fam,3);
+
 return
 
+% -------------------------------------------------------------------------
 % ----------------------------------------- Display nearby exemplars
 
 % ------------ display in dendrogram order

@@ -40,7 +40,7 @@ for z = 1:length(Z(:,1)),
   gc = gc + 1;
 end
 
-q = Group{end}
+q = Group{end};
 
 
 return

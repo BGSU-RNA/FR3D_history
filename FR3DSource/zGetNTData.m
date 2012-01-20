@@ -16,7 +16,7 @@
 
 function [Files] = zGetNTData(Filenames,ReadCode,SizeCode,Verbose)
 
-CurrentVersion = 4.9;                       % version number of class limits
+CurrentVersion = 5.0;                       % version number of class limits
 
 if nargin < 2,
   ReadCode = 0;

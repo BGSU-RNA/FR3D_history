@@ -64,24 +64,18 @@ end
 
 % ------------------------------------------- Calc more distances if needed -
 
-if Query.Geometric > 0,                       % if a geometric search
-  tic                                         % keep track of time
-  CalcFlag = 0;                               % if more distances were needed
-  for f=1:length(SIndex),
-    i = SIndex(f);
-    if ceil(Query.DistCutoff) > ceil(max(max(File(i).Distance))),
-      c = cat(1,File(i).NT(1:File(i).NumNT).Center);
-      File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
-             % sparse matrix of center-center distances, up to Query.DistCutoff
-      if length(File(i).NT) > 10,
-%        zSaveNTData(File(i));                % don't bother, avoid mistakes
-%        drawnow;
-      end
-      CalcFlag = 1;
-    end
+for f=1:length(SIndex),
+  i = SIndex(f);
+  if isempty(File(i).Distance),
+    dmin = 0;
+  else
+    dmin = ceil(max(max(File(i).Distance)));
   end
-  if CalcFlag > 0,
-    fprintf('Calculated more distances in %5.3f seconds\n', toc);
+
+  if (ceil(Query.DistCutoff) > dmin) && (File(i).NumNT > 0),
+    c = cat(1,File(i).NT(1:File(i).NumNT).Center);
+    File(i).Distance = zMutualDistance(c,Query.DistCutoff); 
+             % sparse matrix of center-center distances, up to Query.DistCutoff
   end
 end
 

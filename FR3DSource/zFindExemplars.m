@@ -5,6 +5,8 @@
 pcodes = [6 7 13 14 15];
 pcodes = [1 5 6 7 9 11 13 14 15 16];    % pair codes to work on
 
+pcodes = [6 14 15 16];
+
 LMax = 500;                % maximum number of pairs to consider in each class
 
 load('PairExemplars','Exemplar');
@@ -23,9 +25,9 @@ Pairs{15} = 'GU';
 Pairs{16} = 'UU';
 
 if ~exist('File'),                           % if no molecule data is loaded,
-  [File,SIndex] = zAddNTData('Nonredundant_3_list',0);   % load PDB data
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0);   % load PDB data
 else
-  [File,SIndex] = zAddNTData('Nonredundant_3_list',0,File); % add PDB data if needed
+  [File,SIndex] = zAddNTData('NonRedundant_2008_02_21_list',0,File); % add PDB data if needed
 end                       
                           % must load full .mat files!
 File = File(SIndex);

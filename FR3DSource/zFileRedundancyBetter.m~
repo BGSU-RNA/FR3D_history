@@ -1,9 +1,0 @@
-
-load PDBInfo
-
-[y,i] = sort(n(:,2));            % sort by number of nucleotides
-
-n = n(i,:);
-t = t(i,:);
-
-t{1:20,9}

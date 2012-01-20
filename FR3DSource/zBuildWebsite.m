@@ -1,7 +1,10 @@
 
-StartFile = '299D';
+% StartFile = '299D';
+StartFile = '';
 
 [NamesLists,Names] = mGetPDBFilenames;
+
+%Names = zReadPDBList('NonRedundant_2008_02_21_list');
 
 s = 1;
 

@@ -167,9 +167,9 @@ function [Pair] = zAnalyzePair(N1,N2,CL,Exemplar,Displ)
 
   if (fix(a) >= 21) && (fix(a) < 24) && (Pair.StackingOverlap == 0),
     a = 30;
-    if N1.Loc(1,1) < N2.Loc(1,1),     % only print each pair once
-      fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) have no stacking overlap\n', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
-    end
+%    if N1.Loc(1,1) < N2.Loc(1,1),     % only print each pair once
+      % fprintf('Bases %1s%5s(%1s) and %1s%5s(%1s) have no stacking overlap\n', N1.Base, N1.Number, N1.Chain, N2.Base, N2.Number, N2.Chain);
+%    end
   end
 
   % -------------------------- find distance to nearest exemplar

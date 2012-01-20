@@ -1,6 +1,5 @@
 % zCountInstancesofPairs summarizes information on pair interaction frequency from the exemplar file
 
-
 MaxCat = 25;
 
 Count = zeros(4,4,MaxCat);
