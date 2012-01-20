@@ -5,6 +5,7 @@ function [Edge] = zEdgeFromEdgeText(e)
   e = strrep(e,' ','');
 
   switch e
+    case '' , Edge = 0;
     case 'cWW', Edge = 1;
     case 'tWW', Edge = 2;
     case 'cWH', Edge = 3;
