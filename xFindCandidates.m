@@ -21,7 +21,7 @@ for f=1:length(File),
     for j=1:(i-1)
       PS{i,j} = xPairwiseScreen(File(f),Codes,Model,i,j,PC);
       PS{j,i} = PS{i,j}';
-      NNZ(i,j) = nnz(PS{i,j});          % number of non-zero entries
+      NNZ(i,j) = nnz(PS{i,j});              % number of non-zero entries
       NNZ(j,i) = NNZ(i,j);
     end
   end
@@ -29,11 +29,14 @@ for f=1:length(File),
   Perm = sFindPermutation(NNZ);               % find best nucleotide order
   PS   = PS(Perm,Perm);                       % re-order nucleotides
 
-  [List,SS] = xFindPolyhedra(Model,Model.NumNT,PS);
+  [List,SS] = xFindPolyhedra(Model,min(9,Model.NumNT),PS);
 
   if ~isempty(List),
-    List(:,Perm) = List(:,1:Model.NumNT);     % re-order nucleotides
+    List(:,Perm) = List(:,1:min(9,Model.NumNT));     % re-order nucleotides
   end
+
+size(List)
+size(SS)
 
   %-----------------------------------------------------------------------
   for r = 10:Model.NumNT,              % additional nucleotides, if needed
@@ -41,7 +44,7 @@ for f=1:length(File),
       for q = 1:(r-1),
         S{r,q} = xPairwiseScreen(File(f),Codes,Model,r,q);
       end                              % end for q
-      [List,SS] = xAddNucleotide(Model,List,S,SS,r);
+        [List,SS] = xAddNucleotide(Model,List,S,SS,r);
     end                                % end if length(List(:,1)) > 0,
 %   fprintf('Adding nucleotide %2d took     %14.3f seconds\n',r,toc);
   end                                  % end for r

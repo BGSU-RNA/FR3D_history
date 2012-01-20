@@ -4,6 +4,7 @@
 
 function [TList,SS] = xFindPolyhedra(Model,num,PS)
 
+SS = [];
 A=PS{2,1};
 if num>2
     Cutoff=Model.SSCutoff;
@@ -60,7 +61,6 @@ end
 LL = 64000;                                % initial size for list storage
 TList = uint16(zeros(LL,num));
 count = 0;
-SS=0;
 switch num
     case 2
         TList   = [i j];
@@ -84,8 +84,9 @@ switch num
         [TList,count]=Case8(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB); 
         
     case 9
-        [TList,count,SS]=Case9(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB,CC,DD,EE,FF,GG,HH,II,JJ);
-        
+        SS = zeros(LL,1);
+        [TList,count,SS]=Case9(Cutoff,TList,SS,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB,CC,DD,EE,FF,GG,HH,II,JJ);
+        SS = SS(1:count,1);
 end
 TList = TList(1:count,:);
 
@@ -341,26 +342,25 @@ end
         end
     end
   %---------------------------------------------------------------
-    function [TList,count,SSts]=Case9(Cutoff,TList,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB,CC,DD,EE,FF,GG,HH,II,JJ)
-    SSts = 0;
-    for n=1:length(i),  
-      in = i(n);
+    function [TList,count,SS]=Case9(Cutoff,TList,SS,LL,i,j,count,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB,CC,DD,EE,FF,GG,HH,II,JJ)
+
+    for n=1:length(i),                         % loop through pairs
+      in = i(n);                               % indices of this pair
       jn = j(n);        
-      k = find(B(:,in) .* C(:,jn));
-      m = find(D(:,in) .* E(:,jn));
-      [mm,kk]  = find(F(m,k));
+      k = find(B(:,in) .* C(:,jn));            % k that agree with pair
+      m = find(D(:,in) .* E(:,jn));            % m that agree with pair
+      [mm,kk]  = find(F(m,k));                 % k and m that match too
         r = find(G(:,in) .* H(:,jn));
         s = find(K(:,in) .* L(:,jn));
         t = find(P(:,in) .* Q(:,jn));
         h = find(V(:,in) .* W(:,jn));
         u = find(CC(:,in) .* DD(:,jn));
-        for p = 1:length(kk),
-            kkkp = k(kk(p));
+        for p = 1:length(kk),                  % loop through tetrahedra
+            kkkp = k(kk(p));                   % tetrahedron in jn kkkp mmmp
             mmmp = m(mm(p));            
-            SSkm= A(jn,in) + B(kkkp,in) + C(kkkp,jn) ...
-                + D(mmmp,in) + E(mmmp,jn) + F(mmmp,kkkp);
+            SSkm = A(jn,in) + B(kkkp,in) + C(kkkp,jn) ...
+                 + D(mmmp,in) + E(mmmp,jn) + F(mmmp,kkkp);
             if SSkm<Cutoff(4)            
-            
                 rr = find(I(r,kkkp) .* J(r,mmmp));
                 ss = find(M(s,kkkp) .* N(s,mmmp));
                 tt = find(R(t,kkkp) .* S(t,mmmp));
@@ -387,10 +387,11 @@ end
                                         V(hhhhrshte,in)+W(hhhhrshte,jn)+X(hhhhrshte,kkkp)+Y(hhhhrshte,mmmp)+Z(hhhhrshte,rrrrsq)+AA(hhhhrshte,ssssrq)+BB(hhhhrshte,ttttrsthe)+...
                                         CC(uuuursustee,in)+DD(uuuursustee,jn)+EE(uuuursustee,kkkp)+FF(uuuursustee,mmmp)+GG(uuuursustee,rrrrsq)+...
                                         HH(uuuursustee,ssssrq)+II(uuuursustee,ttttrsthe)+JJ(uuuursustee,hhhhrshte);
-                                    if SSts<Cutoff(9)
+                                    if SSts < Cutoff(9)
                                         if count + length(ust) > LL - 10000,                      % memory management
                                           AddLL = min(LL,1000000);
-                                          TList = [TList; uint16(zeros(AddLL,9))];
+                                          TList = [TList; uint16(zeros(AddLL,9))]; 
+                                          SS    = [SS; zeros(AddLL,1)];            
                                           LL    = length(TList(:,1));
 if count > 1000000,
   fprintf('Found %2d million candidates so far\n',fix(count/1000000));
@@ -398,6 +399,7 @@ end
                                         end
                                         count = count + 1;
                                         TList(count,:) = [in jn kkkp mmmp rrrrsq ssssrq ttttrsthe hhhhrshte uuuursustee];
+                                        SS(count,1)    = SSts;
                                     end
                                end
                         end
