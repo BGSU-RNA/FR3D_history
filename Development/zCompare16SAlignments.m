@@ -1,6 +1,6 @@
 
 AnalyzeList = [1:8];
-AnalyzeList = [1:9];
+AnalyzeList = [1:11];
 
 File = zAddNTData({'2avy','1j5e'});
 if isempty(File(1).Distance),

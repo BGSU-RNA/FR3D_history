@@ -7,7 +7,7 @@ Node(1).Edge(FF.NumNT,FF.NumNT) = 0;
 FF.Edge = sparse(Node(1).Edge + Node(1).Edge');
 FF.Filename = [File(1).Filename '_JAR3D'];
 FF.BasePhosphate = 0*FF.BasePhosphate;
-T([1 jj+1],:) = zSummarizeInteractions([File(1) FF],1);
+zSummarizeInteractions([File(1) FF],1);
 
 % ------------------------------ List nested basepairs not used in model
 

@@ -5,14 +5,14 @@ Node(n).type = 'Hairpin';
 
 if TertiaryFreeNode == 0 || Extension < 2,  % this stem has long-range inter
                                             % or we are using regular hairpins
-  Node(n).MiddleIndex = [a:B];              % fixed bases in the hairpin
+  Node(n).MiddleIndex = [a:B];
+  Node(n).LeftIndex   = a;                 % 
+  Node(n).RightIndex  = B;                 % 
+  Node(n).LeftLetter  = cat(2,File.NT(a:B).Base);
+  Node(n).RightLetter = '';
   if a > B,
     Node(n).MiddleIndex = [a];
   end
-  Node(n).LeftIndex   = a;                  % 
-  Node(n).RightIndex  = B;                  % 
-  Node(n).LeftLetter  = cat(2,File.NT(a:B).Base);
-  Node(n).RightLetter = '';
   Node(n).P           = ones(17,1);
   Node(n).PIns        = 1;
   Node(n).subtype     = 'XXXX';                  % revise this later!

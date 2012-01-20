@@ -26,8 +26,6 @@ a = find(C == Chain);
 
 StructureSequence = cat(2,File.NT(a).Base);
 
-% ------------------------------------ Identify matching alignment, if needed
-
 if Entry == 0,
   if Verbose > 0,
     fprintf('Aligning sequence from structure to each entry in FASTA file\n');
@@ -75,30 +73,26 @@ if Entry == 0,
   end
 end
 
-% ------------------------------------ Align 3D structure sequence to alignment
-
-  % --------- Align 3D structure sequence simply to sequence from alignment
-
   p = 0.99;
   d = 2;
 %  [matches,align1,align2,s1,s2] = dNeedlemanWunsch(StructureSequence,FASTA(Entry).Sequence,p,d);
 
   [matches,align1,align2,s1,s2] = zNeedlemanWunsch(StructureSequence,FASTA(Entry).Sequence);
 
-  k = double(FASTA(Entry).Aligned ~= '-');            % 1 if not a gap
+
+  k = double(FASTA(Entry).Aligned ~= '-');  % 1 if not a gap
   m = cumsum(k);
   
-  x = zInvertFunction(align1);                        % map 
+  x = zInvertFunction(align1);              % map 
   y = [align2 (length(FASTA(Entry).Sequence)+1)]; 
   z = [zInvertFunction(m) length(FASTA(Entry).Aligned)]; % maps elements of seq to columns
-
-z
 
 %align1
 
 %length(x)
 %length(y)
 %length(z)
+
 
   FastaCol = z(y(x));  
 

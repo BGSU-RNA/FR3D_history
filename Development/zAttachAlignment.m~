@@ -5,26 +5,21 @@ function [File] = zAttachAlignment(File,Verbose)
 [n,t,r] = xlsread('Alignments\StructureToAlignmentMap.xls');
 
 for f = 1:length(File),
-  p = find(ismember(upper(t(:,1)),upper(File(f).Filename)));  % find line(s)
+  p = find(ismember(upper(t(:,1)),upper(File(f).Filename)));
 
-  if length(p) > 0,                                 % if one or more,
-    for a = 1:length(p),                            % loop through them
+  if length(p) > 0,
+    for a = 1:length(p),
       if r{p(a),4} >= 0,
         FASTA = zReadFASTA(['Alignments' filesep r{p(a),3}]);
         if Verbose > 0,
           fprintf('Read alignment %s for %s\n', r{p(a),3}, File(f).Filename);
         end
-
-        Chain = r{p(a),2};
-        Entry = r{p(a),4};
-
         File(f) = zAlignToFASTA(File(f),r{p(a),2},FASTA,r{p(a),4},Verbose);
 
         if Verbose > 0,
           fprintf('Incorporated sequence data with %s\n', File(f).Filename);
         end
       end
-pause
     end
   else
     if Verbose > 0,

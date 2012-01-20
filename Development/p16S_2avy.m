@@ -9,6 +9,8 @@ end
 
 clc
 
+Verbose = 0;
+
 JAR3D_path                                % tell where JAR3D class files are 
 
 % ----------------------------------------------- Fix up the file first
