@@ -1,0 +1,130 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+
+<title>FR3D: Finding Local and Composite Recurrent Structural Motifs in RNA 3D Structures</title>
+<head>
+
+
+
+
+
+<body>
+<h1 align="center"><font size="7">FR3D project page</font></h1>
+<h2 align="center"><a href="http://rna.bgsu.edu">Bowling Green State University 
+RNA group</a></h2>
+<p>
+
+FR3D stands for &quot;Find RNA 3D&quot;.&nbsp; It was developed to find small RNA motifs 
+(two to 20 nucleotides) in 
+<a href="http://www.rcsb.org">PDB 
+files</a>.&nbsp; It is available in two forms, as Matlab code that has been 
+tested on the PC, Macintosh, and UNIX, 
+and as a PC executable version that does not require a Matlab license.&nbsp; 
+Releases, features, and known bugs are listed chronologically at the bottom of 
+this page.&nbsp; <p align="center">
+<img border=0 width=953 height=514
+src="index_files/image002.jpg"
+alt="Screen shot of the FR3D graphical user interface.  The query motif comes from the PDB file 1s72.  It consists of nucleotides 2701, 2702, 2703, 2691, 2693, and 2694.  The search to be conducted is a mixed geometric and symbolic search.  Candidate motifs must have the three indicated basepairs."
+v:shapes="_x0000_s1025">
+</p>
+
+<b>Paper to cite:&nbsp; </b>FR3D: Finding Local and Composite Recurrent 
+Structural Motifs in RNA 3D Structures, Michael Sarver; Craig L. Zirbel; Jesse 
+Stombaugh; Ali Mokdad; Neocles B. Leontis, to appear in the
+<a href="http://www.springerlink.com/content/1432-1416/">Journal of Mathematical 
+Biology</a>.<p>
+
+<b><a href="FR3D_User_Manual_2007_03_09.pdf">User's manual:</a> </b>
+(3 MB)<b>&nbsp; </b>Describes how to install the Matlab code and the PC executable version, how to 
+start FR3D, and how to conduct searches.&nbsp; 
+In order to run the PC executable version, you will need the
+<a href="MCRInstaller.exe">Matlab MCR 
+installer</a> (100 MB).<p>
+
+<b><a href="doc/FR3D/index.html">Documentation:</a>&nbsp; </b>Describes each 
+Matlab program in FR3D and displays the dependency between them.&nbsp; Matlab 
+users can run additional programs to analyze basepairs.<p>
+
+Additional PDB files are available at the <a href="http://www.rcsb.org">RCSB Protein Data Bank</a><p>
+
+Requests for information and bug reports should be sent to Craig L. Zirbel at <img src="http://www-math.bgsu.edu/z/cz.gif" align="absbottom">.
+
+<h2>
+
+Downloads and release history</h2>
+<p>
+
+By downloading the software, you implicitly agree to the <a href="termsofuse.html">terms of use</a>.<p>
+
+<hr>
+
+March 19, 2007 - <a href="FR3D_Starter_Package_2007-03-19.zip">Starter package</a> 
+(29 MB, Matlab code, PC executable, PDB files) - <a href="FR3D_2007-03-19.zip">Matlab code</a> (747KB) -
+<a href="FR3DEXE_2007-03-19.zip">PC Executable</a> (605KB)<p>
+
+The starter package makes it easier for first-time users to download FR3D and 
+start using it.&nbsp; A new option has been added to the Display Candidates 
+menu, the ability to make scatterplots of the parameters describing pairs of 
+nucleotides in the candidates.&nbsp; Known bugs:&nbsp; the alignment of 
+candidates is sometimes incorrect; figure windows sometimes have incorrect 
+names.<p>
+
+<hr>
+
+January 26, 2007 - <a href="FR3D-2007-01-26.zip">Matlab code</a> (514KB) -
+<a href="FR3D-4-Analyzed-Files.zip">4 analyzed PDB files</a> (24MB)<p>
+
+Substantial changes have been made.&nbsp; The basepairing criteria have been 
+updated.&nbsp; FR3D now stores small versions of analyzed files to reduce memory 
+usage and decrease startup time.&nbsp; The user can create lists of PDB files to 
+more easily manage searches.&nbsp; Many additional symbolic constraints are 
+allowed.&nbsp; The listing of candidates makes it easier to spot local and 
+composite motifs, and to identify conserved features between candidates.&nbsp; 
+Additional display features allow sorting candidates by centrality, grouping 
+them into clusters, and showing an alignment of the nucleotides in the 
+candidates.&nbsp; There is now a User's manual and other documentation.<p>
+
+<hr>
+
+August 29, 2006 - <a href="FR3D-2006-08-29.zip">Matlab code</a> (550KB) -
+<a href="FR3D-4-Analyzed-Files.zip">4 analyzed PDB files</a> (17MB)<p>
+
+A PC executable version is now provided; see links above.&nbsp; Users may make and 
+maintain lists of PDB files to search.&nbsp; To do so, make a text file called 
+MyList_list.pdb with the name (no extension) of each PDB file on a separate 
+line, then save it in the folder PDBFiles.&nbsp; Bugs noted in the previous release 
+have been fixed. Bugs: 1. With the PC executable, you cannot copy the list of 
+candidates found from the console window.&nbsp; 2. With the PC executable, you 
+cannot &quot;View Query&quot; by checking the checkbox on the GUI.<hr>
+
+July 25, 2006 - <a href="FR3D-2006-07-25.zip">Matlab code</a> -
+<a href="1s72.zip">link to 1s72 PDB file</a><p>
+
+A graphical user interface (GUI), written by Ali Mokdad, has been added.&nbsp; 
+The program is more stable.&nbsp; Facilities have been added to mark candidates, 
+to group them, to sort them by centrality to find a centroid, to produce a motif 
+alignment, and to write them to a PDB file.&nbsp; NMR files are handled by 
+spacing each version of the structure by 1000 Angstroms to prevent 
+&quot;interactions&quot; between different copies of the same structure.&nbsp; Bugs:&nbsp; 
+1. The 
+query motif must be from the first chain in the file.&nbsp; 2. Only query motifs 
+of 9 nucleotides or smaller can be used.<hr>
+<p>
+
+April 6, 2006 - <a href="FR3D.zip">Matlab code and one PDB file</a><p>
+
+Run the program FR3D and follow the directions in its header line.
+
+<p>
+
+<script type="text/javascript">
+ if ( Date.parse( document.lastModified ) != 0 ) {
+  document.write( '<BR><EM>Last modified:</EM>&nbsp;&nbsp;' );
+  document.writeln( document.lastModified );
+}
+</script> / 
+
+&nbsp;
+
+</body>
+</html>

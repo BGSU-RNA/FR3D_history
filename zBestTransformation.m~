@@ -7,7 +7,7 @@
 % scale is the scalar scale factor
 % shift is the 3x1 translation between centers of mass
 
-function [R,scale,shift,sshift] = zBestTransformation(X,Y)
+function [R,scale,shift] = zBestTransformation(X,Y)
 
 n = length(X(:,1));                 % number of data points
 
@@ -21,10 +21,5 @@ R = zBestRotation(A,B);             % find optimal rotation matrix
 
 scale = sqrt(sum(sum(B.*B)) / sum(sum(A.*A)));  % the optimal scale
 
-shift = (mY - mX*R')';           % the optimal shift with no scaling
+shift = (mY - scale*mX*R')';    % the optimal shift
 
-sshift = (mY - scale*mX*R')';    % the optimal shift when rescaling
-
-% Note: there is no need to calculate and return the optimal scale in our
-% applications, since we don't want to rescale.  There should be two versions
-% of this program, one with scaling, one without.
